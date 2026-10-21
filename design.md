@@ -53,6 +53,12 @@ Giữ độ tương phản rõ cho chữ và nút. Dùng đỏ làm điểm nh�
 
 Lớp hạt nhiễu `body::after` rất nhẹ (`opacity: .045`) giúp toàn trang có chất giấy. Ảnh cần có điểm đặt chữ đủ thoáng; thêm lớp phủ đọc chữ khi thay ảnh hero. Giữ hình trang trí không cản thao tác và không thay thế nội dung văn bản.
 
+## Nhà tài trợ
+
+Section nhà tài trợ nằm sau lời mời và trước footer. Lưới logo dùng nền giấy sáng, viền mảnh; logo có lớp xám nhạt ở trạng thái thường và hiện màu gốc khi hover hoặc focus bằng bàn phím. Khung media bên dưới dùng nền xanh trầm và tự chuyển mỗi 5 giây, có nút chuyển thủ công; chuyển động tạm dừng khi người xem tương tác hoặc bật chế độ giảm chuyển động.
+
+Dữ liệu nằm trong `app/components/sponsors-section.tsx`: PNJ đã dùng `public/images/sponsors/pnj-logo.jpg` và `pnj-image.jpg`, các vị trí khác vẫn là minh họa. Khi có thêm nhà tài trợ, cập nhật mảng `sponsors` với `name`, `website`, `logo` (đường dẫn file trong `public/`) và `kind`; cập nhật mảng `slides` với ảnh hoặc video tương ứng. Xóa nhãn “minh họa” sau khi thay toàn bộ dữ liệu mẫu. Style riêng nằm trong `app/sponsors.css`.
+
 ## Chuyển động
 
 - **Mở trang:** các cụm mây thật từ `intro-cloud.webp` phủ màn hình rồi tách và tan trong khoảng `3.6s`, để lộ hero. Đây là hoạt ảnh một lần.

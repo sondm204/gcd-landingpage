@@ -1,5 +1,6 @@
 @import "tailwindcss";
 @import "./hero.css";
+@import "./sponsors.css";
 
 :root {
   --paper: #f3eddf;

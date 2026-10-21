@@ -73,6 +73,22 @@ test("station elements float in separately when scrolled into view", async ({ pa
   await expect(station.locator(".station-art")).toHaveClass(/is-visible/);
 });
 
+test("sponsor and registration journey dots become active after navigation", async ({ page }) => {
+  await page.goto("/");
+  const dots = page.getByRole("navigation", { name: "Các điểm dừng" });
+  const sponsor = dots.getByRole("link", { name: "Nhà tài trợ" });
+  const registration = dots.getByRole("link", { name: "Đăng ký" });
+
+  await sponsor.click();
+  await expect(page).toHaveURL(/#nha-tai-tro$/);
+  await expect(sponsor).toHaveAttribute("aria-current", "location");
+
+  await registration.click();
+  await expect(page).toHaveURL(/#loi-hen$/);
+  await expect(registration).toHaveAttribute("aria-current", "location");
+  await expect(sponsor).not.toHaveAttribute("aria-current", "location");
+});
+
 test("desktop journey, program details, saved itinerary and download", async ({ page }) => {
   const errors: string[] = [];
   page.on("pageerror", (error) => errors.push(error.message));

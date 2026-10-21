@@ -4,6 +4,7 @@ import dynamic from "next/dynamic";
 import { useEffect, useRef, useState } from "react";
 import { Arrow, Lantern, Lotus, Sun } from "./ornaments";
 import HeroSection from "./hero-section";
+import SponsorsSection from "./sponsors-section";
 
 const HeritageViewer = dynamic(() => import("./heritage-viewer"), {
   ssr: false,
@@ -76,10 +77,7 @@ export default function HeritageJourney() {
       }
       reveal.observe(el);
     });
-    const sections = new IntersectionObserver((entries) => {
-      entries.forEach((entry) => { if (entry.isIntersecting) setActive(entry.target.id); });
-    }, { rootMargin: "-20% 0px -55% 0px" });
-    document.querySelectorAll("section[id]").forEach((el) => sections.observe(el));
+    const sections = Array.from(document.querySelectorAll<HTMLElement>("section[id]"));
     const sceneObserver = new IntersectionObserver((entries) => {
       if (entries.some((entry) => entry.isIntersecting)) {
         setSceneVisible(true);
@@ -95,6 +93,14 @@ export default function HeritageJourney() {
         document.documentElement.style.setProperty("--journey-progress", `${max > 0 ? window.scrollY / max : 0}`);
         headerRef.current?.classList.toggle("over-hero", window.scrollY < 60);
         if (!media.matches) document.documentElement.style.setProperty("--hero-shift", `${Math.min(window.scrollY * 0.12, 95)}px`);
+        const marker = Math.min(window.innerHeight * 0.35, 260);
+        let currentSection = sections[0]?.id || "khoi-hanh";
+        for (const section of sections) {
+          if (section.getBoundingClientRect().top > marker) break;
+          currentSection = section.id;
+        }
+        if (max > 0 && window.scrollY >= max - 4) currentSection = sections.at(-1)?.id || currentSection;
+        setActive(currentSection);
         frame = 0;
       });
     };
@@ -108,7 +114,7 @@ export default function HeritageJourney() {
     } catch { /* Storage is optional; the itinerary can still be downloaded. */ }
     return () => {
       media.removeEventListener("change", update);
-      reveal.disconnect(); sections.disconnect(); sceneObserver.disconnect();
+      reveal.disconnect(); sceneObserver.disconnect();
       window.removeEventListener("scroll", onScroll); cancelAnimationFrame(frame);
       document.documentElement.style.removeProperty("--hero-shift");
       document.documentElement.style.removeProperty("--journey-progress");
@@ -195,6 +201,7 @@ export default function HeritageJourney() {
           <div className="heritage-copy"><span className="eyebrow" data-reveal><span className="live-dot" /> KHÔNG GIAN DI SẢN 3D</span><h2 id="heritage-title" data-reveal data-reveal-delay="80">Một góc nhìn mới.<br /><em>Một niềm tự hào<br />rất cũ.</em></h2><p data-reveal data-reveal-delay="150">Đi vòng quanh một mái đình.<br />Ngắm di sản từ một góc khác.<br />Để những điều quen thuộc lại khiến bạn ngỡ ngàng.</p><div className="heritage-note" data-reveal data-reveal-delay="220"><Sun /><span>Chạm, kéo và khám phá.<br /><small>Mô hình nghệ thuật lấy cảm hứng từ kiến trúc Việt.</small></span></div></div>
           <div className="heritage-stage" ref={sceneRef} data-reveal data-reveal-delay="120">{sceneVisible ? <HeritageViewer reducedMotion={reducedMotion} /> : <div className="scene-loading"><Sun /><span>Một góc Việt Nam đang chờ bạn.</span></div>}</div>
         </section>
+        <SponsorsSection />
         <section className="invitation section-pad" id="loi-hen">
           <Lantern className="invite-lantern left" /><Lantern className="invite-lantern right" />
           <div><span className="eyebrow" data-reveal>HÀNH TRÌNH SẼ TRỌN VẸN HƠN KHI CÓ BẠN</span><h2 data-reveal data-reveal-delay="70">Mang theo sự tò mò.<br /><em>Mang về một niềm tự hào.</em></h2><p data-reveal data-reveal-delay="130">Một cuộc hẹn với văn hoá Việt, theo cách của thế hệ mình.</p><button className="button button-red" data-reveal data-reveal-delay="200" onClick={() => setModal("passport")}>Hẹn mình ở con đường di sản <Arrow /></button><div className="event-status" data-reveal data-reveal-delay="260"><span className="live-dot" /> Ngày & địa điểm tổ chức sẽ sớm được công bố</div></div>
@@ -202,7 +209,28 @@ export default function HeritageJourney() {
         </section>
       </main>
       <footer className="site-footer"><a href="#khoi-hanh" className="footer-brand" data-reveal>Một dải <em>di sản.</em></a><span data-reveal data-reveal-delay="80">Hiểu mình đến từ đâu.<br />Biết mình có thể đi xa đến đâu.</span><a href="#khoi-hanh" className="back-top" data-reveal data-reveal-delay="150">Về đầu hành trình ↑</a><div className="footer-bottom" data-reveal data-reveal-delay="200"><span>VIETNAM ROOTS, GLOBAL MINDS</span><span>Một hành trình kết nối văn hoá & thế hệ.</span><span>ĐƯỢC KỂ BẰNG NIỀM TỰ HÀO VIỆT</span></div></footer>
-      <nav className="journey-dots" aria-label="Các điểm dừng">{[["khoi-hanh", "Khởi hành"], ["hoi-cho", "Hội chợ"], ["tranh-bien", "Tranh biện"], ["doi-thoai", "Workshop"], ["khong-gian", "Di sản 3D"]].map(([id, label]) => <a href={`#${id}`} key={id} aria-label={label} aria-current={active === id ? "location" : undefined} className={active === id ? "current" : ""}><span>{label}</span></a>)}</nav>
+      <nav className="journey-dots" aria-label="Các điểm dừng">
+        {[
+          ["khoi-hanh", "Khởi hành"],
+          ["hoi-cho", "Hội chợ"],
+          ["tranh-bien", "Tranh biện"],
+          ["doi-thoai", "Workshop"],
+          ["khong-gian", "Di sản 3D"],
+          ["nha-tai-tro", "Nhà tài trợ"],
+          ["loi-hen", "Đăng ký"],
+        ].map(([id, label]) => (
+          <a
+            href={`#${id}`}
+            key={id}
+            aria-label={label}
+            aria-current={active === id ? "location" : undefined}
+            className={active === id ? "current" : ""}
+            onClick={() => setActive(id)}
+          >
+            <span>{label}</span>
+          </a>
+        ))}
+      </nav>
       <dialog ref={dialogRef} className="experience-dialog" onCancel={closeModal} onClick={(event) => { if (event.target === event.currentTarget) closeModal(); }} aria-labelledby="dialog-title">
         <div className="dialog-inner">
           <button className="dialog-close" onClick={closeModal} aria-label="Đóng cửa sổ">✕</button>
