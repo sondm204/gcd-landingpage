@@ -1,36 +1,63 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Một Dải Di Sản
 
-## Getting Started
+Landing page sự kiện văn hoá Việt Nam, xây dựng trên Next.js 16, React 19, Three.js và React Three Fiber.
 
-First, run the development server:
+## Chạy dự án
 
 ```bash
-npm run dev
-# or
-yarn dev
-# or
+pnpm install
 pnpm dev
-# or
-bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+Mở `http://localhost:3000`.
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+```bash
+pnpm build
+pnpm start
+```
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+Font được tải về lúc build bởi `next/font/google`, sau đó phục vụ từ chính ứng dụng.
 
-## Learn More
+## Trải nghiệm
 
-To learn more about Next.js, take a look at the following resources:
+- Hero toàn màn hình với tranh phong cảnh di sản tràn viền, chữ nổi trên nền và thanh điều hướng trong suốt khi ở đầu trang.
+- Chim bay/vỗ cánh, mây trôi nhiều lớp, thuyền buồm trôi và nhấp nhô, ánh nước chuyển động lặp. Nút tạm dừng; tự dừng khi hero ra khỏi màn hình, tab bị ẩn hoặc bật giảm chuyển động.
+- Collage di sản trên nền giấy, typography tiếng Việt, minh hoạ riêng cho từng chương trình.
+- Con đường nối hội chợ văn hoá, cuộc thi tranh biện sinh viên và workshop · talkshow.
+- Hiệu ứng mở đầu, parallax, reveal khi cuộn, tiến trình và điều hướng theo điểm dừng.
+- Ba mô hình 3D cách điệu: Chùa Một Cột, Tháp Rùa, Ngọ Môn. Kéo để xoay, chọn mô hình, tự xoay/tạm dừng, nút xoay bằng bàn phím và đặt lại góc nhìn.
+- Chỉ tải Three.js khi gần đến vùng 3D; ngừng tự xoay khi ngoài màn hình hoặc tab bị ẩn; giới hạn độ phân giải canvas.
+- Responsive, hỗ trợ giảm chuyển động và nội dung thay thế nếu WebGL không khả dụng.
+- Hộ chiếu văn hoá: chọn trạm, lưu vào localStorage và tải lịch trình dạng `.txt`.
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+## Nội dung cần chốt trước khi công bố
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+Ngày, địa điểm, thể lệ tranh biện và lịch từng hoạt động chưa được cung cấp nên đang hiển thị là chờ công bố/dự kiến. Nghệ sĩ Xuân Bắc chỉ xuất hiện dưới dạng khách mời đề xuất, chưa xác nhận.
 
-## Deploy on Vercel
+Chức năng lưu hành trình là tiện ích cá nhân trên thiết bị, **không gửi dữ liệu tới ban tổ chức và không phải đăng ký tham dự**. Khi có thông tin chính thức, thay CTA bằng đường dẫn đăng ký hoặc kết nối API phù hợp.
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+Mô hình được dựng bằng hình học thủ tục, là phiên bản nghệ thuật lấy cảm hứng từ công trình thật, không phải bản quét hoặc phục dựng chính xác.
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+## Cấu trúc
+
+- `app/components/heritage-journey.tsx`: nội dung, điều hướng, reveal và hộ chiếu.
+- `app/components/hero-section.tsx`, `app/hero.css`: hero toàn cảnh và các lớp chuyển động độc lập.
+- `app/components/heritage-viewer.tsx`: mô hình và tương tác Three.js.
+- `app/components/ornaments.tsx`: hoa sen, lồng đèn và họa tiết.
+- `app/globals.css`: thiết kế, chuyển động, responsive.
+- `app/layout.tsx`: font và metadata.
+- `public/images/`: ảnh collage gốc và WebP tối ưu.
+- `docs/art-direction.md`: định hướng và prompt ảnh tạo bằng image_gen.
+
+## Kiểm tra trình duyệt
+
+```bash
+pnpm build
+pnpm test:e2e
+```
+
+Playwright chạy Chrome đã cài, khởi động bản production ở cổng 3100 và kiểm tra: điều hướng, dialog/focus, lưu và tải lịch trình, mobile không tràn ngang, chuyển mô hình 3D, reduced motion và fallback khi WebGL bị tắt.
+
+Ảnh QA xuất vào `test-results/` (không commit). Nếu máy chưa có Google Chrome, cài Chrome hoặc chỉnh `channel` trong `playwright.config.ts` sang trình duyệt Chromium có sẵn.
+
+Đọc hướng dẫn Next.js đi kèm tại `node_modules/next/dist/docs/` trước khi sửa API hoặc cấu trúc framework.
