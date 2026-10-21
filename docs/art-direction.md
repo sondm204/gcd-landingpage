@@ -7,7 +7,7 @@ Một trang sự kiện theo hành trình: mở đầu bằng collage Việt Nam
 - Nền giấy ngà `#f3eddf`, đỏ son `#aa382a`, xanh trầm `#293e34`.
 - Playfair Display và Be Vietnam Pro, có bộ ký tự tiếng Việt, được Next.js tự lưu trữ.
 - Ảnh collage ở hero; minh hoạ các trạm bằng CSS/SVG để dễ thay đổi, không cần tải ảnh ngoài.
-- Chuyển động mở đầu theo thứ tự; parallax nhẹ; reveal một lần khi vào vùng nhìn; lồng đèn đung đưa; dòng chữ chạy; thanh tiến trình.
+- Chuyển động mở đầu theo thứ tự; parallax nhẹ; float-in một lần theo từng phần tử khi vào vùng nhìn; lồng đèn đung đưa; dòng chữ chạy; thanh tiến trình.
 - Tôn trọng `prefers-reduced-motion`. Nội dung vẫn đọc được khi JavaScript chưa tải.
 
 ## Ảnh được tạo

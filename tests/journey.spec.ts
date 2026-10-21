@@ -33,6 +33,22 @@ test("full-screen hero covers the viewport and ambient motion can pause", async 
   await expect(hero).toHaveAttribute("data-running", "false");
 });
 
+test("station elements float in separately when scrolled into view", async ({ page }) => {
+  await page.goto("/");
+  const station = page.locator("#tranh-bien");
+  const title = station.getByRole("heading", { level: 2 });
+  const description = station.locator(".station-copy > p");
+  await expect(title).toHaveClass(/reveal-pending/);
+  await expect(title).not.toHaveClass(/is-visible/);
+  await expect(description).not.toHaveClass(/is-visible/);
+  await title.scrollIntoViewIfNeeded();
+  await expect(title).toHaveClass(/is-visible/);
+  await expect(description).toHaveClass(/is-visible/);
+  await expect(title).toHaveCSS("opacity", "1");
+  await expect(description).toHaveCSS("opacity", "1");
+  await expect(station.locator(".station-art")).toHaveClass(/is-visible/);
+});
+
 test("desktop journey, program details, saved itinerary and download", async ({ page }) => {
   const errors: string[] = [];
   page.on("pageerror", (error) => errors.push(error.message));

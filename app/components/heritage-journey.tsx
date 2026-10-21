@@ -56,19 +56,26 @@ export default function HeritageJourney() {
     media.addEventListener("change", update);
     const reveal = new IntersectionObserver((entries) => {
       entries.forEach((entry) => {
-        if (entry.isIntersecting) {
-          entry.target.classList.add("is-visible");
-          if (!media.matches) {
-            entry.target.animate(
-              [{ opacity: 0, transform: "translateY(35px)" }, { opacity: 1, transform: "translateY(0)" }],
-              { duration: 850, easing: "cubic-bezier(.2,.7,.2,1)" },
-            );
+        if (!entry.isIntersecting) return;
+        entry.target.classList.add("is-visible");
+        const onRevealEnd = (event: Event) => {
+          const transition = event as TransitionEvent;
+          if (transition.target === entry.target && transition.propertyName === "transform") {
+            entry.target.classList.remove("reveal-pending");
+            entry.target.removeEventListener("transitionend", onRevealEnd);
           }
-          reveal.unobserve(entry.target);
-        }
+        };
+        entry.target.addEventListener("transitionend", onRevealEnd);
+        reveal.unobserve(entry.target);
       });
-    }, { threshold: 0.12 });
-    document.querySelectorAll("[data-reveal]").forEach((el) => reveal.observe(el));
+    }, { threshold: 0.08, rootMargin: "0px 0px -6% 0px" });
+    document.querySelectorAll<HTMLElement>("[data-reveal]").forEach((el) => {
+      if (!media.matches) {
+        el.style.setProperty("--float-delay", `${Math.min(Number(el.dataset.revealDelay || 0), 300)}ms`);
+        el.classList.add("reveal-pending");
+      }
+      reveal.observe(el);
+    });
     const sections = new IntersectionObserver((entries) => {
       entries.forEach((entry) => { if (entry.isIntersecting) setActive(entry.target.id); });
     }, { rootMargin: "-20% 0px -55% 0px" });
@@ -162,10 +169,10 @@ export default function HeritageJourney() {
         <div className="ticker" aria-hidden="true"><div>{Array.from({ length: 4 }, (_, i) => <span key={i}>TỪ CỘI NGUỒN <b>✳</b> ĐẾN THẾ GIỚI <b>✳</b> VIETNAM ROOTS, GLOBAL MINDS <b>✳</b></span>)}</div></div>
         <section className="introduction section-pad" id="hanh-trinh">
           <div className="intro-side" data-reveal><span className="eyebrow">LỜI MỜI TỪ DI SẢN</span><Sun /><span className="vertical-note">MỖI BƯỚC ĐI, MỘT KẾT NỐI</span></div>
-          <div className="intro-copy" data-reveal><h2>Di sản không ở lại quá khứ.<br />Di sản <em>sống cùng chúng ta.</em></h2><div className="intro-columns"><p>Trong nếp nhà, trong câu hát, trong một món ăn thân quen — có một Việt Nam vẫn đang được kể mỗi ngày.</p><p>Chúng mình mời bạn bước lên con đường di sản: chạm vào văn hoá, cất lên góc nhìn của mình và cùng viết tiếp câu chuyện Việt Nam.</p></div></div>
+          <div className="intro-copy"><h2 data-reveal>Di sản không ở lại quá khứ.<br />Di sản <em>sống cùng chúng ta.</em></h2><div className="intro-columns"><p data-reveal data-reveal-delay="90">Trong nếp nhà, trong câu hát, trong một món ăn thân quen — có một Việt Nam vẫn đang được kể mỗi ngày.</p><p data-reveal data-reveal-delay="180">Chúng mình mời bạn bước lên con đường di sản: chạm vào văn hoá, cất lên góc nhìn của mình và cùng viết tiếp câu chuyện Việt Nam.</p></div></div>
           <a href="#hoi-cho" className="intro-next" aria-label="Đến trạm đầu tiên">↓</a>
         </section>
-        <div className="journey-heading section-pad" data-reveal><span className="eyebrow">BẢN ĐỒ TRẢI NGHIỆM</span><h2>Ba điểm dừng.<br /><em>Một hành trình đáng nhớ.</em></h2><span className="handwritten">Đi cùng chúng mình nhé! ↴</span></div>
+        <div className="journey-heading section-pad"><span className="eyebrow" data-reveal>BẢN ĐỒ TRẢI NGHIỆM</span><h2 data-reveal data-reveal-delay="70">Ba điểm dừng.<br /><em>Một hành trình đáng nhớ.</em></h2><span className="handwritten" data-reveal data-reveal-delay="150">Đi cùng chúng mình nhé! ↴</span></div>
         <div className="journey-stations">
           <svg className="journey-route" viewBox="0 0 1200 1900" preserveAspectRatio="none" fill="none" aria-hidden="true"><path className="route-base" d="M600 0C600 130 80 100 80 360S1120 380 1120 700S80 1000 80 1290S600 1520 600 1900" /><path className="route-dashes" d="M600 0C600 130 80 100 80 360S1120 380 1120 700S80 1000 80 1290S600 1520 600 1900" /></svg>
           {programs.map((program, index) => (
@@ -174,27 +181,27 @@ export default function HeritageJourney() {
                 {index === 0 ? <MarketArt /> : index === 1 ? <DebateArt /> : <WorkshopArt />}
                 <span className="art-footnote">TRẠM {program.number} / {program.short}</span>
               </div>
-              <div className="station-copy" data-reveal>
-                <div className="station-kicker"><span className="station-number">{program.number}</span><span className="eyebrow">{program.type}</span></div>
-                <h2 id={`title-${program.id}`}>{program.title.split("\n")[0]}<br /><em>{program.title.split("\n")[1]}</em></h2>
-                <p>{program.description}</p>
-                <div className="tags">{program.tags.map((tag) => <span key={tag}>{tag}</span>)}</div>
-                <button className="text-link" onClick={() => setModal(index)}>Khám phá điểm dừng <Arrow /></button>
+              <div className="station-copy">
+                <div className="station-kicker" data-reveal><span className="station-number">{program.number}</span><span className="eyebrow">{program.type}</span></div>
+                <h2 id={`title-${program.id}`} data-reveal data-reveal-delay="70">{program.title.split("\n")[0]}<br /><em>{program.title.split("\n")[1]}</em></h2>
+                <p data-reveal data-reveal-delay="130">{program.description}</p>
+                <div className="tags" data-reveal data-reveal-delay="190">{program.tags.map((tag) => <span key={tag}>{tag}</span>)}</div>
+                <button className="text-link" data-reveal data-reveal-delay="240" onClick={() => setModal(index)}>Khám phá điểm dừng <Arrow /></button>
               </div>
             </section>
           ))}
         </div>
         <section className="heritage-section section-pad" id="khong-gian" aria-labelledby="heritage-title">
-          <div className="heritage-copy" data-reveal><span className="eyebrow"><span className="live-dot" /> KHÔNG GIAN DI SẢN 3D</span><h2 id="heritage-title">Một góc nhìn mới.<br /><em>Một niềm tự hào<br />rất cũ.</em></h2><p>Đi vòng quanh một mái đình.<br />Ngắm di sản từ một góc khác.<br />Để những điều quen thuộc lại khiến bạn ngỡ ngàng.</p><div className="heritage-note"><Sun /><span>Chạm, kéo và khám phá.<br /><small>Mô hình nghệ thuật lấy cảm hứng từ kiến trúc Việt.</small></span></div></div>
-          <div className="heritage-stage" ref={sceneRef}>{sceneVisible ? <HeritageViewer reducedMotion={reducedMotion} /> : <div className="scene-loading"><Sun /><span>Một góc Việt Nam đang chờ bạn.</span></div>}</div>
+          <div className="heritage-copy"><span className="eyebrow" data-reveal><span className="live-dot" /> KHÔNG GIAN DI SẢN 3D</span><h2 id="heritage-title" data-reveal data-reveal-delay="80">Một góc nhìn mới.<br /><em>Một niềm tự hào<br />rất cũ.</em></h2><p data-reveal data-reveal-delay="150">Đi vòng quanh một mái đình.<br />Ngắm di sản từ một góc khác.<br />Để những điều quen thuộc lại khiến bạn ngỡ ngàng.</p><div className="heritage-note" data-reveal data-reveal-delay="220"><Sun /><span>Chạm, kéo và khám phá.<br /><small>Mô hình nghệ thuật lấy cảm hứng từ kiến trúc Việt.</small></span></div></div>
+          <div className="heritage-stage" ref={sceneRef} data-reveal data-reveal-delay="120">{sceneVisible ? <HeritageViewer reducedMotion={reducedMotion} /> : <div className="scene-loading"><Sun /><span>Một góc Việt Nam đang chờ bạn.</span></div>}</div>
         </section>
         <section className="invitation section-pad" id="loi-hen">
           <Lantern className="invite-lantern left" /><Lantern className="invite-lantern right" />
-          <div data-reveal><span className="eyebrow">HÀNH TRÌNH SẼ TRỌN VẸN HƠN KHI CÓ BẠN</span><h2>Mang theo sự tò mò.<br /><em>Mang về một niềm tự hào.</em></h2><p>Một cuộc hẹn với văn hoá Việt, theo cách của thế hệ mình.</p><button className="button button-red" onClick={() => setModal("passport")}>Hẹn mình ở con đường di sản <Arrow /></button><div className="event-status"><span className="live-dot" /> Ngày & địa điểm tổ chức sẽ sớm được công bố</div></div>
-          <div className="invitation-bottom"><span>GỐC RỄ VIỆT NAM.</span><Lotus /><span>TƯ DUY TOÀN CẦU.</span></div>
+          <div><span className="eyebrow" data-reveal>HÀNH TRÌNH SẼ TRỌN VẸN HƠN KHI CÓ BẠN</span><h2 data-reveal data-reveal-delay="70">Mang theo sự tò mò.<br /><em>Mang về một niềm tự hào.</em></h2><p data-reveal data-reveal-delay="130">Một cuộc hẹn với văn hoá Việt, theo cách của thế hệ mình.</p><button className="button button-red" data-reveal data-reveal-delay="200" onClick={() => setModal("passport")}>Hẹn mình ở con đường di sản <Arrow /></button><div className="event-status" data-reveal data-reveal-delay="260"><span className="live-dot" /> Ngày & địa điểm tổ chức sẽ sớm được công bố</div></div>
+          <div className="invitation-bottom" data-reveal><span>GỐC RỄ VIỆT NAM.</span><Lotus /><span>TƯ DUY TOÀN CẦU.</span></div>
         </section>
       </main>
-      <footer className="site-footer"><a href="#khoi-hanh" className="footer-brand">Một dải <em>di sản.</em></a><span>Hiểu mình đến từ đâu.<br />Biết mình có thể đi xa đến đâu.</span><a href="#khoi-hanh" className="back-top">Về đầu hành trình ↑</a><div className="footer-bottom"><span>VIETNAM ROOTS, GLOBAL MINDS</span><span>Một hành trình kết nối văn hoá & thế hệ.</span><span>ĐƯỢC KỂ BẰNG NIỀM TỰ HÀO VIỆT</span></div></footer>
+      <footer className="site-footer"><a href="#khoi-hanh" className="footer-brand" data-reveal>Một dải <em>di sản.</em></a><span data-reveal data-reveal-delay="80">Hiểu mình đến từ đâu.<br />Biết mình có thể đi xa đến đâu.</span><a href="#khoi-hanh" className="back-top" data-reveal data-reveal-delay="150">Về đầu hành trình ↑</a><div className="footer-bottom" data-reveal data-reveal-delay="200"><span>VIETNAM ROOTS, GLOBAL MINDS</span><span>Một hành trình kết nối văn hoá & thế hệ.</span><span>ĐƯỢC KỂ BẰNG NIỀM TỰ HÀO VIỆT</span></div></footer>
       <nav className="journey-dots" aria-label="Các điểm dừng">{[["khoi-hanh", "Khởi hành"], ["hoi-cho", "Hội chợ"], ["tranh-bien", "Tranh biện"], ["doi-thoai", "Workshop"], ["khong-gian", "Di sản 3D"]].map(([id, label]) => <a href={`#${id}`} key={id} aria-label={label} aria-current={active === id ? "location" : undefined} className={active === id ? "current" : ""}><span>{label}</span></a>)}</nav>
       <dialog ref={dialogRef} className="experience-dialog" onCancel={closeModal} onClick={(event) => { if (event.target === event.currentTarget) closeModal(); }} aria-labelledby="dialog-title">
         <div className="dialog-inner">

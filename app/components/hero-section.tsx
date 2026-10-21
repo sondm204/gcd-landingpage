@@ -94,7 +94,7 @@ export default function HeroSection({ reducedMotion }: { reducedMotion: boolean 
           alt="Toàn cảnh nghệ thuật di sản Việt Nam: núi đá vôi, Tháp Rùa và kiến trúc Huế bên dòng sông xanh"
           fill
           preload
-          sizes="100vw"
+          sizes="(max-aspect-ratio: 16/9) 190vh, 100vw"
         />
       </div>
       <div className="hero-atmosphere" aria-hidden="true">

@@ -180,8 +180,8 @@
 }
 .boat-course {
   position: absolute;
-  left: 42%;
-  top: 62%;
+  left: 34%;
+  top: 69%;
   width: clamp(95px, 10vw, 168px);
   animation: boat-drift 24s ease-in-out infinite alternate;
 }

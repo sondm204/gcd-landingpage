@@ -24,7 +24,7 @@ Font được tải về lúc build bởi `next/font/google`, sau đó phục v�
 - Chim bay/vỗ cánh, mây trôi nhiều lớp, thuyền buồm trôi và nhấp nhô, ánh nước chuyển động lặp. Nút tạm dừng; tự dừng khi hero ra khỏi màn hình, tab bị ẩn hoặc bật giảm chuyển động.
 - Collage di sản trên nền giấy, typography tiếng Việt, minh hoạ riêng cho từng chương trình.
 - Con đường nối hội chợ văn hoá, cuộc thi tranh biện sinh viên và workshop · talkshow.
-- Hiệu ứng mở đầu, parallax, reveal khi cuộn, tiến trình và điều hướng theo điểm dừng.
+- Hiệu ứng mở đầu, parallax, float-in theo từng thành phần khi cuộn đến, tiến trình và điều hướng theo điểm dừng. Float-in chỉ chạy một lần, có độ trễ nhẹ giữa các phần tử và tắt khi bật chế độ giảm chuyển động.
 - Ba mô hình 3D cách điệu: Chùa Một Cột, Tháp Rùa, Ngọ Môn. Kéo để xoay, chọn mô hình, tự xoay/tạm dừng, nút xoay bằng bàn phím và đặt lại góc nhìn.
 - Chỉ tải Three.js khi gần đến vùng 3D; ngừng tự xoay khi ngoài màn hình hoặc tab bị ẩn; giới hạn độ phân giải canvas.
 - Responsive, hỗ trợ giảm chuyển động và nội dung thay thế nếu WebGL không khả dụng.
