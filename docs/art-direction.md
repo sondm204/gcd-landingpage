@@ -1,5 +1,16 @@
 # Một Dải Di Sản
 
+## Mây mở đầu
+
+Ảnh mây có hình khối, nền trong suốt, được tạo bằng image_gen tích hợp. Sáu lớp ảnh trôi sang hai bên rồi tan dần, thay thế lớp gradient sương trước đây.
+
+- Ảnh gốc: `public/images/intro-cloud.png`.
+- Ảnh dùng trên trang: `public/images/intro-cloud.webp`, 1536 × 1024, giữ kênh alpha.
+
+Prompt:
+
+> Create one isolated wide fluffy cumulus cloud on a genuinely transparent background. Asset for a Vietnamese heritage art website opening animation. A clearly recognizable CLOUD with large rounded billowing lobes, smaller puffs around the perimeter, a broad dense opaque white/ivory body, softly shaded pale sage-gray undersides, warm sunlight on top. Hand-painted watercolor and gouache illustration with subtle vintage paper-grain texture inside the cloud, refined realistic volume, not cartoon outlined. Landscape 3:2 canvas. Cloud fills 90 percent of canvas width and 75 percent of height. Keep the entire cloud visible with generous fully transparent margin, well-defined scalloped silhouette with only a very slight feathered edge. Dense solid opaque cloud center, absolutely not fog or mist, no translucent haze filling the canvas. No sky, no scenery, no text, no border, no shadows outside the cloud. Transparent background.
+
 ## Hướng thiết kế
 
 Một trang sự kiện theo hành trình: mở đầu bằng collage Việt Nam, lời mời từ di sản, ba trạm trải nghiệm, không gian khám phá 3D và lời hẹn tham gia.

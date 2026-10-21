@@ -62,6 +62,38 @@ function HeritageBoat() {
   );
 }
 
+function CloudIntro() {
+  const [finished, setFinished] = useState(false);
+
+  useEffect(() => {
+    // Also remove the decorative layer if animation events are interrupted.
+    const timeout = window.setTimeout(() => setFinished(true), 4500);
+    return () => window.clearTimeout(timeout);
+  }, []);
+
+  if (finished) return null;
+
+  return (
+    <div className="cloud-intro" aria-hidden="true" onAnimationEnd={(event) => {
+      if (event.target === event.currentTarget) setFinished(true);
+    }}>
+      <div className="intro-mist" />
+      {["top-left", "top-right", "middle-left", "middle-right", "bottom-left", "bottom-right"].map((position, index) => (
+        <div className={`intro-cloud-bank bank-${position}`} key={position}>
+          <Image
+            src="/images/intro-cloud.webp"
+            alt=""
+            fill
+            sizes="(max-width: 600px) 160vw, 90vw"
+            preload={index === 0}
+            loading={index === 0 ? undefined : "eager"}
+          />
+        </div>
+      ))}
+    </div>
+  );
+}
+
 export default function HeroSection({ reducedMotion }: { reducedMotion: boolean }) {
   const rootRef = useRef<HTMLElement>(null);
   const [paused, setPaused] = useState(false);
@@ -87,6 +119,8 @@ export default function HeroSection({ reducedMotion }: { reducedMotion: boolean 
   }, [paused, reducedMotion]);
 
   return (
+    <>
+    <CloudIntro />
     <section ref={rootRef} className="hero hero-immersive" id="khoi-hanh" aria-labelledby="hero-title" data-running="true">
       <div className="hero-art">
         <Image
@@ -135,5 +169,6 @@ export default function HeroSection({ reducedMotion }: { reducedMotion: boolean 
         </button>
       </div>
     </section>
+    </>
   );
 }

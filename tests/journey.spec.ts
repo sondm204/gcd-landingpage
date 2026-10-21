@@ -1,5 +1,29 @@
 import { test, expect } from "@playwright/test";
 
+test("opening clouds cover the screen, dissolve and leave the hero usable", async ({ page }) => {
+  await page.goto("/");
+  const intro = page.locator(".cloud-intro");
+  await expect(intro).toBeVisible();
+  await intro.evaluate((el) => el.getAnimations({ subtree: true }).forEach((animation) => {
+    animation.pause();
+    animation.currentTime = 0;
+  }));
+  await page.locator(".intro-cloud-bank img").first().evaluate((img) => (img as HTMLImageElement).decode());
+  const bounds = await intro.boundingBox();
+  expect(bounds).toEqual({ x: 0, y: 0, width: 1440, height: 1000 });
+  await expect(page.locator(".intro-mist")).toHaveCSS("opacity", "1");
+  await page.screenshot({ path: "test-results/cloud-intro-start.png" });
+  await intro.evaluate((el) => el.getAnimations({ subtree: true }).forEach((animation) => {
+    animation.currentTime = 1800;
+  }));
+  await page.screenshot({ path: "test-results/cloud-intro-middle.png" });
+  await intro.evaluate((el) => el.getAnimations({ subtree: true }).forEach((animation) => animation.play()));
+  await expect(intro).toHaveCount(0, { timeout: 6000 });
+  await page.getByRole("button", { name: "Tạm dừng chuyển động khung cảnh" }).click();
+  await expect(intro).toHaveCount(0);
+  await expect(page.getByRole("link", { name: "Bước vào hành trình" })).toBeVisible();
+});
+
 test("full-screen hero covers the viewport and ambient motion can pause", async ({ page }) => {
   await page.goto("/");
   const hero = page.locator(".hero-immersive");
@@ -56,7 +80,7 @@ test("desktop journey, program details, saved itinerary and download", async ({ 
   await expect(page.getByRole("heading", { level: 1 })).toContainText("Việt Nam");
   await expect(page.locator(".hero-art img")).toBeVisible();
   await expect(page.locator(".hero-art img")).toHaveJSProperty("complete", true);
-  await page.waitForTimeout(1400); // Let the entrance choreography complete before the visual capture.
+  await expect(page.locator(".cloud-intro")).toHaveCount(0, { timeout: 6000 });
   await page.screenshot({ path: "test-results/desktop-hero.png" });
   await page.getByRole("button", { name: "Khám phá điểm dừng" }).first().click();
   await expect(page.getByRole("dialog")).toBeVisible();
@@ -107,7 +131,7 @@ test("3D models render, switch and respond to controls", async ({ page }) => {
 test("mobile navigation, no horizontal overflow and itinerary dialog", async ({ page }) => {
   await page.setViewportSize({ width: 390, height: 844 });
   await page.goto("/");
-  await page.waitForTimeout(1400);
+  await expect(page.locator(".cloud-intro")).toHaveCount(0, { timeout: 6000 });
   await page.screenshot({ path: "test-results/mobile-hero.png", fullPage: false });
   await page.getByRole("button", { name: "Mở menu" }).click();
   await page.getByRole("navigation", { name: "Điều hướng chính" }).getByRole("link", { name: "Điểm hẹn" }).click();
@@ -138,6 +162,7 @@ test("reduced motion and WebGL unavailable keep the journey usable", async ({ pa
   });
   await page.goto("/");
   await expect(page.locator(".hero-immersive")).toHaveAttribute("data-running", "false");
+  await expect(page.locator(".cloud-intro")).not.toBeVisible();
   expect(await page.locator(".cloud-one").evaluate((el) => getComputedStyle(el).animationName)).toBe("none");
   await page.locator("#khong-gian").scrollIntoViewIfNeeded();
   await expect(page.locator(".scene-fallback")).toBeVisible({ timeout: 25_000 });
