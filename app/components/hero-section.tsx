@@ -148,7 +148,7 @@ export default function HeroSection({ reducedMotion }: { reducedMotion: boolean 
       <div className="hero-vignette" aria-hidden="true" />
       <div className="hero-topline"><span>MỘT HÀNH TRÌNH VỀ NGUỒN CỘI</span><span>VĂN HOÁ VIỆT · TINH THẦN TRẺ</span></div>
       <div className="hero-copy">
-        <div className="eyebrow hero-enter"><span className="little-star">✳</span> VIETNAM ROOTS, GLOBAL MINDS <span className="little-star">✳</span></div>
+        <div className="eyebrow hero-enter hero-event-name"><span className="little-star" aria-hidden="true">✳</span> Global Citizens Day 2026 <span className="little-star" aria-hidden="true">✳</span></div>
         <h1 id="hero-title" className="hero-enter"><span>Việt Nam,</span><span>một dải <em>di sản.</em></span></h1>
         <p className="hero-enter">Từ những điều xưa cũ, mở ra những kết nối mới.<br />Một hành trình chạm vào hồn Việt.</p>
         <a href="#hanh-trinh" className="button button-red hero-enter">Bước vào hành trình <Arrow /></a>

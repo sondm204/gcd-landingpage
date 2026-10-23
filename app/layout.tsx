@@ -16,8 +16,8 @@ const playfair = Red_Rose({
 });
 
 export const metadata: Metadata = {
-  title: "Một Dải Di Sản — Vietnam Roots, Global Minds",
-  description: "Bước vào con đường di sản Việt Nam. Khám phá hội chợ văn hoá, tranh biện sinh viên và workshop · talkshow kết nối những giá trị xưa với thế hệ hôm nay.",
+  title: "Global Citizens Day 2026 — Một Dải Di Sản",
+  description: "Global Citizens Day 2026 — Bước vào con đường di sản Việt Nam. Khám phá hội chợ văn hoá, tranh biện sinh viên và workshop · talkshow kết nối những giá trị xưa với thế hệ hôm nay.",
 };
 
 export default function RootLayout({ children }: LayoutProps<"/">) {

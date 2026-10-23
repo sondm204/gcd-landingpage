@@ -882,4 +882,4 @@
   .flock-far {
     left: 72%;
   }
-}
+}.hero-immersive .hero-event-name { font-size: clamp(12px, 1.2vw, 17px); letter-spacing: .12em; font-weight: 600; text-transform: uppercase; gap: 12px; }

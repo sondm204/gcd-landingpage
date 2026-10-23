@@ -449,6 +449,17 @@ export default function HeritageJourney() {
         </section>
       </main>
       <footer className="site-footer">
+        <div className="footer-event" data-reveal>
+          <div className="footer-event-copy">
+            <span className="eyebrow">GLOBAL CITIZENS DAY 2026</span>
+            <p>Vietnam Roots, Global Minds</p>
+          </div>
+          <div className="footer-logos" aria-label="Các đơn vị chương trình">
+            <Image src="/images/logo_VN.png" alt="Logo Việt Nam" width={180} height={110} />
+            <Image src="/images/logo_danhnhan.png" alt="Logo Danh Nhân" width={180} height={110} />
+            <Image src="/images/logo_ThangLong.png" alt="Logo Thăng Long" width={180} height={110} />
+          </div>
+        </div>
         <a href="#khoi-hanh" className="footer-brand" data-reveal>
           Một dải <em>di sản.</em>
         </a>
