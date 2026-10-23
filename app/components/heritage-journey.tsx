@@ -1,6 +1,7 @@
 "use client";
 
 import dynamic from "next/dynamic";
+import Image from "next/image";
 import { useEffect, useRef, useState } from "react";
 import { Arrow, Lantern, Lotus, Sun } from "./ornaments";
 import HeroSection from "./hero-section";
@@ -155,60 +156,321 @@ export default function HeritageJourney() {
 
   return (
     <>
-      <a href="#hanh-trinh" className="skip-link">Bỏ qua phần mở đầu</a>
+      <a href="#hanh-trinh" className="skip-link">
+        Bỏ qua phần mở đầu
+      </a>
       <div className="reading-progress" aria-hidden="true" />
       <header ref={headerRef} className="site-header over-hero">
-        <a href="#khoi-hanh" className="brand" aria-label="Một Dải Di Sản — Trang đầu">
-          <span className="brand-seal">di<br />sản<span>✳</span></span>
-          <span className="brand-wordmark">MỘT DẢI DI SẢN<small>VIETNAM ROOTS, GLOBAL MINDS</small></span>
+        <a
+          href="#khoi-hanh"
+          className="brand"
+          aria-label="Một Dải Di Sản — Trang đầu"
+        >
+          <span className="brand-seal">
+            di
+            <br />
+            sản<span>✳</span>
+          </span>
+          <span className="brand-wordmark">
+            MỘT DẢI DI SẢN<small>VIETNAM ROOTS, GLOBAL MINDS</small>
+          </span>
         </a>
-        <nav className={menuOpen ? "main-nav open" : "main-nav"} aria-label="Điều hướng chính">
-          {[["hanh-trinh", "Câu chuyện"], ["hoi-cho", "Điểm hẹn"], ["khong-gian", "Di sản 3D"]].map(([id, label]) => (
-            <a key={id} href={`#${id}`} className={active === id ? "active" : ""} onClick={() => setMenuOpen(false)}>{label}</a>
+        <nav
+          className={menuOpen ? "main-nav open" : "main-nav"}
+          aria-label="Điều hướng chính"
+        >
+          {[
+            ["hanh-trinh", "Câu chuyện"],
+            ["hoi-cho", "Điểm hẹn"],
+            ["khong-gian", "Di sản 3D"],
+          ].map(([id, label]) => (
+            <a
+              key={id}
+              href={`#${id}`}
+              className={active === id ? "active" : ""}
+              onClick={() => setMenuOpen(false)}
+            >
+              {label}
+            </a>
           ))}
-          <button className="nav-cta" onClick={() => { setModal("passport"); setMenuOpen(false); }}>Hẹn một chuyến đi <Arrow /></button>
+          <button
+            className="nav-cta"
+            onClick={() => {
+              setModal("passport");
+              setMenuOpen(false);
+            }}
+          >
+            Hẹn một chuyến đi <Arrow />
+          </button>
         </nav>
-        <button className="menu-toggle" aria-label={menuOpen ? "Đóng menu" : "Mở menu"} aria-expanded={menuOpen} onClick={() => setMenuOpen(!menuOpen)}>{menuOpen ? "✕" : "☰"}</button>
+        <button
+          className="menu-toggle"
+          aria-label={menuOpen ? "Đóng menu" : "Mở menu"}
+          aria-expanded={menuOpen}
+          onClick={() => setMenuOpen(!menuOpen)}
+        >
+          {menuOpen ? "✕" : "☰"}
+        </button>
       </header>
       <main>
         <HeroSection reducedMotion={reducedMotion} />
-        <div className="ticker" aria-hidden="true"><div>{Array.from({ length: 4 }, (_, i) => <span key={i}>TỪ CỘI NGUỒN <b>✳</b> ĐẾN THẾ GIỚI <b>✳</b> VIETNAM ROOTS, GLOBAL MINDS <b>✳</b></span>)}</div></div>
+        <div
+          className="program-logos section-pad"
+          aria-label="Các đơn vị chương trình"
+        >
+          <Image
+            src="/images/logo_VN.png"
+            alt="Logo Việt Nam"
+            width={180}
+            height={110}
+          />
+          <Image
+            src="/images/logo_danhnhan.png"
+            alt="Logo Danh Nhân"
+            width={180}
+            height={110}
+          />
+          <Image
+            src="/images/logo_ThangLong.png"
+            alt="Logo Thăng Long"
+            width={180}
+            height={110}
+          />
+        </div>
+        <div className="ticker" aria-hidden="true">
+          <div>
+            {Array.from({ length: 4 }, (_, i) => (
+              <span key={i}>
+                TỪ CỘI NGUỒN <b>✳</b> ĐẾN THẾ GIỚI <b>✳</b> VIETNAM ROOTS,
+                GLOBAL MINDS <b>✳</b>
+              </span>
+            ))}
+          </div>
+        </div>
         <section className="introduction section-pad" id="hanh-trinh">
-          <div className="intro-side" data-reveal><span className="eyebrow">LỜI MỜI TỪ DI SẢN</span><Sun /><span className="vertical-note">MỖI BƯỚC ĐI, MỘT KẾT NỐI</span></div>
-          <div className="intro-copy"><h2 data-reveal>Di sản không ở lại quá khứ.<br />Di sản <em>sống cùng chúng ta.</em></h2><div className="intro-columns"><p data-reveal data-reveal-delay="90">Trong nếp nhà, trong câu hát, trong một món ăn thân quen — có một Việt Nam vẫn đang được kể mỗi ngày.</p><p data-reveal data-reveal-delay="180">Chúng mình mời bạn bước lên con đường di sản: chạm vào văn hoá, cất lên góc nhìn của mình và cùng viết tiếp câu chuyện Việt Nam.</p></div></div>
-          <a href="#hoi-cho" className="intro-next" aria-label="Đến trạm đầu tiên">↓</a>
+          <div className="intro-side" data-reveal>
+            <span className="eyebrow">LỜI MỜI TỪ DI SẢN</span>
+            <Sun />
+            <span className="vertical-note">MỖI BƯỚC ĐI, MỘT KẾT NỐI</span>
+          </div>
+          <div className="intro-copy">
+            <h2 data-reveal>
+              Di sản không ở lại quá khứ.
+              <br />
+              Di sản <em>sống cùng chúng ta.</em>
+            </h2>
+            <div className="intro-columns">
+              <p data-reveal data-reveal-delay="90">
+                Trong nếp nhà, trong câu hát, trong một món ăn thân quen — có
+                một Việt Nam vẫn đang được kể mỗi ngày.
+              </p>
+              <p data-reveal data-reveal-delay="180">
+                Chúng mình mời bạn bước lên con đường di sản: chạm vào văn hoá,
+                cất lên góc nhìn của mình và cùng viết tiếp câu chuyện Việt Nam.
+              </p>
+            </div>
+          </div>
+          <a
+            href="#hoi-cho"
+            className="intro-next"
+            aria-label="Đến trạm đầu tiên"
+          >
+            ↓
+          </a>
         </section>
-        <div className="journey-heading section-pad"><span className="eyebrow" data-reveal>BẢN ĐỒ TRẢI NGHIỆM</span><h2 data-reveal data-reveal-delay="70">Ba điểm dừng.<br /><em>Một hành trình đáng nhớ.</em></h2><span className="handwritten" data-reveal data-reveal-delay="150">Đi cùng chúng mình nhé! ↴</span></div>
+        <div className="journey-heading section-pad">
+          <span className="eyebrow" data-reveal>
+            BẢN ĐỒ TRẢI NGHIỆM
+          </span>
+          <h2 data-reveal data-reveal-delay="70">
+            Ba điểm dừng.
+            <br />
+            <em>Một hành trình đáng nhớ.</em>
+          </h2>
+          <span className="handwritten" data-reveal data-reveal-delay="150">
+            Đi cùng chúng mình nhé! ↴
+          </span>
+        </div>
         <div className="journey-stations">
-          <svg className="journey-route" viewBox="0 0 1200 1900" preserveAspectRatio="none" fill="none" aria-hidden="true"><path className="route-base" d="M600 0C600 130 80 100 80 360S1120 380 1120 700S80 1000 80 1290S600 1520 600 1900" /><path className="route-dashes" d="M600 0C600 130 80 100 80 360S1120 380 1120 700S80 1000 80 1290S600 1520 600 1900" /></svg>
+          <svg
+            className="journey-route"
+            viewBox="0 0 1200 1900"
+            preserveAspectRatio="none"
+            fill="none"
+            aria-hidden="true"
+          >
+            <path
+              className="route-base"
+              d="M600 0C600 130 80 100 80 360S1120 380 1120 700S80 1000 80 1290S600 1520 600 1900"
+            />
+            <path
+              className="route-dashes"
+              d="M600 0C600 130 80 100 80 360S1120 380 1120 700S80 1000 80 1290S600 1520 600 1900"
+            />
+          </svg>
           {programs.map((program, index) => (
-            <section className={`station station-${index + 1} section-pad`} id={program.id} key={program.id} aria-labelledby={`title-${program.id}`}>
+            <section
+              className={`station station-${index + 1} section-pad`}
+              id={program.id}
+              key={program.id}
+              aria-labelledby={`title-${program.id}`}
+            >
               <div className="station-art" data-reveal>
-                {index === 0 ? <MarketArt /> : index === 1 ? <DebateArt /> : <WorkshopArt />}
-                <span className="art-footnote">TRẠM {program.number} / {program.short}</span>
+                {index === 0 ? (
+                  <MarketArt />
+                ) : index === 1 ? (
+                  <DebateArt />
+                ) : (
+                  <WorkshopArt />
+                )}
+                <span className="art-footnote">
+                  TRẠM {program.number} / {program.short}
+                </span>
               </div>
               <div className="station-copy">
-                <div className="station-kicker" data-reveal><span className="station-number">{program.number}</span><span className="eyebrow">{program.type}</span></div>
-                <h2 id={`title-${program.id}`} data-reveal data-reveal-delay="70">{program.title.split("\n")[0]}<br /><em>{program.title.split("\n")[1]}</em></h2>
-                <p data-reveal data-reveal-delay="130">{program.description}</p>
-                <div className="tags" data-reveal data-reveal-delay="190">{program.tags.map((tag) => <span key={tag}>{tag}</span>)}</div>
-                <button className="text-link" data-reveal data-reveal-delay="240" onClick={() => setModal(index)}>Khám phá điểm dừng <Arrow /></button>
+                <div className="station-kicker" data-reveal>
+                  <span className="station-number">{program.number}</span>
+                  <span className="eyebrow">{program.type}</span>
+                </div>
+                <h2
+                  id={`title-${program.id}`}
+                  data-reveal
+                  data-reveal-delay="70"
+                >
+                  {program.title.split("\n")[0]}
+                  <br />
+                  <em>{program.title.split("\n")[1]}</em>
+                </h2>
+                <p data-reveal data-reveal-delay="130">
+                  {program.description}
+                </p>
+                <div className="tags" data-reveal data-reveal-delay="190">
+                  {program.tags.map((tag) => (
+                    <span key={tag}>{tag}</span>
+                  ))}
+                </div>
+                <button
+                  className="text-link"
+                  data-reveal
+                  data-reveal-delay="240"
+                  onClick={() => setModal(index)}
+                >
+                  Khám phá điểm dừng <Arrow />
+                </button>
               </div>
             </section>
           ))}
         </div>
-        <section className="heritage-section section-pad" id="khong-gian" aria-labelledby="heritage-title">
-          <div className="heritage-copy"><span className="eyebrow" data-reveal><span className="live-dot" /> KHÔNG GIAN DI SẢN 3D</span><h2 id="heritage-title" data-reveal data-reveal-delay="80">Một góc nhìn mới.<br /><em>Một niềm tự hào<br />rất cũ.</em></h2><p data-reveal data-reveal-delay="150">Đi vòng quanh một mái đình.<br />Ngắm di sản từ một góc khác.<br />Để những điều quen thuộc lại khiến bạn ngỡ ngàng.</p><div className="heritage-note" data-reveal data-reveal-delay="220"><Sun /><span>Chạm, kéo và khám phá.<br /><small>Mô hình nghệ thuật lấy cảm hứng từ kiến trúc Việt.</small></span></div></div>
-          <div className="heritage-stage" ref={sceneRef} data-reveal data-reveal-delay="120">{sceneVisible ? <HeritageViewer reducedMotion={reducedMotion} /> : <div className="scene-loading"><Sun /><span>Một góc Việt Nam đang chờ bạn.</span></div>}</div>
+        <section
+          className="heritage-section section-pad"
+          id="khong-gian"
+          aria-labelledby="heritage-title"
+        >
+          <div className="heritage-copy">
+            <span className="eyebrow" data-reveal>
+              <span className="live-dot" /> KHÔNG GIAN DI SẢN 3D
+            </span>
+            <h2 id="heritage-title" data-reveal data-reveal-delay="80">
+              Một góc nhìn mới.
+              <br />
+              <em>
+                Một niềm tự hào
+                <br /> rất cũ.
+              </em>
+            </h2>
+            <p data-reveal data-reveal-delay="150">
+              Đi vòng quanh một mái đình.
+              <br />
+              Ngắm di sản từ một góc khác.
+              <br />
+              Để những điều quen thuộc lại khiến bạn ngỡ ngàng.
+            </p>
+            <div className="heritage-note" data-reveal data-reveal-delay="220">
+              <Sun />
+              <span>
+                Chạm, kéo và khám phá.
+                <br />
+                <small>
+                  Mô hình nghệ thuật lấy cảm hứng từ kiến trúc Việt.
+                </small>
+              </span>
+            </div>
+          </div>
+          <div
+            className="heritage-stage"
+            ref={sceneRef}
+            data-reveal
+            data-reveal-delay="120"
+          >
+            {sceneVisible ? (
+              <HeritageViewer reducedMotion={reducedMotion} />
+            ) : (
+              <div className="scene-loading">
+                <Sun />
+                <span>Một góc Việt Nam đang chờ bạn.</span>
+              </div>
+            )}
+          </div>
         </section>
         <SponsorsSection />
         <section className="invitation section-pad" id="loi-hen">
-          <Lantern className="invite-lantern left" /><Lantern className="invite-lantern right" />
-          <div><span className="eyebrow" data-reveal>HÀNH TRÌNH SẼ TRỌN VẸN HƠN KHI CÓ BẠN</span><h2 data-reveal data-reveal-delay="70">Mang theo sự tò mò.<br /><em>Mang về một niềm tự hào.</em></h2><p data-reveal data-reveal-delay="130">Một cuộc hẹn với văn hoá Việt, theo cách của thế hệ mình.</p><button className="button button-red" data-reveal data-reveal-delay="200" onClick={() => setModal("passport")}>Hẹn mình ở con đường di sản <Arrow /></button><div className="event-status" data-reveal data-reveal-delay="260"><span className="live-dot" /> Ngày & địa điểm tổ chức sẽ sớm được công bố</div></div>
-          <div className="invitation-bottom" data-reveal><span>GỐC RỄ VIỆT NAM.</span><Lotus /><span>TƯ DUY TOÀN CẦU.</span></div>
+          <Lantern className="invite-lantern left" />
+          <Lantern className="invite-lantern right" />
+          <div>
+            <span className="eyebrow" data-reveal>
+              HÀNH TRÌNH SẼ TRỌN VẸN HƠN KHI CÓ BẠN
+            </span>
+            <h2 data-reveal data-reveal-delay="70">
+              Mang theo sự tò mò.
+              <br />
+              <em>Mang về một niềm tự hào.</em>
+            </h2>
+            <p data-reveal data-reveal-delay="130">
+              Một cuộc hẹn với văn hoá Việt, theo cách của thế hệ mình.
+            </p>
+            <button
+              className="button button-red"
+              data-reveal
+              data-reveal-delay="200"
+              onClick={() => setModal("passport")}
+            >
+              Hẹn mình ở con đường di sản <Arrow />
+            </button>
+            <div className="event-status" data-reveal data-reveal-delay="260">
+              <span className="live-dot" /> Ngày & địa điểm tổ chức sẽ sớm được
+              công bố
+            </div>
+          </div>
+          <div className="invitation-bottom" data-reveal>
+            <span>GỐC RỄ VIỆT NAM.</span>
+            <Lotus />
+            <span>TƯ DUY TOÀN CẦU.</span>
+          </div>
         </section>
       </main>
-      <footer className="site-footer"><a href="#khoi-hanh" className="footer-brand" data-reveal>Một dải <em>di sản.</em></a><span data-reveal data-reveal-delay="80">Hiểu mình đến từ đâu.<br />Biết mình có thể đi xa đến đâu.</span><a href="#khoi-hanh" className="back-top" data-reveal data-reveal-delay="150">Về đầu hành trình ↑</a><div className="footer-bottom" data-reveal data-reveal-delay="200"><span>VIETNAM ROOTS, GLOBAL MINDS</span><span>Một hành trình kết nối văn hoá & thế hệ.</span><span>ĐƯỢC KỂ BẰNG NIỀM TỰ HÀO VIỆT</span></div></footer>
+      <footer className="site-footer">
+        <a href="#khoi-hanh" className="footer-brand" data-reveal>
+          Một dải <em>di sản.</em>
+        </a>
+        <span data-reveal data-reveal-delay="80">
+          Hiểu mình đến từ đâu.
+          <br />
+          Biết mình có thể đi xa đến đâu.
+        </span>
+        <a
+          href="#khoi-hanh"
+          className="back-top"
+          data-reveal
+          data-reveal-delay="150"
+        >
+          Về đầu hành trình ↑
+        </a>
+        <div className="footer-bottom" data-reveal data-reveal-delay="200">
+          <span>VIETNAM ROOTS, GLOBAL MINDS</span>
+          <span>Một hành trình kết nối văn hoá & thế hệ.</span>
+          <span>ĐƯỢC KỂ BẰNG NIỀM TỰ HÀO VIỆT</span>
+        </div>
+      </footer>
       <nav className="journey-dots" aria-label="Các điểm dừng">
         {[
           ["khoi-hanh", "Khởi hành"],
@@ -231,18 +493,113 @@ export default function HeritageJourney() {
           </a>
         ))}
       </nav>
-      <dialog ref={dialogRef} className="experience-dialog" onCancel={closeModal} onClick={(event) => { if (event.target === event.currentTarget) closeModal(); }} aria-labelledby="dialog-title">
+      <dialog
+        ref={dialogRef}
+        className="experience-dialog"
+        onCancel={closeModal}
+        onClick={(event) => {
+          if (event.target === event.currentTarget) closeModal();
+        }}
+        aria-labelledby="dialog-title"
+      >
         <div className="dialog-inner">
-          <button className="dialog-close" onClick={closeModal} aria-label="Đóng cửa sổ">✕</button>
-          {modal === "passport" ? <>
-            <span className="eyebrow">TẤM HỘ CHIẾU VĂN HOÁ CỦA BẠN</span><h2 id="dialog-title">Hẹn một <em>chuyến đi.</em></h2><p>Chọn những điểm dừng bạn yêu thích để lưu hành trình của riêng mình.</p>
-            <div className="passport-options">{programs.map((p) => <label key={p.id}><input type="checkbox" checked={selected.includes(p.id)} onChange={() => { setSelected((prev) => prev.includes(p.id) ? prev.filter((id) => id !== p.id) : [...prev, p.id]); setSaved(false); setSaveError(false); }} /><span className="passport-number">{p.number}</span><span><strong>{p.type}</strong><small>{p.short}</small></span></label>)}</div>
-            <div className="dialog-notice">Sự kiện đang được chuẩn bị. Lưu hành trình là một lời hẹn cá nhân, chưa phải đăng ký tham dự. Ngày, địa điểm và hình thức đăng ký sẽ được công bố sau.</div>
-            <div className="dialog-actions"><button className="button button-red" disabled={!selected.length} onClick={savePassport}>{saved ? "Đã lưu trên thiết bị ✓" : "Lưu hành trình"}<Arrow /></button><button className="text-link" disabled={!selected.length} onClick={downloadPassport}>Tải bản lưu ↓</button></div>
-            <p className="save-status" role="status">{saveError ? "Trình duyệt chưa cho phép lưu. Bạn có thể tải bản lưu về thiết bị." : saved ? "Hành trình đã được lưu trong trình duyệt này." : !selected.length ? "Hãy chọn ít nhất một điểm dừng." : ""}</p>
-          </> : typeof modal === "number" ? <>
-            <span className="eyebrow">TRẠM {programs[modal].number} / {programs[modal].type}</span><h2 id="dialog-title">{programs[modal].short}</h2><p>{programs[modal].detail}</p><ul className="activity-list">{programs[modal].activities.map((activity) => <li key={activity}>{activity}</li>)}</ul><div className="dialog-notice">Nội dung dự kiến. Lịch chi tiết và thông tin tham gia sẽ được ban tổ chức cập nhật.</div><button className="button button-red" onClick={() => setModal("passport")}>Lên lịch trình của bạn <Arrow /></button>
-          </> : null}
+          <button
+            className="dialog-close"
+            onClick={closeModal}
+            aria-label="Đóng cửa sổ"
+          >
+            ✕
+          </button>
+          {modal === "passport" ? (
+            <>
+              <span className="eyebrow">TẤM HỘ CHIẾU VĂN HOÁ CỦA BẠN</span>
+              <h2 id="dialog-title">
+                Hẹn một <em>chuyến đi.</em>
+              </h2>
+              <p>
+                Chọn những điểm dừng bạn yêu thích để lưu hành trình của riêng
+                mình.
+              </p>
+              <div className="passport-options">
+                {programs.map((p) => (
+                  <label key={p.id}>
+                    <input
+                      type="checkbox"
+                      checked={selected.includes(p.id)}
+                      onChange={() => {
+                        setSelected((prev) =>
+                          prev.includes(p.id)
+                            ? prev.filter((id) => id !== p.id)
+                            : [...prev, p.id],
+                        );
+                        setSaved(false);
+                        setSaveError(false);
+                      }}
+                    />
+                    <span className="passport-number">{p.number}</span>
+                    <span>
+                      <strong>{p.type}</strong>
+                      <small>{p.short}</small>
+                    </span>
+                  </label>
+                ))}
+              </div>
+              <div className="dialog-notice">
+                Sự kiện đang được chuẩn bị. Lưu hành trình là một lời hẹn cá
+                nhân, chưa phải đăng ký tham dự. Ngày, địa điểm và hình thức
+                đăng ký sẽ được công bố sau.
+              </div>
+              <div className="dialog-actions">
+                <button
+                  className="button button-red"
+                  disabled={!selected.length}
+                  onClick={savePassport}
+                >
+                  {saved ? "Đã lưu trên thiết bị ✓" : "Lưu hành trình"}
+                  <Arrow />
+                </button>
+                <button
+                  className="text-link"
+                  disabled={!selected.length}
+                  onClick={downloadPassport}
+                >
+                  Tải bản lưu ↓
+                </button>
+              </div>
+              <p className="save-status" role="status">
+                {saveError
+                  ? "Trình duyệt chưa cho phép lưu. Bạn có thể tải bản lưu về thiết bị."
+                  : saved
+                    ? "Hành trình đã được lưu trong trình duyệt này."
+                    : !selected.length
+                      ? "Hãy chọn ít nhất một điểm dừng."
+                      : ""}
+              </p>
+            </>
+          ) : typeof modal === "number" ? (
+            <>
+              <span className="eyebrow">
+                TRẠM {programs[modal].number} / {programs[modal].type}
+              </span>
+              <h2 id="dialog-title">{programs[modal].short}</h2>
+              <p>{programs[modal].detail}</p>
+              <ul className="activity-list">
+                {programs[modal].activities.map((activity) => (
+                  <li key={activity}>{activity}</li>
+                ))}
+              </ul>
+              <div className="dialog-notice">
+                Nội dung dự kiến. Lịch chi tiết và thông tin tham gia sẽ được
+                ban tổ chức cập nhật.
+              </div>
+              <button
+                className="button button-red"
+                onClick={() => setModal("passport")}
+              >
+                Lên lịch trình của bạn <Arrow />
+              </button>
+            </>
+          ) : null}
         </div>
       </dialog>
     </>

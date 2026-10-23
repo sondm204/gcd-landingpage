@@ -1,15 +1,15 @@
 import type { Metadata } from "next";
-import { Be_Vietnam_Pro, Playfair_Display } from "next/font/google";
+import { Red_Rose } from "next/font/google";
 import "./globals.css";
 
-const vietnam = Be_Vietnam_Pro({
+const vietnam = Red_Rose({
   variable: "--font-body",
   subsets: ["latin", "vietnamese"],
   weight: ["400", "500", "600", "700"],
   display: "swap",
 });
 
-const playfair = Playfair_Display({
+const playfair = Red_Rose({
   variable: "--font-display",
   subsets: ["latin", "vietnamese"],
   display: "swap",

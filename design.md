@@ -26,8 +26,8 @@ Giữ độ tương phản rõ cho chữ và nút. Dùng đỏ làm điểm nh�
 
 ## Chữ và giọng văn
 
-- **Playfair Display** (`--font-display`): tiêu đề lớn, câu dẫn và những chữ cần cảm giác biên tập. Trọng lượng mặc định `500`; có thể dùng chữ nghiêng màu đỏ để nhấn một cụm ngắn.
-- **Be Vietnam Pro** (`--font-body`): đoạn văn, điều hướng, nút, nhãn và thông tin chương trình. Font được khai báo trong `app/layout.tsx` với hỗ trợ tiếng Việt.
+- **Red Rose** (`--font-display`): tiêu đề lớn, câu dẫn và những chữ cần cảm giác biên tập. Trọng lượng mặc định `500`; có thể dùng chữ nghiêng màu đỏ để nhấn một cụm ngắn.
+- **Red Rose** (`--font-body`): đoạn văn, điều hướng, nút, nhãn và thông tin chương trình. Font được khai báo trong `app/layout.tsx` với hỗ trợ tiếng Việt.
 - Tiêu đề hero lớn, căn giữa trên ảnh; desktop dùng `clamp(66px, 7.1vw, 112px)`, mobile dùng `clamp(37px, 11.3vw, 64px)`. Tiêu đề các phần khác co giãn theo khung nhìn thay vì dùng một cỡ cố định.
 - Nhãn nhỏ (`.eyebrow`) cỡ `10px`, nét `600`, letter-spacing `2px`; hợp với số thứ tự, tên chặng và nhãn phụ. Văn bản dài dùng chiều cao dòng thoáng (`line-height: 1.9`).
 - Câu chữ tiếng Việt nên ngắn, gợi hình nhưng rõ ý. Ngày, địa điểm và khách mời chưa xác nhận phải thể hiện là thông tin dự kiến, không viết như đã công bố.
