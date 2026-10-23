@@ -124,7 +124,7 @@ export default function HeroSection({ reducedMotion }: { reducedMotion: boolean 
     <section ref={rootRef} className="hero hero-immersive" id="khoi-hanh" aria-labelledby="hero-title" data-running="true">
       <div className="hero-art">
         <Image
-          src="/images/heritage-panorama.webp"
+          src="/images/heritage-panorama2.png"
           alt="Toàn cảnh nghệ thuật di sản Việt Nam: núi đá vôi, Tháp Rùa và kiến trúc Huế bên dòng sông xanh"
           fill
           preload
