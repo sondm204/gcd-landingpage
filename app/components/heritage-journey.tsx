@@ -6,35 +6,15 @@ import { useEffect, useRef, useState } from "react";
 import { Arrow, Lantern, Lotus, Sun } from "./ornaments";
 import HeroSection from "./hero-section";
 import SponsorsSection from "./sponsors-section";
+import GlobalMindSection from "./global-mind-section";
+import { programs } from "./journey-programs";
 
 const HeritageViewer = dynamic(() => import("./heritage-viewer"), {
   ssr: false,
   loading: () => <div className="scene-loading"><Sun /><span>Đang mở một miền di sản…</span></div>,
 });
 
-const programs = [
-  {
-    id: "hoi-cho", number: "01", type: "HỘI CHỢ VĂN HOÁ", title: "Chạm vào\nhồn Việt.", short: "Một phiên chợ, ngàn câu chuyện",
-    description: "Đi qua những gian hàng đậm sắc ba miền. Chạm vào chất gốm, thử một nét in Đông Hồ, rồi tìm lại hương vị thân quen trong một món quà quê.",
-    tags: ["Làng nghề", "Ẩm thực", "Trải nghiệm"],
-    detail: "Một cuộc dạo chơi dành cho tất cả mọi người: khám phá các gian hàng thủ công, nghe câu chuyện phía sau những món đồ và tự tay thử làm một sản phẩm mang dấu ấn của riêng mình.",
-    activities: ["Gặp gỡ những câu chuyện làng nghề qua gốm, tranh dân gian và sản phẩm thủ công.", "Khám phá hương vị vùng miền và câu chuyện văn hoá phía sau từng món ăn.", "Ghé góc trải nghiệm, lưu dấu hành trình bằng một món quà tự tay thực hiện."],
-  },
-  {
-    id: "tranh-bien", number: "02", type: "CUỘC THI TRANH BIỆN", title: "Tiếng nói trẻ.\nGiá trị ngàn năm.", short: "Khi di sản bước vào cuộc đối thoại",
-    description: "Giữ gìn hay làm mới? Địa phương hay toàn cầu? Sân khấu dành cho những góc nhìn sinh viên, nơi mỗi lập luận mở thêm một cách hiểu về di sản.",
-    tags: ["Sinh viên", "Tư duy phản biện", "Đối thoại"],
-    detail: "Một không gian tranh biện cho sinh viên cùng đặt câu hỏi về tương lai của văn hoá Việt. Các đội tìm hiểu dữ kiện, xây dựng lập luận và học cách lắng nghe những quan điểm khác biệt.",
-    activities: ["Chủ đề gợi mở: bảo tồn di sản trong đời sống hiện đại và vai trò của người trẻ.", "Hình thức đội thi, thể lệ và tiêu chí chấm điểm sẽ được ban tổ chức công bố.", "Khán giả cùng lắng nghe, đặt câu hỏi và tiếp nối cuộc đối thoại."],
-  },
-  {
-    id: "doi-thoai", number: "03", type: "WORKSHOP · TALKSHOW", title: "Gặp người kể.\nViết chuyện tiếp.", short: "Cảm hứng được trao, di sản được nối",
-    description: "Ngồi lại bên những câu chuyện làm nghề, gặp gỡ người truyền cảm hứng và tự tay sáng tạo. Để di sản không chỉ được ngắm nhìn, mà được tiếp nối.",
-    tags: ["Giao lưu", "Sáng tạo", "Kết nối"],
-    detail: "Lắng nghe những người làm văn hoá chia sẻ hành trình của họ, rồi thử biến cảm hứng thành một sáng tạo nhỏ. Không cần kinh nghiệm trước đó, chỉ cần sự tò mò và một tâm thế cởi mở.",
-    activities: ["Talkshow về cách kể câu chuyện văn hoá Việt bằng ngôn ngữ của hôm nay.", "Workshop sáng tạo lấy cảm hứng từ chất liệu và hoạ tiết truyền thống.", "Khách mời đề xuất: nghệ sĩ Xuân Bắc. Sự tham gia chưa được xác nhận."],
-  },
-];
+
 
 export default function HeritageJourney() {
   const [menuOpen, setMenuOpen] = useState(false);
@@ -145,7 +125,7 @@ export default function HeritageJourney() {
   }
 
   function downloadPassport() {
-    const text = `MỘT DẢI DI SẢN\nVietnam Roots, Global Minds\n\nHÀNH TRÌNH CỦA TÔI\n${programs.filter((p) => selected.includes(p.id)).map((p) => `\n${p.number}. ${p.type}\n${p.short}\n${p.description}\n`).join("")}\nNgày, địa điểm và lịch chi tiết: sẽ được công bố.\nĐây là bản lưu lịch trình cá nhân, không phải vé tham dự hay xác nhận đăng ký.`;
+    const text = `MỘT DẢI DI SẢN\nVietnam Roots, Global Mind\n\nHÀNH TRÌNH CỦA TÔI\n${programs.filter((p) => selected.includes(p.id)).map((p) => `\n${p.number}. ${p.type}\n${p.short}\n${p.description}\n`).join("")}\nNgày, địa điểm và lịch chi tiết: sẽ được công bố.\nĐây là bản lưu lịch trình cá nhân, không phải vé tham dự hay xác nhận đăng ký.`;
     const url = URL.createObjectURL(new Blob(["\ufeff", text], { type: "text/plain;charset=utf-8" }));
     const link = document.createElement("a");
     link.href = url; link.download = "hanh-trinh-di-san.txt"; link.click();
@@ -172,7 +152,7 @@ export default function HeritageJourney() {
             sản<span>✳</span>
           </span>
           <span className="brand-wordmark">
-            MỘT DẢI DI SẢN<small>VIETNAM ROOTS, GLOBAL MINDS</small>
+            MỘT DẢI DI SẢN<small>VIETNAM ROOTS, GLOBAL MIND</small>
           </span>
         </a>
         <nav
@@ -242,31 +222,29 @@ export default function HeritageJourney() {
             {Array.from({ length: 4 }, (_, i) => (
               <span key={i}>
                 TỪ CỘI NGUỒN <b>✳</b> ĐẾN THẾ GIỚI <b>✳</b> VIETNAM ROOTS,
-                GLOBAL MINDS <b>✳</b>
+                GLOBAL MIND <b>✳</b>
               </span>
             ))}
           </div>
         </div>
         <section className="introduction section-pad" id="hanh-trinh">
           <div className="intro-side" data-reveal>
-            <span className="eyebrow">LỜI MỜI TỪ DI SẢN</span>
+            <span className="eyebrow">TỪ GỐC RỄ VIỆT ĐẾN TƯ DUY TOÀN CẦU</span>
             <Sun />
             <span className="vertical-note">MỖI BƯỚC ĐI, MỘT KẾT NỐI</span>
           </div>
           <div className="intro-copy">
             <h2 data-reveal>
-              Di sản không ở lại quá khứ.
+              Hiểu mình đến từ đâu.
               <br />
-              Di sản <em>sống cùng chúng ta.</em>
+              Tự tin <em>bước cùng thế giới.</em>
             </h2>
             <div className="intro-columns">
               <p data-reveal data-reveal-delay="90">
-                Trong nếp nhà, trong câu hát, trong một món ăn thân quen — có
-                một Việt Nam vẫn đang được kể mỗi ngày.
+                Global Citizens Day 2026 mở ra hành trình để người trẻ hiểu giá trị Việt, rèn bản lĩnh và học cách kết nối trong một thế giới đa văn hoá.
               </p>
               <p data-reveal data-reveal-delay="180">
-                Chúng mình mời bạn bước lên con đường di sản: chạm vào văn hoá,
-                cất lên góc nhìn của mình và cùng viết tiếp câu chuyện Việt Nam.
+                Từ trải nghiệm văn hoá đến tranh biện và sáng tạo, mỗi điểm dừng là một cơ hội để hỏi sâu hơn, nhìn rộng hơn và chủ động chọn bước đi của mình.
               </p>
             </div>
           </div>
@@ -278,14 +256,15 @@ export default function HeritageJourney() {
             ↓
           </a>
         </section>
+        <GlobalMindSection />
         <div className="journey-heading section-pad">
           <span className="eyebrow" data-reveal>
-            BẢN ĐỒ TRẢI NGHIỆM
+            TRẢI NGHIỆM ĐỂ TRƯỞNG THÀNH
           </span>
           <h2 data-reveal data-reveal-delay="70">
             Ba điểm dừng.
             <br />
-            <em>Một hành trình đáng nhớ.</em>
+            <em>Mở rộng một tầm nhìn.</em>
           </h2>
           <span className="handwritten" data-reveal data-reveal-delay="150">
             Đi cùng chúng mình nhé! ↴
@@ -418,15 +397,15 @@ export default function HeritageJourney() {
           <Lantern className="invite-lantern right" />
           <div>
             <span className="eyebrow" data-reveal>
-              HÀNH TRÌNH SẼ TRỌN VẸN HƠN KHI CÓ BẠN
+              TƯƠNG LAI BẮT ĐẦU TỪ BƯỚC ĐI CỦA BẠN
             </span>
             <h2 data-reveal data-reveal-delay="70">
-              Mang theo sự tò mò.
+              Mang theo bản sắc.
               <br />
-              <em>Mang về một niềm tự hào.</em>
+              <em>Bước tới một thế giới rộng hơn.</em>
             </h2>
             <p data-reveal data-reveal-delay="130">
-              Một cuộc hẹn với văn hoá Việt, theo cách của thế hệ mình.
+              Một góc nhìn mới, một kết nối mới, một việc bạn muốn bắt đầu — bạn sẽ mang điều gì từ hôm nay vào tương lai?
             </p>
             <button
               className="button button-red"
@@ -434,7 +413,7 @@ export default function HeritageJourney() {
               data-reveal-delay="200"
               onClick={() => setModal("passport")}
             >
-              Hẹn mình ở con đường di sản <Arrow />
+              Bắt đầu hành trình của bạn <Arrow />
             </button>
             <div className="event-status" data-reveal data-reveal-delay="260">
               <span className="live-dot" /> Ngày & địa điểm tổ chức sẽ sớm được
@@ -452,7 +431,7 @@ export default function HeritageJourney() {
         <div className="footer-event" data-reveal>
           <div className="footer-event-copy">
             <span className="eyebrow">GLOBAL CITIZENS DAY 2026</span>
-            <p>Vietnam Roots, Global Minds</p>
+            <p>Vietnam Roots, Global Mind</p>
           </div>
           <div className="footer-logos" aria-label="Các đơn vị chương trình">
             <Image src="/images/logo_VN.png" alt="Logo Việt Nam" width={180} height={110} />
@@ -477,7 +456,7 @@ export default function HeritageJourney() {
           Về đầu hành trình ↑
         </a>
         <div className="footer-bottom" data-reveal data-reveal-delay="200">
-          <span>VIETNAM ROOTS, GLOBAL MINDS</span>
+          <span>VIETNAM ROOTS, GLOBAL MIND</span>
           <span>Một hành trình kết nối văn hoá & thế hệ.</span>
           <span>ĐƯỢC KỂ BẰNG NIỀM TỰ HÀO VIỆT</span>
         </div>
@@ -523,7 +502,7 @@ export default function HeritageJourney() {
           </button>
           {modal === "passport" ? (
             <>
-              <span className="eyebrow">TẤM HỘ CHIẾU VĂN HOÁ CỦA BẠN</span>
+              <span className="eyebrow">HÀNH TRÌNH CÔNG DÂN TOÀN CẦU CỦA BẠN</span>
               <h2 id="dialog-title">
                 Hẹn một <em>chuyến đi.</em>
               </h2>

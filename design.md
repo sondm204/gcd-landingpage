@@ -76,3 +76,13 @@ D·ªØ li·ªáu n·∫±m trong `app/components/sponsors-section.tsx`: PNJ ƒë√£ d√πng `p
 5. C·∫≠p nh·∫≠t t√†i li·ªáu n√†y khi thay ƒë·ªïi phong c√°ch n·ªÅn t·∫£ng.
 
 Ngu·ªìn tri·ªÉn khai hi·ªán t·∫°i: `app/globals.css`, `app/hero.css`, `app/layout.tsx` v√† `app/components/`. L·ªãch s·ª≠ ƒë·ªãnh h∆∞·ªõng h√¨nh ·∫£nh n·∫±m trong `docs/art-direction.md`; n·∫øu hai t√†i li·ªáu kh√°c nhau, m√£ ngu·ªìn v√† t√†i li·ªáu n√†y m√¥ t·∫£ giao di·ªán hi·ªán h√†nh.
+
+## M?ch n?i dung Global Citizens Day 2026
+
+ThÙng di?p: **Hi?u v? c?i ngu?n ñ V?ng v‡ng b?n linh ñ Khai m? tu duy to‡n c?u ñ Ch? d?ng ki?n t?o tuong lai.** Slogan th?ng nh?t: **Vietnam Roots, Global Mind**.
+
+Hero d?n b?ng ìG?c r? Vi?t. Tu duy to‡n c?u.î Section `global-mind-section.tsx` di?n gi?i b?n tr? c?t b?ng c‚u h?i t? suy ng?m, v?i d? ho? d?a c?u v‡ du?ng k?t n?i. –‚y l‡ bi?u tu?ng cho tu duy m?, khÙng d?i di?n cho c·c qu?c gia hay d?i t·c tham d? d„ x·c nh?n.
+
+Ba chuong trÏnh g?n v?i nang l?c c? th?: h?i ch? gi˙p hi?u v‡ k? c‚u chuy?n Vi?t; tranh bi?n gi˙p ki?m ch?ng, l?p lu?n v‡ l?ng nghe kh·c bi?t; workshop/talkshow hu?ng d?n s·ng t?o, h?p t·c v‡ h‡nh d?ng. Ph?n 3D cung c?p ch?t li?u d? tÏm hi?u v‡ k? chuy?n. L?i m?i cu?i trang hu?ng ngu?i tham gia d?n bu?c di ti?p theo c?a chÌnh mÏnh.
+
+Khi thÍm n?i dung, k?t n?i gi· tr? d?a phuong v?i m?t c‚u h?i, m?t gÛc nhÏn ho?c m?t h‡nh d?ng cÛ Ìch. Tr·nh ch? li?t kÍ hi?n v?t, d?ng th?i khÙng ng? ˝ cÛ kh·ch m?i qu?c t?, chuong trÏnh trao d?i hay co h?i ngh? nghi?p khi chua du?c x·c nh?n. C·c n?i dung ho?t d?ng m?i v?n l‡ d?nh hu?ng d? ki?n d? ban t? ch?c r‡ so·t.

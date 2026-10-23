@@ -17,7 +17,7 @@ const playfair = Red_Rose({
 
 export const metadata: Metadata = {
   title: "Global Citizens Day 2026 — Một Dải Di Sản",
-  description: "Global Citizens Day 2026 — Bước vào con đường di sản Việt Nam. Khám phá hội chợ văn hoá, tranh biện sinh viên và workshop · talkshow kết nối những giá trị xưa với thế hệ hôm nay.",
+  description: "Global Citizens Day 2026 — Vietnam Roots, Global Mind. Hiểu về cội nguồn, vững vàng bản lĩnh, khai mở tư duy toàn cầu và chủ động kiến tạo tương lai qua hội chợ, tranh biện và workshop · talkshow.",
 };
 
 export default function RootLayout({ children }: LayoutProps<"/">) {

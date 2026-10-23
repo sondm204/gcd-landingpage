@@ -93,14 +93,14 @@ test("desktop journey, program details, saved itinerary and download", async ({ 
   const errors: string[] = [];
   page.on("pageerror", (error) => errors.push(error.message));
   await page.goto("/");
-  await expect(page.getByRole("heading", { level: 1 })).toContainText("Việt Nam");
+  await expect(page.getByRole("heading", { level: 1 })).toContainText("Gốc rễ Việt");
   await expect(page.locator(".hero-art img")).toBeVisible();
   await expect(page.locator(".hero-art img")).toHaveJSProperty("complete", true);
   await expect(page.locator(".cloud-intro")).toHaveCount(0, { timeout: 6000 });
   await page.screenshot({ path: "test-results/desktop-hero.png" });
   await page.getByRole("button", { name: "Khám phá điểm dừng" }).first().click();
   await expect(page.getByRole("dialog")).toBeVisible();
-  await expect(page.getByRole("heading", { name: "Một phiên chợ, ngàn câu chuyện" })).toBeVisible();
+  await expect(page.getByRole("heading", { name: "Từ câu chuyện địa phương đến kết nối toàn cầu" })).toBeVisible();
   await page.keyboard.press("Escape");
   await expect(page.getByRole("dialog")).not.toBeVisible();
   await expect(page.getByRole("button", { name: "Khám phá điểm dừng" }).first()).toBeFocused();
@@ -160,7 +160,7 @@ test("mobile navigation, no horizontal overflow and itinerary dialog", async ({ 
   await page.evaluate(() => window.scrollTo({ top: 0, behavior: "instant" }));
   await page.screenshot({ path: "test-results/mobile-full.png", fullPage: true });
   await page.locator("#loi-hen").scrollIntoViewIfNeeded();
-  await page.getByRole("button", { name: "Hẹn mình ở con đường di sản" }).click();
+  await page.getByRole("button", { name: "Bắt đầu hành trình của bạn" }).click();
   await expect(page.getByRole("dialog")).toBeVisible();
   await page.screenshot({ path: "test-results/mobile-passport.png" });
   await page.getByRole("button", { name: "Đóng cửa sổ" }).click();

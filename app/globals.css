@@ -1,4 +1,5 @@
 @import "tailwindcss";
+@import "./global-mind.css";
 @import "./hero.css";
 @import "./sponsors.css";
 

@@ -146,27 +146,15 @@ export default function HeroSection({ reducedMotion }: { reducedMotion: boolean 
         <div className="river-shimmer shimmer-two" />
       </div>
       <div className="hero-vignette" aria-hidden="true" />
-      <div className="hero-topline"><span>MỘT HÀNH TRÌNH VỀ NGUỒN CỘI</span><span>VĂN HOÁ VIỆT · TINH THẦN TRẺ</span></div>
       <div className="hero-copy">
         <div className="eyebrow hero-enter hero-event-name"><span className="little-star" aria-hidden="true">✳</span> Global Citizens Day 2026 <span className="little-star" aria-hidden="true">✳</span></div>
-        <h1 id="hero-title" className="hero-enter"><span>Việt Nam,</span><span>một dải <em>di sản.</em></span></h1>
-        <p className="hero-enter">Từ những điều xưa cũ, mở ra những kết nối mới.<br />Một hành trình chạm vào hồn Việt.</p>
+        <h1 id="hero-title" className="hero-enter"><span>Việt Nam.</span><span>Một dải <em>di sản</em></span></h1>
+        <p className="hero-enter">Hiểu cội nguồn. Vững bản lĩnh.<br />Mở tư duy. Chủ động kiến tạo tương lai.</p>
         <a href="#hanh-trinh" className="button button-red hero-enter">Bước vào hành trình <Arrow /></a>
         <div className="hero-caption hero-enter"><span className="tiny-line" /> HIỂU CỘI NGUỒN · VƯƠN THẾ GIỚI <span className="tiny-line" /></div>
       </div>
       <div className="hero-bottom">
         <a href="#hanh-trinh"><span className="scroll-pill">↓</span> CUỘN ĐỂ KHÁM PHÁ</a>
-        <span className="hero-stops">03 ĐIỂM DỪNG <i /> 01 TINH THẦN VIỆT</span>
-        <button
-          className="hero-motion-toggle"
-          aria-label={paused || reducedMotion ? "Bật chuyển động khung cảnh" : "Tạm dừng chuyển động khung cảnh"}
-          aria-pressed={paused || reducedMotion}
-          disabled={reducedMotion}
-          onClick={() => setPaused(!paused)}
-        >
-          <span aria-hidden="true">{paused || reducedMotion ? "▷" : "Ⅱ"}</span>
-          {reducedMotion ? "CHẾ ĐỘ TĨNH" : paused ? "BẬT CHUYỂN ĐỘNG" : "DỪNG CHUYỂN ĐỘNG"}
-        </button>
       </div>
     </section>
     </>
