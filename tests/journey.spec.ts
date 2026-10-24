@@ -128,12 +128,10 @@ test("3D models render, switch and respond to controls", async ({ page }) => {
   page.on("pageerror", (error) => errors.push(error.message));
   await page.goto("/");
   await page.locator("#khong-gian").scrollIntoViewIfNeeded();
-  await expect(page.locator("canvas")).toBeVisible({ timeout: 25_000 });
   await expect(page.getByRole("heading", { name: "Chùa Một Cột", exact: true })).toBeVisible();
-  await page.getByRole("button", { name: "Dừng tự xoay" }).click();
-  await page.getByRole("button", { name: "Xoay trái", exact: true }).click();
-  await page.getByRole("button", { name: "Xoay phải", exact: true }).click();
-  await page.getByRole("button", { name: "Đặt lại góc nhìn" }).click();
+  await expect(page.locator('.sketchfab-stage iframe')).toBeVisible();
+  await page.getByRole("button", { name: "02 Tháp Rùa" }).click();
+  await expect(page.locator(".sketchfab-stage iframe")).toHaveAttribute("src", /a22adcd051914e2e911debf0730cab28/);
   await page.waitForTimeout(1000);
   await page.screenshot({ path: "test-results/desktop-3d.png" });
   await page.getByRole("button", { name: "02 Tháp Rùa" }).click();
@@ -181,7 +179,8 @@ test("reduced motion and WebGL unavailable keep the journey usable", async ({ pa
   await expect(page.locator(".cloud-intro")).not.toBeVisible();
   expect(await page.locator(".cloud-one").evaluate((el) => getComputedStyle(el).animationName)).toBe("none");
   await page.locator("#khong-gian").scrollIntoViewIfNeeded();
-  await expect(page.locator(".scene-fallback")).toBeVisible({ timeout: 25_000 });
+  await page.getByRole("button", { name: "02 Tháp Rùa" }).click();
+  await expect(page.locator(".sketchfab-stage iframe")).toBeVisible();
   await page.getByRole("button", { name: "02 Tháp Rùa" }).click();
   await expect(page.getByRole("heading", { name: "Tháp Rùa", exact: true })).toBeVisible();
   await expect(page.getByRole("button", { name: "Dừng tự xoay" })).toHaveCount(0);

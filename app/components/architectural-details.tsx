@@ -1,4 +1,5 @@
 import { useMemo } from "react";
+import type {} from "@react-three/fiber";
 import { BufferGeometry, Float32BufferAttribute, CatmullRomCurve3, Vector3 } from "three";
 
 type Point = [number, number, number];

@@ -1,0 +1,14 @@
+.sketchfab-viewer { width: 100%; min-width: 0; }
+.sketchfab-stage { position: relative; width: 100%; height: clamp(340px, 30vw, 440px); background: transparent; border: 1px solid #d6c79d24; border-radius: 3px; overflow: hidden; }
+.sketchfab-stage iframe { display: block; width: 100%; height: 100%; border: 0; background: transparent; }
+.sketchfab-toolbar { display: flex; flex-wrap: wrap; justify-content: space-between; align-items: center; gap: 12px; padding: 14px 0 8px; }
+.sketchfab-toolbar > span { font-size: 12px; color: #c0cbb9; line-height: 1.6; }
+.sketchfab-buttons { display: flex; flex-wrap: wrap; gap: 6px; }
+.sketchfab-buttons button { display: grid; place-items: center; width: 42px; height: 42px; background: #263e34; color: #e3d1a4; border: 1px solid #d6c79d55; font-size: 22px; transition: background .2s; }
+.sketchfab-buttons button:hover:not(:disabled) { background: #48604d; }
+.sketchfab-buttons button:focus-visible { outline-color: #e3d1a4; }
+.sketchfab-status { padding-block: 8px; font-size: 12px; line-height: 1.8; color: #d8bc80; }
+.sketchfab-status a { text-decoration: underline; text-underline-offset: 3px; }
+.sketchfab-viewer:fullscreen { padding: 18px; background: #263e34; display: flex; flex-direction: column; }
+.sketchfab-viewer:fullscreen .sketchfab-stage { height: auto; flex: 1; min-height: 0; }
+@media (max-width: 600px) { .sketchfab-stage { height: clamp(300px, 42svh, 360px); } }
