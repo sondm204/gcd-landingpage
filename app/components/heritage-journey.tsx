@@ -2,12 +2,18 @@
 
 import dynamic from "next/dynamic";
 import Image from "next/image";
+import Link from "next/link";
 import { useEffect, useRef, useState } from "react";
 import { Arrow, Lantern, Lotus, Sun } from "./ornaments";
 import HeroSection from "./hero-section";
 import SponsorsSection from "./sponsors-section";
 import GlobalMindSection from "./global-mind-section";
 import { programs } from "./journey-programs";
+
+// Thêm các trang đã có vào danh sách này để mở rộng điều hướng chính.
+const pageLinks = [
+  { href: "/booths", label: "Gian hàng" },
+];
 
 const HeritageViewer = dynamic(() => import("./heritage-viewer"), {
   ssr: false,
@@ -159,19 +165,14 @@ export default function HeritageJourney() {
           className={menuOpen ? "main-nav open" : "main-nav"}
           aria-label="Điều hướng chính"
         >
-          {[
-            ["hanh-trinh", "Câu chuyện"],
-            ["hoi-cho", "Điểm hẹn"],
-            ["khong-gian", "Di sản 3D"],
-          ].map(([id, label]) => (
-            <a
-              key={id}
-              href={`#${id}`}
-              className={active === id ? "active" : ""}
+          {pageLinks.map(({ href, label }) => (
+            <Link
+              key={href}
+              href={href}
               onClick={() => setMenuOpen(false)}
             >
               {label}
-            </a>
+            </Link>
           ))}
           <button
             className="nav-cta"
@@ -336,6 +337,7 @@ export default function HeritageJourney() {
                 >
                   Khám phá điểm dừng <Arrow />
                 </button>
+                {index === 0 && <Link href="/booths" className="text-link" style={{ display: "flex", width: "fit-content", marginTop: 18 }} data-reveal data-reveal-delay="280">Đề xuất vị trí gian hàng <Arrow /></Link>}
               </div>
             </section>
           ))}
