@@ -58,6 +58,14 @@ test("Sketchfab autoplay, camera controls and responsive embed", async ({ page }
   for (const item of [
     { tab: "02 Tháp Rùa", id: "a22adcd051914e2e911debf0730cab28", author: "minhduc26119931" },
     { tab: "03 Ngọ Môn", id: "4a1866001d034611a47b9116695da1d2", author: "Đào Minh Đức" },
+    { tab: "04 Nhà hát Thành phố", id: "4267a8d941414589bc49f899c9c9d61f" },
+    { tab: "05 Chùa Cầu", id: "59d89d40238c445f8316364b5fa45acd" },
+    { tab: "06 Khuê Văn Các", id: "e448a20cb453475ab52b7a6486eae671" },
+    { tab: "07 Lăng Tự Đức", id: "978f8e7afd9a4aebb738339c9f0087a0" },
+    { tab: "08 Nhà thờ Chính toà", id: "b02a72b4468b4cceb1db4f2cc394d182" },
+    { tab: "09 Trống đồng Đông Sơn", id: "7e38e31e0ac64f43a2035aecfc32f6b2" },
+    { tab: "10 Nón lá", id: "08338678a712414fbdbf392e6d8ce53e" },
+    { tab: "11 Bia tiến sĩ", id: "7aac2b6d65764a519fdbc71ceb03227f" },
     { tab: "01 Chùa Một Cột", id: "9b2562f8884141c0b1777e1a1c05887c", author: "inucaboo" },
   ]) {
     await page.getByRole("button", { name: item.tab, exact: true }).click();

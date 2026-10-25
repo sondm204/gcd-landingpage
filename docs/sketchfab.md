@@ -7,6 +7,16 @@
 | Chùa Một Cột | `9b2562f8884141c0b1777e1a1c05887c` | inucaboo |
 | Tháp Rùa | `a22adcd051914e2e911debf0730cab28` | minhduc26119931 |
 | Ngọ Môn | `4a1866001d034611a47b9116695da1d2` | Đào Minh Đức |
+| Nhà hát Thành phố | `4267a8d941414589bc49f899c9c9d61f` | Theo thông tin trong iframe |
+| Chùa Cầu | `59d89d40238c445f8316364b5fa45acd` | Theo thông tin trong iframe |
+| Khuê Văn Các | `e448a20cb453475ab52b7a6486eae671` | kien249 |
+| Lăng Tự Đức | `978f8e7afd9a4aebb738339c9f0087a0` | Theo thông tin trong iframe |
+| Nhà thờ Chính toà | `b02a72b4468b4cceb1db4f2cc394d182` | Theo thông tin trong iframe |
+| Trống đồng Đông Sơn | `7e38e31e0ac64f43a2035aecfc32f6b2` | Theo thông tin trong iframe |
+| Nón lá | `08338678a712414fbdbf392e6d8ce53e` | Theo thông tin trong iframe |
+| Bia tiến sĩ | `7aac2b6d65764a519fdbc71ceb03227f` | Theo thông tin trong iframe |
+
+Bộ chọn hiển thị 3 cột trên desktop, 2 cột trên mobile, đánh số 01–11. Chỉ mô hình đang chọn được tải vào iframe. Khuê Văn Các dùng URL đích người dùng gửi (`e448a20…`), không dùng ID khác trong nhãn liên kết.
 
 - `transparent=1`: yêu cầu nền trong suốt, phụ thuộc quyền Pro trở lên của Sketchfab. Không thể xoá sàn hoặc cảnh quan đã nằm trong geometry chỉ bằng tham số này.
 - `navigation=orbit`, `scrollwheel=1`: cho phép kéo xoay, con lăn và thao tác cảm ứng của viewer.

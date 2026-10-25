@@ -4,7 +4,7 @@ import Script from "next/script";
 import { useEffect, useRef, useState } from "react";
 import "./sketchfab-viewer.css";
 
-export type SketchfabModel = { id: string; title: string; url: string; author: string; authorUrl: string };
+export type SketchfabModel = { id: string; title: string; url: string; author?: string; authorUrl?: string };
 type Point = [number, number, number];
 type Camera = { position: Point; target: Point };
 type ViewerAPI = {
