@@ -4,6 +4,8 @@ Landing page sự kiện văn hoá Việt Nam, xây dựng trên Next.js 16, Rea
 
 ## Chạy dự án
 
+Khu vực đặt vị trí gian hàng: **`/booths`**, quản trị **`/booths/admin`**. Xem [hướng dẫn Supabase, Flyway và tạo admin](docs/booths.md). Các file mẫu cấu hình: `.env.example`, `.env.flyway.example`.
+
 ```bash
 pnpm install
 pnpm dev
