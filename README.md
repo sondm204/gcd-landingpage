@@ -63,3 +63,8 @@ Playwright chạy Chrome đã cài, khởi động bản production ở cổng 3
 Ảnh QA xuất vào `test-results/` (không commit). Nếu máy chưa có Google Chrome, cài Chrome hoặc chỉnh `channel` trong `playwright.config.ts` sang trình duyệt Chromium có sẵn.
 
 Đọc hướng dẫn Next.js đi kèm tại `node_modules/next/dist/docs/` trước khi sửa API hoặc cấu trúc framework.
+## Link preview khi chia sẻ
+
+Open Graph và Twitter Card dùng ảnh 1200×630 tạo từ nền di sản, tên sự kiện và slogan. Cấu hình `SITE_URL=https://gcd-landingpage.vercel.app` trong environment của hosting; khi đổi tên miền, đổi biến này rồi build/deploy lại. Nếu không đặt, app dùng domain production của Vercel hoặc domain hiện tại làm mặc định. `APP_ORIGIN` vẫn dùng riêng cho kiểm tra Origin của API.
+
+Ảnh được tạo tại `/opengraph-image` và `/twitter-image`. Trang chủ và `/booths` có tiêu đề, mô tả, canonical riêng.

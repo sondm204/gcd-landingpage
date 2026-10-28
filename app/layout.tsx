@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { Red_Rose } from "next/font/google";
 import "./globals.css";
+import { siteUrl, siteTitle, siteDescription } from "@/lib/site-metadata";
 
 const vietnam = Red_Rose({
   variable: "--font-body",
@@ -16,8 +17,19 @@ const playfair = Red_Rose({
 });
 
 export const metadata: Metadata = {
-  title: "Global Citizens Day 2026 — Một Dải Di Sản",
-  description: "Global Citizens Day 2026 — Vietnam Roots, Global Mind. Hiểu về cội nguồn, vững vàng bản lĩnh, khai mở tư duy toàn cầu và chủ động kiến tạo tương lai qua hội chợ, tranh biện và workshop · talkshow.",
+  metadataBase: siteUrl,
+  title: siteTitle,
+  description: siteDescription,
+  applicationName: "Global Citizens Day 2026",
+  openGraph: {
+    url: "/",
+    type: "website",
+    locale: "vi_VN",
+    siteName: "Global Citizens Day 2026",
+    title: siteTitle,
+    description: siteDescription,
+  },
+  twitter: { card: "summary_large_image", title: siteTitle, description: siteDescription },
 };
 
 export default function RootLayout({ children }: LayoutProps<"/">) {
