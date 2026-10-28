@@ -8,6 +8,8 @@ import { Arrow, Lantern, Lotus, Sun } from "./ornaments";
 import HeroSection from "./hero-section";
 import SponsorsSection from "./sponsors-section";
 import GlobalMindSection from "./global-mind-section";
+import EventSchedule from "./event-schedule";
+import SpecialGuests from "./special-guests";
 import { programs } from "./journey-programs";
 
 // Thêm các trang đã có vào danh sách này để mở rộng điều hướng chính.
@@ -393,6 +395,8 @@ export default function HeritageJourney() {
             )}
           </div>
         </section>
+        <EventSchedule />
+        <SpecialGuests />
         <SponsorsSection />
         <section className="invitation section-pad" id="loi-hen">
           <Lantern className="invite-lantern left" />
@@ -470,6 +474,8 @@ export default function HeritageJourney() {
           ["tranh-bien", "Tranh biện"],
           ["doi-thoai", "Workshop"],
           ["khong-gian", "Di sản 3D"],
+          ["lich-trinh", "Lịch trình"],
+          ["khach-moi", "Khách mời"],
           ["nha-tai-tro", "Nhà tài trợ"],
           ["loi-hen", "Đăng ký"],
         ].map(([id, label]) => (
