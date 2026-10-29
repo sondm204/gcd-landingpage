@@ -40,7 +40,7 @@ body { background: var(--paper); }
 .collage-label, .art-sticker, .workshop-ticket { background-color: #fffcf4; border-color: #d4ae62; color: #08275c; }
 .debate-podium { background: #0d397e; color: #ffe2a0; }
 .speech-bubble { background: #fff; color: #08275c; border-color: #c9a45c; }
-.debate-word, .workshop-seal { color: #125ac4; }
+.debate-word, .workshop-seal { color: rgb(220, 201, 151); }
 .heritage-section { background: radial-gradient(ellipse at 85% 0, #174b8c, transparent 60%), #061e49; color: #f7faff; border-block: 1px solid #b89146; }
 .heritage-section::before { display: none; }
 .heritage-copy .eyebrow, .heritage-copy h2 em { color: #ffd782; }

@@ -1,36 +1,64 @@
 /* Full-bleed landscape with independent, transform-only ambient layers. */
 /* Key visual: sky, golden heritage ribbons, and a connected globe. */
-.hero-immersive { position: relative; isolation: isolate; min-height: 820px; height: 100svh; max-height: 1160px; overflow: hidden; color: #08275c; background: #b9ddff; }
+.hero-immersive {
+  --hero-header-height: 90px;
+  position: relative;
+  isolation: isolate;
+  box-sizing: border-box;
+  height: 100vh;
+  height: 100dvh;
+  min-height: 0;
+  display: flex;
+  align-items: center;
+  padding-block: calc(var(--hero-header-height) + clamp(8px, 1.5dvh, 24px)) clamp(54px, 9dvh, 110px);
+  overflow: hidden;
+  color: #08275c;
+  background: #b9ddff;
+}
 .hero-immersive .hero-art { position: absolute; inset: 0; z-index: -3; animation: odyssey-arrive 1.6s ease-out both; }
 .hero-immersive .hero-art video { width: 100%; height: 100%; display: block; object-fit: cover; object-position: center center; }
-.hero-vignette { position: absolute; inset: 0; z-index: -2; pointer-events: none; background: linear-gradient(90deg, #eaf5ff25 0%, transparent 70%), linear-gradient(180deg, #e9f4ff55, transparent 30%, transparent 85%, #06387577); }
+.hero-vignette { position: absolute; inset: 0; z-index: -2; pointer-events: none; background: radial-gradient(ellipse at 33% 47%, #fff9e8e6 0%, #fff9e899 25%, transparent 65%), linear-gradient(180deg, #e9f4ff55, transparent 30%, transparent 80%, #063875a6); }
 /* Keep this parent out of a stacking context so the white wordmark canvas blends into the artwork. */
-.hero-immersive .hero-copy { position: relative; width: min(950px, 71%); margin-left: 4.5%; padding-top: clamp(140px, 17svh, 205px); text-align: center; }
-.hero-immersive .hero-event-name { display: flex; justify-content: center; align-items: center; gap: 15px; font-size: 10px; letter-spacing: .23em; color: #174b8c; }
+.hero-immersive .hero-copy {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: clamp(5px, 1dvh, 15px);
+  width: min(950px, 71%);
+  margin-left: 4.5%;
+  max-height: 100%;
+  /* Preserve access to content with unusually large text or very small viewports. */
+  overflow-y: auto;
+  text-align: center;
+}
+.hero-copy > * { flex-shrink: 0; }
+.hero-immersive .hero-event-name { display: flex; justify-content: center; align-items: center; gap: 15px; font-size: 11px; letter-spacing: .23em; color: #08275c; }
 .hero-event-name > span { width: 30px; height: 1px; background: #ae7c28; }
-.hero-immersive h1 { font: 500 clamp(64px, 6.2vw, 100px)/.98 var(--font-display), Georgia, serif; letter-spacing: -.055em; margin: 22px 0 16px; color: #08275c; text-shadow: 0 1px 22px #fff6; }
+.hero-immersive h1 { font: 500 clamp(32px, min(6.7vw, 9.5dvh), 108px)/.98 var(--font-display), Georgia, serif; letter-spacing: -.055em; margin: 0; color: #08275c; text-shadow: 0 1px 22px #fff6; }
 .hero-immersive h1 > span { display: block; }
-.hero-immersive h1 > span:first-child { font-size: 1.1em; margin-bottom: 12px; }
+.hero-immersive h1 > span:first-child { font-size: 1.1em; margin-bottom: clamp(4px, 1dvh, 12px); }
 .hero-immersive h1 > span:last-child { font-size: .82em; white-space: nowrap; }
 .hero-immersive h1 em { color: #9d1519; font-style: normal; font-size: .83em; letter-spacing: -.05em; }
-.hero-copy .heritage-lockup { width: min(650px, 88%); margin: 6px auto 8px; }
-.hero-slogan { display: flex; justify-content: center; align-items: center; gap: 22px; font: 600 clamp(16px, 1.8vw, 27px)/1.3 var(--font-display), Georgia, serif; letter-spacing: -.015em; }
+.hero-copy .heritage-lockup { width: min(700px, 92%, 64dvh); margin: 0 auto; }
+.hero-slogan { display: flex; justify-content: center; align-items: center; gap: clamp(10px, 2dvh, 22px); font: 600 clamp(14px, min(2vw, 3.4dvh), 29px)/1.3 var(--font-display), Georgia, serif; letter-spacing: -.015em; }
 .hero-slogan > span:first-child { color: #9d1519; }
 .hero-slogan i { color: #b88022; font-size: 18px; font-style: normal; }
-.hero-message { margin: 18px auto 20px; font-size: 14px; color: #284f7d; line-height: 1.8; }
-.hero-event-details { display: flex; justify-content: center; gap: 22px; margin: 22px auto; text-align: left; }
+.hero-message { margin: 0 auto; font-size: clamp(12px, 1.8dvh, 16px); font-weight: 500; color: #08275c; line-height: 1.65; text-shadow: 0 1px 3px #fff, 0 0 14px #fff; }
+.hero-event-details { display: flex; justify-content: center; gap: 22px; margin: clamp(2px, .6dvh, 8px) auto; padding: clamp(6px, 1dvh, 12px) 16px; border: 1px solid #ffffffc9; border-radius: 10px; background: #f7fbffe6; color: #08275c; text-align: left; }
 .hero-event-details > div { display: flex; align-items: center; gap: 12px; min-width: 0; }
 .hero-event-details > div + div { border-left: 1px solid #aabece; padding-left: 22px; }
 .hero-event-details svg { width: 26px; height: 30px; stroke: #124a93; stroke-width: 1.6; flex-shrink: 0; }
 .hero-event-details span { display: flex; flex-direction: column; gap: 6px; }
-.hero-event-details strong { font-size: 13px; line-height: 1.6; font-weight: 600; }
-.hero-event-details small { font-size: 11px; line-height: 1.5; }
+.hero-event-details strong { font-size: clamp(12px, 1.6dvh, 14px); line-height: 1.6; font-weight: 600; }
+.hero-event-details small { font-size: 12px; line-height: 1.5; }
 .hero-event-details > div:first-child small { font-size: 9px; letter-spacing: .15em; }
-.hero-actions { display: flex; align-items: center; justify-content: center; gap: 26px; margin-top: 26px; }
-.hero-actions .button { padding: 15px 22px; font-size: 13px; }
-.hero-schedule-link { font-size: 12px; padding-block: 8px; border-bottom: 1px solid #a47f38; }
+.hero-actions { display: flex; align-items: center; justify-content: center; gap: 26px; margin-top: clamp(2px, .8dvh, 12px); }
+.hero-actions .button { padding: clamp(8px, 1.5dvh, 15px) 22px; font-size: 14px; }
+.hero-schedule-link { font-size: 13px; font-weight: 600; color: #08275c; padding: 10px 14px; border: 1px solid #a9bed8; border-radius: 5px; background: #f7fbfff0; transition: background .2s, border-color .2s; }
+.hero-schedule-link:hover { background: #fff; border-color: #08275c; }
 .hero-schedule-link span { margin-left: 14px; }
-.hero-bottom { position: absolute; bottom: 25px; left: 4.5%; right: 4.5%; display: flex; justify-content: center; color: #fff7df; font-size: 9px; letter-spacing: .18em; z-index: 2; }
+.hero-bottom { position: absolute; bottom: max(10px, env(safe-area-inset-bottom), 2dvh); left: 4.5%; right: 4.5%; display: flex; justify-content: center; color: #fff7df; font-size: 9px; letter-spacing: .18em; z-index: 2; }
 .hero-bottom a { display: flex; align-items: center; gap: 14px; }
 .scroll-pill { display: grid; place-items: center; border: 1px solid #ffe2a099; width: 24px; height: 36px; border-radius: 20px; font-size: 18px; animation: odyssey-nudge 3s ease-in-out infinite; }
 .hero-atmosphere { position: absolute; inset: 0; z-index: -1; pointer-events: none; }
@@ -47,31 +75,72 @@
 @keyframes odyssey-twinkle { from { opacity: .3; transform: scale(.7); } to { opacity: 1; transform: scale(1.15); } }
 @keyframes odyssey-nudge { 50% { transform: translateY(5px); } }
 @media (min-width: 1800px) { .hero-immersive .hero-copy { margin-left: max(5%, calc((100vw - 1700px) / 2)); } }
-@media (max-width: 1100px) { .hero-immersive { min-height: 820px; }.hero-immersive .hero-copy { width: 77%; margin-left: 2%; }.hero-event-details { gap: 14px; }.hero-event-details > div + div { padding-left: 14px; }.hero-event-details strong { font-size: 11px; } }
+@media (max-width: 1100px) { .hero-immersive .hero-copy { width: 77%; margin-left: 2%; }.hero-event-details { gap: 14px; }.hero-event-details > div + div { padding-left: 14px; } }
 @media (max-width: 800px) {
-  .hero-immersive { min-height: 950px; height: auto; max-height: none; padding-bottom: 320px; }
+  .hero-immersive { --hero-header-height: 78px; }
   .hero-immersive .hero-art video { object-position: 72% bottom; }
-  .hero-vignette { background: linear-gradient(180deg, #eaf5fff5 0%, #eff7fff2 38%, #fff7e8de 56%, transparent 78%, #08275c55); }
-  .hero-immersive .hero-copy { width: 90%; margin-inline: auto; padding-top: 130px; }
-  .hero-immersive h1 { font-size: clamp(52px, 9vw, 76px); }
-  .hero-slogan { font-size: clamp(15px, 2.7vw, 22px); gap: 12px; }
-  .hero-event-details { flex-direction: column; align-items: center; gap: 15px; }
+  .hero-vignette { background: linear-gradient(180deg, #eaf5fff5 0%, #eff7fff2 38%, #fff7e8eb 60%, #fff7e855 78%, #08275c99); }
+  .hero-immersive .hero-copy { width: 90%; margin-inline: auto; }
+  .hero-immersive h1 { font-size: clamp(32px, min(9.6vw, 9.5dvh), 82px); }
+  .hero-slogan { font-size: clamp(14px, min(2.9vw, 3.2dvh), 24px); gap: 12px; }
+  .hero-event-details { flex-direction: column; align-items: center; gap: clamp(6px, 1.5dvh, 15px); }
   .hero-event-details > div { justify-content: center; }.hero-event-details > div + div { padding: 0; border: 0; }
-  .hero-event-details strong { font-size: 13px; }.hero-event-details > div:first-child small { display: none; }
-  .hero-message { font-size: 13px; }.hero-bottom { font-size: 8px; letter-spacing: .08em; }
+  .hero-event-details > div:first-child small { display: none; }
+  .hero-bottom { font-size: 8px; letter-spacing: .08em; }
   .odyssey-glow { top: auto; bottom: 5%; width: 80vw; height: 80vw; }.odyssey-spark { top: auto; bottom: 18%; }
 }
 @media (max-width: 480px) {
-  .hero-immersive { min-height: 950px; padding-bottom: 280px; }
   .hero-immersive .hero-event-name { font-size: 8px; letter-spacing: .12em; gap: 10px; }
-  .hero-event-name > span { width: 16px; }.hero-immersive h1 { font-size: clamp(43px, 11vw, 56px); margin-top: 22px; }
+  .hero-event-name > span { width: 16px; }.hero-immersive h1 { font-size: clamp(30px, min(11.7vw, 8.4dvh), 60px); }
   .hero-immersive h1 > span:last-child { white-space: normal; font-size: .85em; line-height: 1.1; }
-  .hero-immersive h1 em { display: block; margin-top: 10px; font-size: .9em; }
-  .hero-copy .heritage-lockup { width: 100%; margin-block: 15px; }
-  .hero-slogan { font-size: 13px; gap: 9px; }.hero-slogan i { font-size: 12px; }
-  .hero-message { font-size: 12px; }.hero-event-details svg { width: 22px; }.hero-event-details strong { font-size: 11px; }.hero-event-details small { font-size: 10px; }
-  .hero-actions { gap: 16px; flex-wrap: wrap; }.hero-actions .button { padding: 13px 18px; font-size: 12px; }.hero-schedule-link { font-size: 11px; }
+  .hero-immersive h1 em { display: block; margin-top: clamp(3px, 1dvh, 10px); font-size: .9em; }
+  .hero-copy .heritage-lockup { width: min(100%, 64dvh); }
+  .hero-slogan { font-size: 14px; gap: 9px; }.hero-slogan i { font-size: 12px; }
+  .hero-event-details { padding-inline: 12px; }.hero-event-details svg { width: 22px; }.hero-event-details strong { font-size: 12px; }.hero-event-details small { font-size: 11px; }
+  .hero-actions { gap: 8px; flex-wrap: wrap; }.hero-actions .button { padding: clamp(8px, 1.5dvh, 13px) 12px; font-size: 12px; gap: 10px; }.hero-schedule-link { font-size: 11px; padding: 8px; }.hero-schedule-link span { margin-left: 4px; }
   .hero-bottom { font-size: 6.5px; }
+}
+@media (max-width: 360px) and (max-height: 650px) {
+  .hero-immersive .hero-copy { gap: 5px; }
+  .hero-immersive h1 { font-size: clamp(30px, 11vw, 40px); }
+  .hero-event-details { padding: 6px 10px; }
+  .hero-event-details strong { font-size: 11px; }.hero-event-details small { font-size: 10px; }
+  .hero-actions { gap: 6px; }
+  .hero-actions .button { font-size: 11px; padding: 8px; gap: 6px; }
+  .hero-actions .button > span { font-size: 18px; }
+  .hero-schedule-link { font-size: 10px; padding: 7px; }.hero-schedule-link span { margin-left: 2px; }
+}
+/* Short landscape screens need a wider composition rather than a tall stack. */
+@media (max-height: 500px) and (min-aspect-ratio: 4/3) {
+  .hero-immersive { padding-block: calc(var(--hero-header-height) + 6px) max(42px, env(safe-area-inset-bottom)); }
+  .hero-immersive .hero-copy { width: 90%; margin-inline: auto; display: grid; grid-template-columns: 1.1fr 1fr; grid-template-areas: "eyebrow eyebrow" "title lockup" "slogan message" "details actions"; gap: 6px 24px; }
+  .hero-event-name { grid-area: eyebrow; }
+  .hero-immersive h1 { grid-area: title; font-size: clamp(25px, min(5.6vw, 9dvh), 52px); }
+  .hero-immersive h1 > span:last-child { white-space: nowrap; font-size: .75em; }
+  .hero-immersive h1 em { display: inline; margin: 0; }
+  .hero-copy .heritage-lockup { grid-area: lockup; width: min(100%, 68dvh); }
+  .hero-slogan { grid-area: slogan; font-size: 13px; gap: 8px; }
+  .hero-message { grid-area: message; font-size: 11px; }
+  .hero-event-details { grid-area: details; flex-direction: column; align-items: center; gap: 3px; margin: 0; padding: 4px 8px; }
+  .hero-event-details > div + div { border: 0; padding: 0; }
+  .hero-event-details > div:first-child small { display: none; }
+  .hero-event-details svg { width: 18px; height: 20px; }
+  .hero-event-details strong { font-size: 10px; }.hero-event-details small { font-size: 9px; }
+  .hero-actions { grid-area: actions; flex-wrap: wrap; gap: 4px 12px; margin: 0; }
+  .hero-actions .button { padding: 8px 12px; font-size: 11px; gap: 10px; }.hero-schedule-link { font-size: 10px; padding-block: 4px; }
+  .hero-bottom { font-size: 7px; }.scroll-pill { height: 25px; width: 20px; font-size: 15px; }
+}
+@media (max-height: 360px) and (min-aspect-ratio: 4/3) {
+  .hero-immersive .hero-copy { gap: 3px 18px; }
+  .hero-immersive .hero-event-name { font-size: 8px; line-height: 1.3; }
+  .hero-immersive h1 { font-size: 24px; }
+  .hero-immersive h1 > span:first-child { margin-bottom: 2px; }
+  .hero-message { font-size: 10px; line-height: 1.4; }
+  .hero-slogan { font-size: 11px; }
+  .hero-event-details span { gap: 2px; }
+  .hero-event-details strong { font-size: 9px; }.hero-event-details small { font-size: 8px; }
+  .hero-actions .button { padding-block: 6px; font-size: 10px; }
+  .hero-actions .button > span { font-size: 18px; }
 }
 @media (prefers-reduced-motion: reduce) { .cloud-intro { display: none; }.hero-enter, .hero-immersive .hero-art, .hero-atmosphere *, .scroll-pill { animation: none !important; } }
 .cloud-intro {

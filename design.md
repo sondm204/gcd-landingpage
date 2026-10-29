@@ -46,7 +46,7 @@ Wordmark dùng `mix-blend-mode: multiply` để hòa nền trắng vào artwork.
 
 ## Các khu vực
 
-- **Hero:** nền tràn khung, chữ navy và wordmark vàng ở trái/giữa, địa cầu ở phải. Mobile tăng lớp phủ sáng cho nội dung, dành vùng dưới cho dải di sản. Header trắng xanh trong nhẹ.
+- **Hero:** cao đúng `100dvh` theo vùng hiển thị hiện tại của thiết bị (fallback `100vh`), không đặt chiều cao tối thiểu cố định. Chữ, wordmark và khoảng cách co giãn theo cả chiều rộng và chiều cao; dành khoảng riêng cho header và gợi ý cuộn. Điện thoại xoay ngang dùng bố cục hai cột. Khung nội dung có thể cuộn khi người dùng tăng cỡ chữ lớn hoặc màn hình quá nhỏ. Nền tràn khung, chữ navy và wordmark vàng ở trái/giữa, địa cầu ở phải; mobile có lớp phủ sáng để dễ đọc.
 - **Hành trình:** nền sáng, đường nối xanh–vàng, số trạm navy, minh họa CSS/SVG cùng bảng màu. Giữ cấu trúc kể chuyện và điều hướng khi cuộn.
 - **Di sản 3D:** nền navy đậm, chữ sáng, nút chọn vàng/xanh. Sketchfab giữ xoay, zoom và thông tin tác giả.
 - **Timeline:** nền xanh nhạt, đường dọc mảnh, mốc vàng; chương trình nổi bật có chấm xanh và chữ đậm. Hoạt động song song có nền riêng.
