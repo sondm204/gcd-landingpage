@@ -2,7 +2,7 @@
 /* Key visual: sky, golden heritage ribbons, and a connected globe. */
 .hero-immersive { position: relative; isolation: isolate; min-height: 820px; height: 100svh; max-height: 1160px; overflow: hidden; color: #08275c; background: #b9ddff; }
 .hero-immersive .hero-art { position: absolute; inset: 0; z-index: -3; animation: odyssey-arrive 1.6s ease-out both; }
-.hero-immersive .hero-art img { object-fit: cover; object-position: center center; }
+.hero-immersive .hero-art video { width: 100%; height: 100%; display: block; object-fit: cover; object-position: center center; }
 .hero-vignette { position: absolute; inset: 0; z-index: -2; pointer-events: none; background: linear-gradient(90deg, #eaf5ff25 0%, transparent 70%), linear-gradient(180deg, #e9f4ff55, transparent 30%, transparent 85%, #06387577); }
 /* Keep this parent out of a stacking context so the white wordmark canvas blends into the artwork. */
 .hero-immersive .hero-copy { position: relative; width: min(950px, 71%); margin-left: 4.5%; padding-top: clamp(140px, 17svh, 205px); text-align: center; }
@@ -50,7 +50,7 @@
 @media (max-width: 1100px) { .hero-immersive { min-height: 820px; }.hero-immersive .hero-copy { width: 77%; margin-left: 2%; }.hero-event-details { gap: 14px; }.hero-event-details > div + div { padding-left: 14px; }.hero-event-details strong { font-size: 11px; } }
 @media (max-width: 800px) {
   .hero-immersive { min-height: 950px; height: auto; max-height: none; padding-bottom: 320px; }
-  .hero-immersive .hero-art img { object-position: 72% bottom; }
+  .hero-immersive .hero-art video { object-position: 72% bottom; }
   .hero-vignette { background: linear-gradient(180deg, #eaf5fff5 0%, #eff7fff2 38%, #fff7e8de 56%, transparent 78%, #08275c55); }
   .hero-immersive .hero-copy { width: 90%; margin-inline: auto; padding-top: 130px; }
   .hero-immersive h1 { font-size: clamp(52px, 9vw, 76px); }

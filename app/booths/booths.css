@@ -1,7 +1,7 @@
 .booths-app { background: var(--paper); color: var(--ink); min-height: 100svh; }
 .booths-app button, .booths-app input, .booths-app textarea, .booths-app select { font: inherit; }
 .booths-app button:disabled { cursor: not-allowed; opacity: .48; }
-.booths-header { max-width: 1500px; margin: auto; padding: 24px 5%; display: flex; justify-content: space-between; align-items: center; gap: 24px; border-bottom: 1px solid var(--line); }
+.booths-header { margin: auto; padding: 24px 5%; display: flex; justify-content: space-between; align-items: center; gap: 24px; border-bottom: 1px solid var(--line); }
 .booths-brand { display: flex; align-items: center; gap: 14px; }
 .booths-brand > span { background: var(--red); color: #fff6df; padding: 9px; font-size: 20px; line-height: 1; border: 3px double #f0d8b2; }
 .booths-brand > span span { display: block; font-size: 14px; margin-top: 4px; }

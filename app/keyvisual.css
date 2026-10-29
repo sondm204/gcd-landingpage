@@ -5,7 +5,10 @@ body { background: var(--paper); }
 ::selection { background: #ffe2a0; color: #08275c; }
 .reading-progress { background: linear-gradient(90deg, #125ac4, #53b6ff, #e9b645); }
 .site-header { height: 90px; }
-.site-header.over-hero { background: #f7faffb3; backdrop-filter: blur(14px); border-color: #fff9; }
+.site-header-spacer { height: 90px; }
+.site-header .main-nav > .nav-cta { padding: 12px 19px; }
+.site-header .main-nav > .nav-cta::after { content: none; }
+.site-header.over-hero { --header-background: rgb(247 250 255 / 25%); --header-blur: 14px; border-color: #fff9; }
 .brand-seal { width: 48px; height: 48px; display: grid; place-items: center; padding: 0; transform: none; border: 1px solid #e5c37c; outline: 3px solid #125ac410; border-radius: 50%; color: #ffe2a0; background: #08275c; font-size: 12px; letter-spacing: .02em; }
 .brand-seal > span { position: static; font-size: 12px; }
 .brand-wordmark { font-size: 13px; letter-spacing: .1em; }
@@ -75,6 +78,7 @@ body { background: var(--paper); }
 .journey-dots a.current { background: #125ac4; outline-color: #c7983b; }
 .journey-dots span { background: #08275c; color: #fff3d3; border-color: #c5a054; }
 @media (max-width: 800px) {
+  .site-header-spacer { height: 78px; }
   .site-header { height: 78px; }
   .brand-wordmark { font-size: 11px; letter-spacing: .04em; }
   .brand-wordmark small { font-size: 8px; }
@@ -83,3 +87,10 @@ body { background: var(--paper); }
   .footer-logos { padding: 8px 12px; }
 }
 @media (max-width: 400px) { .brand-seal { width: 40px; height: 40px; }.brand { gap: 9px; }.brand-wordmark { font-size: 9px; }.brand-wordmark small { font-size: 7px; } }
+
+@media (max-width: 1100px) {
+  .site-header .menu-toggle { display: block; }
+  .site-header .main-nav { display: none; position: absolute; top: 100%; left: 0; right: 0; padding: 24px 6%; background: #f7faff; border-bottom: 1px solid #cbd9ec; box-shadow: 0 15px 20px #061e4910; }
+  .site-header .main-nav.open { display: flex; flex-direction: column; align-items: stretch; gap: 12px; font-size: 13px; }
+  .site-header .booth-account-popup { left: 0; right: auto; max-width: calc(100vw - 12vw); }
+}

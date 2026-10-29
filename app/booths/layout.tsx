@@ -1,6 +1,5 @@
 import type { Metadata } from "next";
 import Link from "next/link";
-import BoothAccount from "./components/booth-account";
 import "./booths.css";
 import "./booths-keyvisual.css";
 
@@ -22,7 +21,6 @@ export const metadata: Metadata = {
 };
 export default function BoothsLayout({ children }: { children: React.ReactNode }) {
   return <div className="booths-app">
-    <header className="booths-header"><Link href="/" className="booths-brand"><span>GCD<span>26</span></span><div>GLOBAL CITIZENS DAY<small>VIETNAM ROOTS, GLOBAL MINDS</small></div></Link><nav aria-label="Điều hướng gian hàng"><Link href="/">Trang sự kiện ↗</Link><Link href="/booths">Sơ đồ gian hàng</Link><BoothAccount /></nav></header>
     {children}
     <footer className="booths-footer"><span>GLOBAL CITIZENS DAY 2026</span><span>Kết nối thương hiệu · Lan toả giá trị Việt</span><Link href="/">Về trang sự kiện ↗</Link></footer>
   </div>;

@@ -13,11 +13,6 @@ import SpecialGuests from "./special-guests";
 import { programs } from "./journey-programs";
 import { event } from "@/lib/event";
 
-// Thêm các trang đã có vào danh sách này để mở rộng điều hướng chính.
-const pageLinks = [
-  { href: "/booths", label: "Gian hàng" },
-];
-
 const HeritageViewer = dynamic(() => import("./heritage-viewer"), {
   ssr: false,
   loading: () => <div className="scene-loading"><Sun /><span>Đang mở một miền di sản…</span></div>,
@@ -26,7 +21,7 @@ const HeritageViewer = dynamic(() => import("./heritage-viewer"), {
 
 
 export default function HeritageJourney() {
-  const [menuOpen, setMenuOpen] = useState(false);
+
   const [active, setActive] = useState("khoi-hanh");
   const [modal, setModal] = useState<number | "passport" | null>(null);
   const [selected, setSelected] = useState<string[]>(programs.map((p) => p.id));
@@ -37,8 +32,14 @@ export default function HeritageJourney() {
   const dialogRef = useRef<HTMLDialogElement>(null);
   const sceneRef = useRef<HTMLDivElement>(null);
   const lastFocus = useRef<HTMLElement | null>(null);
-  const headerRef = useRef<HTMLElement>(null);
+
   const modalOpen = modal !== null;
+
+  useEffect(() => {
+    const openPassport = () => setModal("passport");
+    window.addEventListener("open-heritage-passport", openPassport);
+    return () => window.removeEventListener("open-heritage-passport", openPassport);
+  }, []);
 
   useEffect(() => {
     const media = window.matchMedia("(prefers-reduced-motion: reduce)");
@@ -81,7 +82,7 @@ export default function HeritageJourney() {
       frame = requestAnimationFrame(() => {
         const max = document.documentElement.scrollHeight - window.innerHeight;
         document.documentElement.style.setProperty("--journey-progress", `${max > 0 ? window.scrollY / max : 0}`);
-        headerRef.current?.classList.toggle("over-hero", window.scrollY < 60);
+
         if (!media.matches) document.documentElement.style.setProperty("--hero-shift", `${Math.min(window.scrollY * 0.12, 95)}px`);
         const marker = Math.min(window.innerHeight * 0.35, 260);
         let currentSection = sections[0]?.id || "khoi-hanh";
@@ -151,51 +152,6 @@ export default function HeritageJourney() {
         Bỏ qua phần mở đầu
       </a>
       <div className="reading-progress" aria-hidden="true" />
-      <header ref={headerRef} className="site-header over-hero">
-        <a
-          href="#khoi-hanh"
-          className="brand"
-          aria-label="Global Citizens Day 2026 — Trang đầu"
-        >
-          <span className="brand-seal">
-            GCD<span>26</span>
-          </span>
-          <span className="brand-wordmark">
-            GLOBAL CITIZENS DAY<small>THE HERITAGE ODYSSEY · 2026</small>
-          </span>
-        </a>
-        <nav
-          className={menuOpen ? "main-nav open" : "main-nav"}
-          aria-label="Điều hướng chính"
-        >
-          {pageLinks.map(({ href, label }) => (
-            <Link
-              key={href}
-              href={href}
-              onClick={() => setMenuOpen(false)}
-            >
-              {label}
-            </Link>
-          ))}
-          <button
-            className="nav-cta"
-            onClick={() => {
-              setModal("passport");
-              setMenuOpen(false);
-            }}
-          >
-            Hẹn một chuyến đi <Arrow />
-          </button>
-        </nav>
-        <button
-          className="menu-toggle"
-          aria-label={menuOpen ? "Đóng menu" : "Mở menu"}
-          aria-expanded={menuOpen}
-          onClick={() => setMenuOpen(!menuOpen)}
-        >
-          {menuOpen ? "✕" : "☰"}
-        </button>
-      </header>
       <main>
         <HeroSection reducedMotion={reducedMotion} />
         <div

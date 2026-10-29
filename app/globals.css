@@ -181,25 +181,20 @@ main {
 .site-header {
   position: fixed;
   top: 0;
-  left: 4.5%;
-  right: 4.5%;
+  left: 0;
+  right: 0;
+  padding-inline: 4.5%;
   z-index: 50;
   height: 94px;
   display: flex;
   align-items: center;
   justify-content: space-between;
   border-bottom: 1px solid var(--line);
-  background: rgb(247 250 255 / 96%);
-  backdrop-filter: blur(12px);
+  --header-background: rgb(247 250 255 / 96%);
+  --header-blur: 12px;
+  background: var(--header-background);
+  backdrop-filter: blur(var(--header-blur));
   transition: background .3s, border-color .3s;
-}
-
-.site-header::before {
-  position: absolute;
-  content: "";
-  inset: 0 -5vw;
-  background: inherit;
-  z-index: -1;
 }
 
 .brand {
@@ -1681,7 +1676,7 @@ main {
 
 @media (min-width: 1600px) {
   .site-header {
-    padding-inline: max(0px, calc((100vw - 1600px) / 2));
+    padding-inline: calc(4.5% + max(0px, (100vw - 1600px) / 2));
   }
 }
 
@@ -1908,8 +1903,7 @@ main {
 
   .site-header {
     height: 74px;
-    left: 6%;
-    right: 6%;
+    padding-inline: 6%;
   }
 
   .menu-toggle {
@@ -1920,8 +1914,8 @@ main {
     display: none;
     position: absolute;
     top: 73px;
-    right: -6.8%;
-    left: -6.8%;
+    right: 0;
+    left: 0;
     padding: 25px 7%;
     background: var(--paper);
     box-shadow: 0 15px 20px #061e4910;

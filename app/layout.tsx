@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import SiteHeader from "./components/site-header";
 import { Be_Vietnam_Pro, Playfair_Display } from "next/font/google";
 import "./globals.css";
 import "./keyvisual.css";
@@ -39,7 +40,7 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
       lang="vi"
       className={`${vietnam.variable} ${playfair.variable}`}
     >
-      <body>{children}</body>
+      <body><SiteHeader />{children}</body>
     </html>
   );
 }

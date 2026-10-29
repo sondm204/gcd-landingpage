@@ -17,10 +17,32 @@ function CloudIntro() {
 }
 
 export default function HeroSection({ reducedMotion }: { reducedMotion: boolean }) {
+  const [introRun, setIntroRun] = useState(0);
   const rootRef = useRef<HTMLElement>(null);
+  const videoRef = useRef<HTMLVideoElement>(null);
+  useEffect(() => {
+    const restart = () => setIntroRun((run) => run + 1);
+    // Also runs when Next restores a previously visited home page.
+    const frame = requestAnimationFrame(() => {
+      if (!window.location.hash) {
+        window.scrollTo({ top: 0, left: 0, behavior: "instant" });
+        restart();
+      }
+    });
+    window.addEventListener("restart-hero-intro", restart);
+    return () => {
+      cancelAnimationFrame(frame);
+      window.removeEventListener("restart-hero-intro", restart);
+    };
+  }, []);
   useEffect(() => {
     let inView = true;
-    const update = () => { if (rootRef.current) rootRef.current.dataset.running = String(inView && !document.hidden && !reducedMotion); };
+    const update = () => {
+      const running = inView && !document.hidden && !reducedMotion;
+      if (rootRef.current) rootRef.current.dataset.running = String(running);
+      if (running) void videoRef.current?.play().catch(() => { /* Keep the poster if autoplay is unavailable. */ });
+      else videoRef.current?.pause();
+    };
     const observer = new IntersectionObserver(([entry]) => { inView = entry.isIntersecting; update(); });
     if (rootRef.current) observer.observe(rootRef.current);
     document.addEventListener("visibilitychange", update); update();
@@ -28,9 +50,9 @@ export default function HeroSection({ reducedMotion }: { reducedMotion: boolean 
   }, [reducedMotion]);
 
   return <>
-    <CloudIntro />
+    <CloudIntro key={introRun} />
     <section ref={rootRef} className="hero hero-immersive" id="khoi-hanh" aria-labelledby="hero-title" data-running="true">
-      <div className="hero-art"><Image src="/keyvisual/1.png" alt="Dải lụa di sản Việt Nam màu xanh và vàng nối lên địa cầu trong ánh bình minh" fill preload sizes="100vw" /></div>
+      <div className="hero-art" aria-hidden="true"><video ref={videoRef} src="/videos/hero_bg.mp4" poster="/keyvisual/1.png" autoPlay={!reducedMotion} muted loop playsInline preload="metadata" /></div>
       <div className="hero-vignette" aria-hidden="true" />
       <div className="hero-atmosphere" aria-hidden="true"><span className="odyssey-glow glow-one" /><span className="odyssey-glow glow-two" /><span className="odyssey-spark spark-one">✦</span><span className="odyssey-spark spark-two">✦</span><span className="odyssey-spark spark-three">✧</span></div>
       <div className="hero-copy">
