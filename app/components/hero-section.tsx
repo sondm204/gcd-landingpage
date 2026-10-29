@@ -2,161 +2,50 @@
 
 import Image from "next/image";
 import { useEffect, useRef, useState } from "react";
-import type { CSSProperties } from "react";
 import { Arrow } from "./ornaments";
-
-const birds = [
-  { x: 0, y: 12, size: 29, delay: "-0.3s" },
-  { x: 48, y: -5, size: 22, delay: "-0.8s" },
-  { x: 94, y: 26, size: 26, delay: "-1.1s" },
-  { x: 140, y: 8, size: 18, delay: "-0.5s" },
-  { x: 181, y: 35, size: 20, delay: "-1.4s" },
-];
-
-function FlyingBird({ style }: { style: CSSProperties }) {
-  return (
-    <svg className="flying-bird" style={style} viewBox="0 0 80 50" fill="currentColor">
-      <g className="bird-wing bird-wing-left">
-        <path d="M41 29C30 20 18 5 2 9C12 12 21 19 28 28L40 32Z" />
-      </g>
-      <g className="bird-wing bird-wing-right">
-        <path d="M39 29C49 16 62 4 78 8C65 12 55 21 48 29L40 32Z" />
-      </g>
-      <path d="M35 29L43 25L48 28L54 30L46 31L40 37L37 34L32 37Z" />
-    </svg>
-  );
-}
-
-function Cloud({ className }: { className: string }) {
-  return (
-    <svg className={className} viewBox="0 0 600 160" fill="none">
-      <path d="M18 117C49 87 94 107 115 83C141 50 182 72 204 56C230 18 292 18 320 48C349 30 388 42 403 67C449 51 482 82 486 96C528 82 569 104 587 120C517 134 457 130 408 137C336 151 278 132 221 139C154 145 72 139 18 117Z" fill="currentColor" />
-      <path d="M5 133C94 122 154 131 224 123C300 115 353 137 433 125C494 118 546 127 595 137C449 149 175 157 5 133Z" fill="currentColor" opacity=".45" />
-    </svg>
-  );
-}
-
-function HeritageBoat() {
-  return (
-    <svg className="heritage-boat" viewBox="0 0 220 190" fill="none">
-      <g className="boat-bob">
-        <path d="M24 141Q109 164 199 137L181 158Q99 178 42 157Z" fill="#513d2a" stroke="#382e25" strokeWidth="2" />
-        <path d="M30 143Q112 157 194 140M43 153Q111 167 182 151" stroke="#c29b60" strokeWidth="2" />
-        <path d="M94 139V22M148 145V55" stroke="#4d3b29" strokeWidth="3" />
-        <path d="M89 27C72 45 63 76 44 115Q67 121 89 121Z" fill="#a33d2c" stroke="#663626" />
-        <path d="M99 24C128 42 131 82 142 118Q118 127 99 124Z" fill="#c26440" stroke="#713e2a" />
-        <path d="M153 58C173 75 178 95 189 124L153 129Z" fill="#ab4c32" stroke="#713e2a" />
-        <path d="M81 40L89 43M68 60L89 64M60 80L89 85M50 102L89 106M99 43L118 47M99 64L128 69M99 86L134 91M99 107L139 111M153 80L170 84M153 100L179 105M153 119L185 121" stroke="#e2b378" strokeWidth="1.3" opacity=".8" />
-        <path d="M95 24L39 140M96 38L184 144M148 59L202 139" stroke="#8e7650" strokeWidth=".8" />
-        <path d="M83 145V133H126V148" fill="#86613b" stroke="#4e3b28" />
-        <path d="M76 134L89 125H120L133 137Z" fill="#594934" />
-        <path d="M87 135H93V143H87ZM100 136H106V145H100ZM113 137H119V146H113Z" fill="#e0c595" />
-        <path d="M169 143V132M166 132Q169 125 173 132" stroke="#43372a" strokeWidth="2" />
-      </g>
-      <g className="boat-wake" stroke="#e5e5c6" strokeLinecap="round">
-        <path d="M10 166Q94 180 201 163" opacity=".65" />
-        <path d="M34 178Q105 187 170 177" opacity=".35" />
-        <path d="M0 157L23 160M194 153L219 150" opacity=".45" />
-      </g>
-    </svg>
-  );
-}
+import HeritageLockup from "./heritage-lockup";
+import { event } from "@/lib/event";
 
 function CloudIntro() {
   const [finished, setFinished] = useState(false);
-
-  useEffect(() => {
-    // Also remove the decorative layer if animation events are interrupted.
-    const timeout = window.setTimeout(() => setFinished(true), 4500);
-    return () => window.clearTimeout(timeout);
-  }, []);
-
+  useEffect(() => { const timer = window.setTimeout(() => setFinished(true), 4500); return () => clearTimeout(timer); }, []);
   if (finished) return null;
-
-  return (
-    <div className="cloud-intro" aria-hidden="true" onAnimationEnd={(event) => {
-      if (event.target === event.currentTarget) setFinished(true);
-    }}>
-      <div className="intro-mist" />
-      {["top-left", "top-right", "middle-left", "middle-right", "bottom-left", "bottom-right"].map((position, index) => (
-        <div className={`intro-cloud-bank bank-${position}`} key={position}>
-          <Image
-            src="/images/intro-cloud.webp"
-            alt=""
-            fill
-            sizes="(max-width: 600px) 160vw, 90vw"
-            preload={index === 0}
-            loading={index === 0 ? undefined : "eager"}
-          />
-        </div>
-      ))}
-    </div>
-  );
+  return <div className="cloud-intro" aria-hidden="true" onAnimationEnd={(e) => { if (e.target === e.currentTarget) setFinished(true); }}>
+    <div className="intro-mist" />
+    {["top-left", "top-right", "middle-left", "middle-right", "bottom-left", "bottom-right"].map((position, index) => <div className={`intro-cloud-bank bank-${position}`} key={position}><Image src="/images/intro-cloud.webp" alt="" fill sizes="(max-width: 600px) 160vw, 90vw" preload={index === 0} loading={index === 0 ? undefined : "eager"} /></div>)}
+  </div>;
 }
 
 export default function HeroSection({ reducedMotion }: { reducedMotion: boolean }) {
   const rootRef = useRef<HTMLElement>(null);
-  const [paused, setPaused] = useState(false);
-
   useEffect(() => {
     let inView = true;
-    const update = () => {
-      if (rootRef.current) {
-        rootRef.current.dataset.running = String(inView && !document.hidden && !paused && !reducedMotion);
-      }
-    };
-    const observer = new IntersectionObserver(([entry]) => {
-      inView = entry.isIntersecting;
-      update();
-    });
+    const update = () => { if (rootRef.current) rootRef.current.dataset.running = String(inView && !document.hidden && !reducedMotion); };
+    const observer = new IntersectionObserver(([entry]) => { inView = entry.isIntersecting; update(); });
     if (rootRef.current) observer.observe(rootRef.current);
-    document.addEventListener("visibilitychange", update);
-    update();
-    return () => {
-      observer.disconnect();
-      document.removeEventListener("visibilitychange", update);
-    };
-  }, [paused, reducedMotion]);
+    document.addEventListener("visibilitychange", update); update();
+    return () => { observer.disconnect(); document.removeEventListener("visibilitychange", update); };
+  }, [reducedMotion]);
 
-  return (
-    <>
+  return <>
     <CloudIntro />
     <section ref={rootRef} className="hero hero-immersive" id="khoi-hanh" aria-labelledby="hero-title" data-running="true">
-      <div className="hero-art">
-        <Image
-          src="/images/heritage-panorama2.png"
-          alt="Toàn cảnh nghệ thuật di sản Việt Nam: núi đá vôi, Tháp Rùa và kiến trúc Huế bên dòng sông xanh"
-          fill
-          preload
-          sizes="(max-aspect-ratio: 16/9) 190vh, 100vw"
-        />
-      </div>
-      <div className="hero-atmosphere" aria-hidden="true">
-        <Cloud className="hero-cloud cloud-one" />
-        <Cloud className="hero-cloud cloud-two" />
-        <Cloud className="hero-cloud cloud-three" />
-        <div className="bird-flock flock-near">
-          {birds.map((bird, i) => <FlyingBird key={i} style={{ left: bird.x, top: bird.y, width: bird.size, "--wing-delay": bird.delay } as CSSProperties} />)}
-        </div>
-        <div className="bird-flock flock-far">
-          {birds.slice(0, 3).map((bird, i) => <FlyingBird key={i} style={{ left: bird.x, top: bird.y, width: bird.size * .68, "--wing-delay": bird.delay } as CSSProperties} />)}
-        </div>
-        <div className="boat-course"><HeritageBoat /></div>
-        <div className="river-shimmer shimmer-one" />
-        <div className="river-shimmer shimmer-two" />
-      </div>
+      <div className="hero-art"><Image src="/keyvisual/1.png" alt="Dải lụa di sản Việt Nam màu xanh và vàng nối lên địa cầu trong ánh bình minh" fill preload sizes="100vw" /></div>
       <div className="hero-vignette" aria-hidden="true" />
+      <div className="hero-atmosphere" aria-hidden="true"><span className="odyssey-glow glow-one" /><span className="odyssey-glow glow-two" /><span className="odyssey-spark spark-one">✦</span><span className="odyssey-spark spark-two">✦</span><span className="odyssey-spark spark-three">✧</span></div>
       <div className="hero-copy">
-        <div className="eyebrow hero-enter hero-event-name"><span className="little-star" aria-hidden="true">✳</span> Global Citizens Day 2026 <span className="little-star" aria-hidden="true">✳</span></div>
-        <h1 id="hero-title" className="hero-enter"><span>Việt Nam.</span><span>Một dải <em>di sản</em></span></h1>
-        <p className="hero-enter">Hiểu cội nguồn. Vững bản lĩnh.<br />Mở tư duy. Chủ động kiến tạo tương lai.</p>
-        <a href="#hanh-trinh" className="button button-red hero-enter">Bước vào hành trình <Arrow /></a>
-        <div className="hero-caption hero-enter"><span className="tiny-line" /> HIỂU CỘI NGUỒN · VƯƠN THẾ GIỚI <span className="tiny-line" /></div>
+        <div className="eyebrow hero-enter hero-event-name"><span /> HÀNH TRÌNH CÔNG DÂN TOÀN CẦU <span /></div>
+        <h1 id="hero-title" className="hero-enter"><span>GLOBAL</span><span>CITIZENS DAY <em>2026</em></span></h1>
+        <HeritageLockup className="hero-enter" />
+        <p className="hero-slogan hero-enter"><span>VIETNAM ROOTS</span><i aria-hidden="true">✦</i><span>GLOBAL MINDS</span></p>
+        <p className="hero-message hero-enter">Hiểu cội nguồn. Vững bản lĩnh.<br />Khai mở tư duy toàn cầu. Chủ động kiến tạo tương lai.</p>
+        <div className="hero-event-details hero-enter">
+          <div><svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><rect x="3" y="5" width="18" height="16" rx="2" /><path d="M7 2v6M17 2v6M3 11h18M7 15h3M14 15h3" /></svg><span><small>HẸN BẠN VÀO</small><strong>{event.date}</strong></span></div>
+          <div><svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M20 10c0 6-8 12-8 12S4 16 4 10a8 8 0 1 1 16 0Z" /><circle cx="12" cy="10" r="2.5" /></svg><span><strong>{event.venue}</strong><small>{event.address}</small></span></div>
+        </div>
+        <div className="hero-actions hero-enter"><a href="#hanh-trinh" className="button button-red">Bước vào hành trình <Arrow /></a><a href="#lich-trinh" className="hero-schedule-link">Lịch trình sự kiện <span aria-hidden="true">↗</span></a></div>
       </div>
-      <div className="hero-bottom">
-        <a href="#hanh-trinh"><span className="scroll-pill">↓</span> CUỘN ĐỂ KHÁM PHÁ</a>
-      </div>
+      <div className="hero-bottom"><a href="#hanh-trinh"><span className="scroll-pill">↓</span> KHỞI HÀNH TỪ BẢN SẮC · KẾT NỐI VỚI THẾ GIỚI</a></div>
     </section>
-    </>
-  );
+  </>;
 }

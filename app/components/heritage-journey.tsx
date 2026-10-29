@@ -11,6 +11,7 @@ import GlobalMindSection from "./global-mind-section";
 import EventSchedule from "./event-schedule";
 import SpecialGuests from "./special-guests";
 import { programs } from "./journey-programs";
+import { event } from "@/lib/event";
 
 // Thêm các trang đã có vào danh sách này để mở rộng điều hướng chính.
 const pageLinks = [
@@ -98,6 +99,8 @@ export default function HeritageJourney() {
     try {
       const stored = JSON.parse(localStorage.getItem("heritage-passport") || "null");
       if (Array.isArray(stored) && stored.length && stored.every((id) => programs.some((p) => p.id === id))) {
+        // Hydrate the optional browser-only saved itinerary after the server render.
+        // eslint-disable-next-line react-hooks/set-state-in-effect
         setSelected(stored); setSaved(true);
       }
     } catch { /* Storage is optional; the itinerary can still be downloaded. */ }
@@ -133,7 +136,7 @@ export default function HeritageJourney() {
   }
 
   function downloadPassport() {
-    const text = `MỘT DẢI DI SẢN\nVietnam Roots, Global Mind\n\nHÀNH TRÌNH CỦA TÔI\n${programs.filter((p) => selected.includes(p.id)).map((p) => `\n${p.number}. ${p.type}\n${p.short}\n${p.description}\n`).join("")}\nNgày, địa điểm và lịch chi tiết: sẽ được công bố.\nĐây là bản lưu lịch trình cá nhân, không phải vé tham dự hay xác nhận đăng ký.`;
+    const text = `${event.name}\n${event.theme}\n${event.slogan}\n\n${event.date}\n${event.venue}\n${event.address}\n\nHÀNH TRÌNH CỦA TÔI\n${programs.filter((p) => selected.includes(p.id)).map((p) => `\n${p.number}. ${p.type}\n${p.short}\n${p.description}\n`).join("")}\nĐây là bản lưu lịch trình cá nhân, không phải vé tham dự hay xác nhận đăng ký.`;
     const url = URL.createObjectURL(new Blob(["\ufeff", text], { type: "text/plain;charset=utf-8" }));
     const link = document.createElement("a");
     link.href = url; link.download = "hanh-trinh-di-san.txt"; link.click();
@@ -152,15 +155,13 @@ export default function HeritageJourney() {
         <a
           href="#khoi-hanh"
           className="brand"
-          aria-label="Một Dải Di Sản — Trang đầu"
+          aria-label="Global Citizens Day 2026 — Trang đầu"
         >
           <span className="brand-seal">
-            di
-            <br />
-            sản<span>✳</span>
+            GCD<span>26</span>
           </span>
           <span className="brand-wordmark">
-            MỘT DẢI DI SẢN<small>VIETNAM ROOTS, GLOBAL MIND</small>
+            GLOBAL CITIZENS DAY<small>THE HERITAGE ODYSSEY · 2026</small>
           </span>
         </a>
         <nav
@@ -225,7 +226,7 @@ export default function HeritageJourney() {
             {Array.from({ length: 4 }, (_, i) => (
               <span key={i}>
                 TỪ CỘI NGUỒN <b>✳</b> ĐẾN THẾ GIỚI <b>✳</b> VIETNAM ROOTS,
-                GLOBAL MIND <b>✳</b>
+                GLOBAL MINDS <b>✳</b>
               </span>
             ))}
           </div>
@@ -422,8 +423,7 @@ export default function HeritageJourney() {
               Bắt đầu hành trình của bạn <Arrow />
             </button>
             <div className="event-status" data-reveal data-reveal-delay="260">
-              <span className="live-dot" /> Ngày & địa điểm tổ chức sẽ sớm được
-              công bố
+              <span className="live-dot" /> {event.date} · {event.venue}
             </div>
           </div>
           <div className="invitation-bottom" data-reveal>
@@ -437,7 +437,7 @@ export default function HeritageJourney() {
         <div className="footer-event" data-reveal>
           <div className="footer-event-copy">
             <span className="eyebrow">GLOBAL CITIZENS DAY 2026</span>
-            <p>Vietnam Roots, Global Mind</p>
+            <p>{event.slogan}</p>
           </div>
           <div className="footer-logos" aria-label="Các đơn vị chương trình">
             <Image src="/images/logo_VN.png" alt="Logo Việt Nam" width={180} height={110} />
@@ -446,7 +446,7 @@ export default function HeritageJourney() {
           </div>
         </div>
         <a href="#khoi-hanh" className="footer-brand" data-reveal>
-          Một dải <em>di sản.</em>
+          The Heritage <em>Odyssey.</em>
         </a>
         <span data-reveal data-reveal-delay="80">
           Hiểu mình đến từ đâu.
@@ -462,7 +462,7 @@ export default function HeritageJourney() {
           Về đầu hành trình ↑
         </a>
         <div className="footer-bottom" data-reveal data-reveal-delay="200">
-          <span>VIETNAM ROOTS, GLOBAL MIND</span>
+          <span>VIETNAM ROOTS – GLOBAL MINDS</span>
           <span>Một hành trình kết nối văn hoá & thế hệ.</span>
           <span>ĐƯỢC KỂ BẰNG NIỀM TỰ HÀO VIỆT</span>
         </div>
@@ -544,8 +544,7 @@ export default function HeritageJourney() {
               </div>
               <div className="dialog-notice">
                 Sự kiện đang được chuẩn bị. Lưu hành trình là một lời hẹn cá
-                nhân, chưa phải đăng ký tham dự. Ngày, địa điểm và hình thức
-                đăng ký sẽ được công bố sau.
+                nhân, chưa phải đăng ký tham dự. Hẹn bạn {event.date.toLowerCase()} tại {event.venue}. Hình thức đăng ký tham dự sẽ được công bố sau.
               </div>
               <div className="dialog-actions">
                 <button

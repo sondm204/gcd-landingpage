@@ -5,5 +5,5 @@ export const siteUrl = new URL(
   "https://gcd-landingpage.vercel.app",
 );
 
-export const siteTitle = "Global Citizens Day 2026 | Vietnam Roots, Global Mind";
-export const siteDescription = "Hiểu về cội nguồn – Vững vàng bản lĩnh – Khai mở tư duy toàn cầu – Chủ động kiến tạo tương lai. Khám phá hội chợ, diễn đàn, Public Speaking, Debating và Heritage Talk.";
+export const siteTitle = "Global Citizens Day 2026 | The Heritage Odyssey";
+export const siteDescription = "Vietnam Roots – Global Minds. Hẹn bạn ngày 29/11/2026 tại Học viện Thanh thiếu niên Việt Nam, Hà Nội. Hành trình hiểu cội nguồn, vững bản lĩnh, khai mở tư duy toàn cầu và kiến tạo tương lai.";

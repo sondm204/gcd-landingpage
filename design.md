@@ -1,88 +1,71 @@
-# Design system — Một Dải Di Sản
+# Design system — Global Citizens Day 2026
 
-Tài liệu này ghi lại phong cách **đang được triển khai** cho landing page sự kiện di sản văn hoá Việt Nam. Mục tiêu là một hành trình biên tập mang chất nghệ thuật: giàu hình ảnh, ấm như giấy in, có nhịp kể chuyện và chuyển động nhẹ để dẫn người xem qua từng điểm dừng.
+## Nhận diện hiện tại
 
-## Tinh thần thị giác
+Thiết kế theo key visual **The Heritage Odyssey** trong `public/keyvisual/`. Chủ đề **Vietnam Roots – Global Minds** kết nối di sản Việt Nam với tư duy công dân toàn cầu. Ngôn ngữ thị giác: địa cầu xanh, dải lụa vàng, ánh bình minh và các đường nét kiến trúc Việt Nam.
 
-- Kết hợp mỹ thuật truyền thống Việt Nam với bố cục đương đại. Họa tiết sen, mặt trời, đèn lồng, mây và đường đi là điểm nhấn, không phủ kín nội dung.
-- Chuyển cảnh theo nhịp **giấy sáng → cảnh quan toàn màn hình → các trạm di sản → không gian xanh đậm → giấy sáng**. Mỗi trạm có một minh họa riêng, nhưng cùng ngôn ngữ màu và chữ.
-- Ưu tiên chất liệu giấy, hạt nhiễu rất nhẹ, viền mảnh, hình cắt ghép và khoảng trắng rộng. Tránh hiệu ứng bóng kính hoặc gradient công nghệ quá mạnh.
-- Ảnh và mô hình 3D mang tính diễn giải nghệ thuật; không trình bày như bản phục dựng lịch sử chính xác.
+Thông tin dùng chung tại `lib/event.ts`: **Chủ nhật, 29/11/2026**, **Học viện Thanh thiếu niên Việt Nam**, **Số 3 Chùa Láng, Phường Láng, Hà Nội**, lấy từ poster `3.png`. Khi đổi thông tin, cập nhật cả cấu hình và poster dùng cho link preview.
 
 ## Màu sắc
 
-| Token / màu | Giá trị | Cách dùng |
+| Token | Giá trị | Vai trò |
 | --- | --- | --- |
-| `--paper` | `#f3eddf` | Nền chính, lớp giấy, chữ trên nền tối |
-| `--ink` | `#293e34` | Chữ và nét chính, xanh lá trầm |
-| `--red` | `#aa382a` | CTA, chữ nhấn, dấu mốc hành trình |
-| `--muted` | `#777568` | Chú thích, nội dung thứ cấp |
-| `--line` | `#d5cebb` | Đường phân cách và viền mảnh |
-| `--gold` | `#b4955e` | Chi tiết trang trí, sắc kim cổ |
-| Xanh nền 3D | `#263e34` | Chuyển nhịp sang phần hiện vật |
-| Vàng nhạt trên nền tối | `#d8bc80` | Điểm nhấn trong phần 3D |
+| `--paper` | `#f7faff` | Nền trắng xanh |
+| `--surface` | `#ffffff` | Thẻ, form, nền logo |
+| `--ink`, `--navy` | `#08275c` | Chữ chính, nhận diện |
+| `--royal` | `#125ac4` | CTA, liên kết, trạng thái đang chọn |
+| `--sky` | `#eaf3ff` | Nền phụ, thẻ thông tin |
+| `--gold` | `#c18b2a` | Viền, điểm dừng, trang trí |
+| `--gold-light` | `#ffe2a0` | Chữ và họa tiết trên nền tối |
+| `--heritage-red` | `#9d1519` | Năm 2026 và Vietnam Roots ở hero |
+| `--muted` | `#596b88` | Nội dung phụ |
+| `--line` | `#cbd9ec` | Viền và phân cách |
 
-Giữ độ tương phản rõ cho chữ và nút. Dùng đỏ làm điểm nhấn có chủ đích, không biến mọi thành phần thành CTA.
+`--red` là tên token kế thừa, hiện trỏ tới xanh royal để giữ tương thích. Không dùng token này cho lỗi và thao tác nguy hiểm; các trạng thái này giữ màu đỏ riêng. Màu gốc của logo, ảnh khách mời và hiện vật 3D được giữ nguyên.
 
-## Chữ và giọng văn
+## Typography
 
-- **Red Rose** (`--font-display`): tiêu đề lớn, câu dẫn và những chữ cần cảm giác biên tập. Trọng lượng mặc định `500`; có thể dùng chữ nghiêng màu đỏ để nhấn một cụm ngắn.
-- **Red Rose** (`--font-body`): đoạn văn, điều hướng, nút, nhãn và thông tin chương trình. Font được khai báo trong `app/layout.tsx` với hỗ trợ tiếng Việt.
-- Tiêu đề hero lớn, căn giữa trên ảnh; desktop dùng `clamp(66px, 7.1vw, 112px)`, mobile dùng `clamp(37px, 11.3vw, 64px)`. Tiêu đề các phần khác co giãn theo khung nhìn thay vì dùng một cỡ cố định.
-- Nhãn nhỏ (`.eyebrow`) cỡ `10px`, nét `600`, letter-spacing `2px`; hợp với số thứ tự, tên chặng và nhãn phụ. Văn bản dài dùng chiều cao dòng thoáng (`line-height: 1.9`).
-- Câu chữ tiếng Việt nên ngắn, gợi hình nhưng rõ ý. Ngày, địa điểm và khách mời chưa xác nhận phải thể hiện là thông tin dự kiến, không viết như đã công bố.
+- **Playfair Display** (`--font-display`): tiêu đề serif theo tinh thần poster, chữ nghiêng ở câu dẫn; kích thước co giãn bằng `clamp()`.
+- **Be Vietnam Pro** (`--font-body`): nội dung, form, điều hướng và lịch trình; ưu tiên dễ đọc và khoảng cách dòng thoáng.
+- Cả hai hỗ trợ tiếng Việt, dùng `next/font/google` trong `app/layout.tsx`, được phục vụ từ ứng dụng sau build.
+- Wordmark **The Heritage Odyssey** dùng artwork gốc. Tiêu đề, slogan, ngày và địa điểm vẫn là HTML có thể đọc/chọn.
 
-## Bố cục và thành phần
-
-- **Hero:** ảnh phong cảnh tràn toàn màn hình (`100svh`, tối thiểu `700px`), chữ nổi trên ảnh; lớp vignette tạo vùng đọc rõ. Header trong suốt khi nằm trên hero.
-- **Lề nội dung:** `.section-pad` dùng `max(7.2vw, calc((100vw - 1400px) / 2))`. Giữ các khối nội dung rộng rãi, tránh dồn quá nhiều chữ trong một khung.
-- **Con đường di sản:** các trạm chương trình sắp theo nhịp xen kẽ minh họa và nội dung; đường nối, số chặng và điểm điều hướng làm rõ hướng di chuyển khi cuộn.
-- **Ba chương trình:** hội chợ gian hàng, tranh biện sinh viên và workshop/talkshow có artwork riêng theo cùng bảng màu. Minh họa trạm chủ yếu là CSS/SVG, với cảm giác collage thủ công.
-- **Không gian 3D:** nền xanh đậm, chữ sáng và vàng nhạt. Ba mô hình cách điệu gồm Chùa Một Cột, Tháp Rùa và Ngọ Môn; khung xem là một điểm dừng trong hành trình, không lấn át phần thông tin.
-- **Nút và viền:** nút chính nền đỏ, chữ kem `#fff8e8`, góc bo rất nhẹ (`2px`), hover nâng `3px` và đỏ đậm hơn. Điều hướng, thẻ và đường phân cách dùng viền mảnh. Luôn giữ trạng thái `focus-visible` rõ ràng.
-- **Responsive:** các thay đổi chính nằm ở `1100px`, `800px`, `600px`, `370px`; riêng hero có thêm quy tắc cho màn hình rộng hoặc thấp. Trên mobile, ưu tiên đọc được tiêu đề, không che nội dung bằng họa tiết và chuyển các cột thành luồng dọc khi cần.
-
-## Hình ảnh và chất liệu
+## Hình ảnh
 
 | Tài sản | Vai trò |
 | --- | --- |
-| `public/images/heritage-panorama.webp` | Ảnh nền hero đang dùng |
-| `public/images/intro-cloud.webp` | Đám mây có hình rõ trong màn mở đầu |
-| `app/components/ornaments.tsx` | Hoa sen, mặt trời, đèn lồng SVG |
-| `app/components/heritage-viewer.tsx` | Các mô hình di sản 3D cách điệu |
+| `public/keyvisual/1.png` | Hero toàn màn hình, nền lời mời và banner gian hàng |
+| `public/keyvisual/3.png` | Poster đầy đủ, ảnh Open Graph/Twitter 1200×630 |
+| `public/keyvisual/4.png` | Wordmark, lấy vùng chữ bằng SVG viewBox trong `heritage-lockup.tsx` |
+| `public/images/intro-cloud.webp` | Mây tan khi vào trang |
+| `public/images/logo_*.png` | Logo chương trình trên nền trắng |
+| `public/images/ns_xuanbac.png`, `km_hoangthuylinh.png` | Khách mời |
+| `public/images/sponsors/` | Logo và media nhà tài trợ |
 
-Lớp hạt nhiễu `body::after` rất nhẹ (`opacity: .045`) giúp toàn trang có chất giấy. Ảnh cần có điểm đặt chữ đủ thoáng; thêm lớp phủ đọc chữ khi thay ảnh hero. Giữ hình trang trí không cản thao tác và không thay thế nội dung văn bản.
+Wordmark dùng `mix-blend-mode: multiply` để hòa nền trắng vào artwork. Không tạo stacking context ở `.hero-copy`, nếu không nền trắng sẽ xuất hiện trở lại. Giữ nguyên ảnh gốc trong `keyvisual/`.
 
-## Nhà tài trợ
+## Các khu vực
 
-Section nhà tài trợ nằm sau lời mời và trước footer. Lưới logo dùng nền giấy sáng, viền mảnh; logo có lớp xám nhạt ở trạng thái thường và hiện màu gốc khi hover hoặc focus bằng bàn phím. Khung media bên dưới dùng nền xanh trầm và tự chuyển mỗi 5 giây, có nút chuyển thủ công; chuyển động tạm dừng khi người xem tương tác hoặc bật chế độ giảm chuyển động.
+- **Hero:** nền tràn khung, chữ navy và wordmark vàng ở trái/giữa, địa cầu ở phải. Mobile tăng lớp phủ sáng cho nội dung, dành vùng dưới cho dải di sản. Header trắng xanh trong nhẹ.
+- **Hành trình:** nền sáng, đường nối xanh–vàng, số trạm navy, minh họa CSS/SVG cùng bảng màu. Giữ cấu trúc kể chuyện và điều hướng khi cuộn.
+- **Di sản 3D:** nền navy đậm, chữ sáng, nút chọn vàng/xanh. Sketchfab giữ xoay, zoom và thông tin tác giả.
+- **Timeline:** nền xanh nhạt, đường dọc mảnh, mốc vàng; chương trình nổi bật có chấm xanh và chữ đậm. Hoạt động song song có nền riêng.
+- **Khách mời:** sân khấu dùng chung xanh–vàng; chỉ chân dung luân chuyển, người phía sau xám. Nút trước/sau dưới mô tả; tự chuyển 10 giây khi hiển thị.
+- **Nhà tài trợ:** thẻ logo trắng, xám khi bình thường, màu gốc khi hover/focus; media trên nền navy. Giữ slideshow và điều khiển thủ công.
+- **Lời mời/footer:** lặp artwork để khép hành trình; footer navy, chữ vàng nhạt, logo trên nền trắng. Hộ chiếu là lịch trình cá nhân trên thiết bị, không phải vé tham dự.
+- **`/booths` và quản trị:** banner cùng artwork; thẻ trắng, viền xanh nhạt, góc bo 5–14px. Bản đồ: trống trắng, có đề xuất vàng, đã chốt navy, đang chọn xanh royal. Trạng thái có nhãn, không chỉ dựa vào màu. Form, popup tài khoản, đăng nhập và dialog duyệt cùng bảng màu.
 
-Dữ liệu nằm trong `app/components/sponsors-section.tsx`: PNJ đã dùng `public/images/sponsors/pnj-logo.jpg` và `pnj-image.jpg`, các vị trí khác vẫn là minh họa. Khi có thêm nhà tài trợ, cập nhật mảng `sponsors` với `name`, `website`, `logo` (đường dẫn file trong `public/`) và `kind`; cập nhật mảng `slides` với ảnh hoặc video tương ứng. Xóa nhãn “minh họa” sau khi thay toàn bộ dữ liệu mẫu. Style riêng nằm trong `app/sponsors.css`.
+## Chuyển động và responsive
 
-## Chuyển động
+Giữ mây mở đầu, float-in khi cuộn, ticker, carousel và hover. Hero có quỹ đạo ánh sáng và điểm sáng chuyển động nhẹ theo địa cầu. Ambient dừng khi hero ngoài màn hình hoặc tab bị ẩn; `prefers-reduced-motion` tắt animation trang trí. Nhiều cột chuyển sang luồng dọc trên điện thoại. Giữ focus bàn phím rõ và nội dung đọc được khi giảm chuyển động.
 
-- **Mở trang:** các cụm mây thật từ `intro-cloud.webp` phủ màn hình rồi tách và tan trong khoảng `3.6s`, để lộ hero. Đây là hoạt ảnh một lần.
-- **Hero lặp:** mây trôi chậm (`95–150s`), chim bay (`37–49s`, có nhịp vỗ cánh), thuyền trôi (`24s`) và nhấp nhô nhẹ (`4.5s`). Chuyển động ambient phải đủ chậm để không tranh sự chú ý với tiêu đề.
-- **Khi cuộn:** phần tử có `data-reveal` bắt đầu mờ, dịch xuống `38px`, thu nhỏ `0.985`; khi vào vùng nhìn sẽ float-in trong `800ms` với easing `cubic-bezier(.2,.7,.2,1)`. Có thể thêm `data-reveal-delay` để tạo nhịp lần lượt; hiệu ứng chỉ chạy một lần.
-- **Nhịp phụ:** ticker chạy `55s`, mặt trời quay `100s`, đèn lồng đung đưa khoảng `6–7s`. Dùng chuyển động có ý nghĩa kể chuyện, tránh thêm nhiều vòng lặp nhanh.
-- Khi hero rời màn hình hoặc tab ẩn, các chuyển động ambient được tạm dừng. Tôn trọng `prefers-reduced-motion`: bỏ hoặc rút ngắn hoạt ảnh, bảo đảm nội dung vẫn xuất hiện và dùng được.
+## Nguồn triển khai
 
-## Khi mở rộng giao diện
+- `app/globals.css`: tokens, layout và tương tác nền tảng.
+- `app/keyvisual.css`: nhận diện chung cho các section.
+- `app/hero.css`: hero, mây và hiệu ứng địa cầu.
+- `app/global-mind.css`, `app/event-program.css`, `app/sponsors.css`: layout từng section.
+- `app/booths/booths.css`, `app/booths/booths-keyvisual.css`: đặt gian hàng và quản trị.
+- `app/opengraph-image.tsx`, `app/twitter-image.tsx`, `lib/site-metadata.ts`: link preview.
 
-1. Dùng lại token màu, hai font và lề nội dung trước khi tạo biến thể mới.
-2. Đặt section mới vào nhịp kể của con đường; chọn một hình ảnh chủ đạo và một điểm nhấn chuyển động là đủ.
-3. Áp dụng `data-reveal` cho các khối cần xuất hiện khi cuộn; kiểm tra cả mobile và chế độ giảm chuyển động.
-4. Kiểm tra độ đọc của chữ trên ảnh, trạng thái bàn phím và hiệu năng của ảnh/3D.
-5. Cập nhật tài liệu này khi thay đổi phong cách nền tảng.
-
-Nguồn triển khai hiện tại: `app/globals.css`, `app/hero.css`, `app/layout.tsx` và `app/components/`. Lịch sử định hướng hình ảnh nằm trong `docs/art-direction.md`; nếu hai tài liệu khác nhau, mã nguồn và tài liệu này mô tả giao diện hiện hành.
-
-## M?ch n?i dung Global Citizens Day 2026
-
-Th�ng di?p: **Hi?u v? c?i ngu?n � V?ng v�ng b?n linh � Khai m? tu duy to�n c?u � Ch? d?ng ki?n t?o tuong lai.** Slogan th?ng nh?t: **Vietnam Roots, Global Mind**.
-
-Hero d?n b?ng �G?c r? Vi?t. Tu duy to�n c?u.� Section `global-mind-section.tsx` di?n gi?i b?n tr? c?t b?ng c�u h?i t? suy ng?m, v?i d? ho? d?a c?u v� du?ng k?t n?i. ��y l� bi?u tu?ng cho tu duy m?, kh�ng d?i di?n cho c�c qu?c gia hay d?i t�c tham d? d� x�c nh?n.
-
-Ba chuong tr�nh g?n v?i nang l?c c? th?: h?i ch? gi�p hi?u v� k? c�u chuy?n Vi?t; tranh bi?n gi�p ki?m ch?ng, l?p lu?n v� l?ng nghe kh�c bi?t; workshop/talkshow hu?ng d?n s�ng t?o, h?p t�c v� h�nh d?ng. Ph?n 3D cung c?p ch?t li?u d? t�m hi?u v� k? chuy?n. L?i m?i cu?i trang hu?ng ngu?i tham gia d?n bu?c di ti?p theo c?a ch�nh m�nh.
-
-Khi th�m n?i dung, k?t n?i gi� tr? d?a phuong v?i m?t c�u h?i, m?t g�c nh�n ho?c m?t h�nh d?ng c� �ch. Tr�nh ch? li?t k� hi?n v?t, d?ng th?i kh�ng ng? � c� kh�ch m?i qu?c t?, chuong tr�nh trao d?i hay co h?i ngh? nghi?p khi chua du?c x�c nh?n. C�c n?i dung ho?t d?ng m?i v?n l� d?nh hu?ng d? ki?n d? ban t? ch?c r� so�t.
+Định hướng cũ lưu như lịch sử tại `docs/art-direction.md`; tài liệu này và key visual hiện tại được ưu tiên khi có mâu thuẫn.

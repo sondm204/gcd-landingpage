@@ -21,7 +21,7 @@ export default function GlobalMindSection() {
           <path className="global-connection" d="M255 145Q330 30 370 72M255 145Q150 25 65 90M255 145Q180 290 77 269" />
           <circle className="global-origin" cx="255" cy="145" r="7" /><circle cx="370" cy="72" r="4" /><circle cx="65" cy="90" r="4" /><circle cx="77" cy="269" r="4" />
         </svg>
-        <span className="global-orbit-label">VIETNAM ROOTS<br /><strong>GLOBAL MIND</strong></span>
+        <span className="global-orbit-label">VIETNAM ROOTS<br /><strong>GLOBAL MINDS</strong></span>
         <span className="global-orbit-note">BẢN SẮC LÀ ĐIỂM TỰA. KẾT NỐI LÀ KHỞI ĐẦU.</span>
       </div>
     </div>

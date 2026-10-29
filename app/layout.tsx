@@ -1,16 +1,17 @@
 import type { Metadata } from "next";
-import { Red_Rose } from "next/font/google";
+import { Be_Vietnam_Pro, Playfair_Display } from "next/font/google";
 import "./globals.css";
+import "./keyvisual.css";
 import { siteUrl, siteTitle, siteDescription } from "@/lib/site-metadata";
 
-const vietnam = Red_Rose({
+const vietnam = Be_Vietnam_Pro({
   variable: "--font-body",
   subsets: ["latin", "vietnamese"],
   weight: ["400", "500", "600", "700"],
   display: "swap",
 });
 
-const playfair = Red_Rose({
+const playfair = Playfair_Display({
   variable: "--font-display",
   subsets: ["latin", "vietnamese"],
   display: "swap",
