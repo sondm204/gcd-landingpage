@@ -1,16 +1,18 @@
 import type { Metadata } from "next";
-import { Red_Rose } from "next/font/google";
+import SiteHeader from "./components/site-header";
+import { Be_Vietnam_Pro, Playfair_Display } from "next/font/google";
 import "./globals.css";
+import "./keyvisual.css";
 import { siteUrl, siteTitle, siteDescription } from "@/lib/site-metadata";
 
-const vietnam = Red_Rose({
+const vietnam = Be_Vietnam_Pro({
   variable: "--font-body",
   subsets: ["latin", "vietnamese"],
   weight: ["400", "500", "600", "700"],
   display: "swap",
 });
 
-const playfair = Red_Rose({
+const playfair = Playfair_Display({
   variable: "--font-display",
   subsets: ["latin", "vietnamese"],
   display: "swap",
@@ -38,7 +40,7 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
       lang="vi"
       className={`${vietnam.variable} ${playfair.variable}`}
     >
-      <body>{children}</body>
+      <body><SiteHeader />{children}</body>
     </html>
   );
 }

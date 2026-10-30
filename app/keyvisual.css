@@ -1,0 +1,96 @@
+/* Global Citizens Day 2026 · The Heritage Odyssey
+   Shared visual language from public/keyvisual. Layout-specific rules stay in their own stylesheets. */
+html { background: var(--paper); }
+body { background: var(--paper); }
+::selection { background: #ffe2a0; color: #08275c; }
+.reading-progress { background: linear-gradient(90deg, #125ac4, #53b6ff, #e9b645); }
+.site-header { height: 90px; }
+.site-header-spacer { height: 90px; }
+.site-header .main-nav > .nav-cta { padding: 12px 19px; }
+.site-header .main-nav > .nav-cta::after { content: none; }
+.site-header.over-hero { --header-background: rgb(247 250 255 / 25%); --header-blur: 14px; border-color: #fff9; }
+.brand-seal { width: 48px; height: 48px; display: grid; place-items: center; padding: 0; transform: none; border: 1px solid #e5c37c; outline: 3px solid #125ac410; border-radius: 50%; color: #ffe2a0; background: #08275c; font-size: 12px; letter-spacing: .02em; }
+.brand-seal > span { position: static; font-size: 12px; }
+.brand-wordmark { font-size: 13px; letter-spacing: .1em; }
+.brand-wordmark small { font-size: 9px; color: #596b88; letter-spacing: .14em; }
+.nav-cta { border-color: #b8ccea; background: #fff9; color: var(--navy); border-radius: 5px; }
+.button-red { background: linear-gradient(120deg, #0d397e, #1265d5); color: #fff; border: 1px solid #2d77d0; box-shadow: 0 7px 22px #125ac41c; border-radius: 5px; }
+.button-red:hover:not(:disabled) { background: #08275c; box-shadow: 0 10px 28px #125ac42b; }
+.text-link { color: var(--royal); border-color: #b89146; }
+.eyebrow { color: var(--royal); }
+.heritage-lockup { display: block; width: 100%; height: auto; mix-blend-mode: multiply; }
+.program-logos { background: #fff; border-bottom: 1px solid var(--line); }
+.ticker { background: linear-gradient(100deg, #061e49, #125ac4); color: #fff2ce; border-block: 1px solid #e0b866; }
+.ticker b { color: #ffd77b; }
+.introduction { background: radial-gradient(ellipse at 0 10%, #dceeff85, transparent 55%), #fff; }
+.intro-side svg { color: #bf8d35; }
+.global-mind { background: radial-gradient(ellipse at 95% 10%, #c5e4ff, transparent 60%), linear-gradient(140deg, #eff6ff, #fffaf0); }
+.global-orbit svg { filter: drop-shadow(0 0 16px #51a5ee33); }
+.global-orbit .global-origin { fill: #ce9c35; }
+.global-orbit-label { background: #eef5ffe8; border-radius: 4px; }
+.global-pillars li { border-color: #c6d7ed; }
+.global-pillar-index span:first-child { color: #b07c26; }
+.journey-heading { background: linear-gradient(180deg, #fff, #f7faff); }
+.station-number { background: #08275c; color: #ffe2a0; border-color: #d4ae62; box-shadow: 0 0 0 5px #edf5ff; }
+.station-kicker .eyebrow { color: var(--royal); }
+.tags span { background: #eaf3ff; color: #315783; border-color: #c9dcf4; }
+.route-base { stroke: #c9a45c; }
+.route-dashes { stroke: #1265d5; }
+.art-disc, .debate-circle, .workshop-disc { background: radial-gradient(circle at 35% 25%, #fff7d8, #c2e1ff); border-color: #90b9ea; }
+.collage-label, .art-sticker, .workshop-ticket { background-color: #fffcf4; border-color: #d4ae62; color: #08275c; }
+.debate-podium { background: #0d397e; color: #ffe2a0; }
+.speech-bubble { background: #fff; color: #08275c; border-color: #c9a45c; }
+.debate-word, .workshop-seal { color: rgb(220, 201, 151); }
+.heritage-section { background: radial-gradient(ellipse at 85% 0, #174b8c, transparent 60%), #061e49; color: #f7faff; border-block: 1px solid #b89146; }
+.heritage-section::before { display: none; }
+.heritage-copy .eyebrow, .heritage-copy h2 em { color: #ffd782; }
+.heritage-copy > p, .heritage-note small { color: #cbdcf5; }
+.event-schedule { background: linear-gradient(130deg, #eef5ff, #fffaf1); }
+.event-agenda-top { border-color: #b08c40; color: #315783; }
+.event-agenda li { border-left-color: #c5a054; }
+.event-agenda li.agenda-featured::before { background: #c8983b; border-color: #ad7c26; box-shadow: 0 0 0 4px #f8e8bf; }
+.event-agenda .agenda-featured h3 { color: #0a438f; font-weight: 600; }
+.agenda-parallel { background: #e1edff; }
+.special-guests { background: radial-gradient(ellipse at 5% 35%, #e1efff, transparent 50%), #fff; }
+.guest-shared-backdrop { border-color: #d2b776; background: radial-gradient(ellipse at 50% 10%, #fff8df, #dcefff 58%, #c0dfff); box-shadow: 0 20px 50px #125ac414; }
+.guest-orbit { border-color: #c3a15a; box-shadow: 0 0 0 26px #90b8ea15, 0 0 0 55px #90b8ea10; }
+.guest-art-label, .guest-portrait-footer { color: #325f92; }
+.guest-navigation button { background: #fff; border-color: #c4d5ed; border-radius: 5px; }
+.guest-navigation button:hover { background: #08275c; color: #fff; }
+.sponsors-section { background: #f4f8ff; border-top: 1px solid var(--line); }
+.sponsor-card { background: #fff; border-color: #ccdaf0; border-radius: 5px; }
+.sponsor-feature { background: linear-gradient(130deg, #061e49, #104b97); border: 1px solid #ccad65; border-radius: 7px; overflow: hidden; }
+.sponsor-feature-copy .eyebrow { color: #ffe2a0; }
+.invitation { background: linear-gradient(180deg, #f7faff 0%, #f7faffeb 46%, #dcecffbb 100%), url('/keyvisual/1.png') center bottom / cover; padding-bottom: 38px; border-top: 1px solid #d9c69b; }
+.invitation .event-status { color: #234c83; }
+.invite-lantern { opacity: .55; }
+.site-footer { background: #061e49; color: #e6efff; border-top: 1px solid #c1a05b; }
+.site-footer .eyebrow, .site-footer .footer-brand em { color: #ffe2a0; }
+.site-footer .footer-event-copy p, .footer-bottom, .site-footer > span { color: #bed1ed; }
+.footer-event, .footer-bottom { border-color: #ffffff26; }
+.footer-logos { background: #fff; padding: 8px 20px; border-radius: 6px; }
+.footer-brand { font-size: clamp(26px, 3vw, 44px); }
+.experience-dialog { border: 1px solid #c5a054; background: linear-gradient(145deg, #fff, #eef5ff); border-radius: 8px; box-shadow: 0 30px 100px #061e4955; }
+.experience-dialog::backdrop { background: #041735ab; }
+.dialog-notice { background: #e7f0ff; border-color: #bdd3ef; color: #355783; }
+.passport-options label { border-color: #cbd9ec; background: #fff9; }
+.journey-dots a { border-color: #688cb7; background: #f7faff; }
+.journey-dots a.current { background: #125ac4; outline-color: #c7983b; }
+.journey-dots span { background: #08275c; color: #fff3d3; border-color: #c5a054; }
+@media (max-width: 800px) {
+  .site-header-spacer { height: 78px; }
+  .site-header { height: 78px; }
+  .brand-wordmark { font-size: 11px; letter-spacing: .04em; }
+  .brand-wordmark small { font-size: 8px; }
+  .main-nav.open { background: #f7faff; border: 1px solid #cbd9ec; }
+  .global-pillars h3 { font-size: 28px; }
+  .footer-logos { padding: 8px 12px; }
+}
+@media (max-width: 400px) { .brand-seal { width: 40px; height: 40px; }.brand { gap: 9px; }.brand-wordmark { font-size: 9px; }.brand-wordmark small { font-size: 7px; } }
+
+@media (max-width: 1100px) {
+  .site-header .menu-toggle { display: block; }
+  .site-header .main-nav { display: none; position: absolute; top: 100%; left: 0; right: 0; padding: 24px 6%; background: #f7faff; border-bottom: 1px solid #cbd9ec; box-shadow: 0 15px 20px #061e4910; }
+  .site-header .main-nav.open { display: flex; flex-direction: column; align-items: stretch; gap: 12px; font-size: 13px; }
+  .site-header .booth-account-popup { left: 0; right: auto; max-width: calc(100vw - 12vw); }
+}

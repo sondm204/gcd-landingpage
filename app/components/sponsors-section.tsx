@@ -110,7 +110,7 @@ export default function SponsorsSection() {
           </a>
         ))}
       </div>
-      <p className="sponsors-demo-note">PNJ dùng logo và hình ảnh được cung cấp. Những vị trí thương hiệu còn lại hiện là dữ liệu minh họa.</p>
+      <p className="sponsors-demo-note"></p>
 
       <div className="sponsor-feature" data-reveal onMouseEnter={() => setPaused(true)} onMouseLeave={() => setPaused(false)} onFocusCapture={() => setPaused(true)} onBlurCapture={(event) => { if (!event.currentTarget.contains(event.relatedTarget)) setPaused(false); }}>
         <div className="sponsor-feature-media">

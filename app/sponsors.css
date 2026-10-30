@@ -42,7 +42,7 @@
   align-items: center;
   gap: 20px;
   padding: 12px 0;
-  border-block: 1px solid #cfc6b4;
+  border-block: 1px solid #cbd9ec;
   color: #8b7860;
   font-size: 10px;
   letter-spacing: 2px;
@@ -54,7 +54,7 @@
   content: "";
   height: 1px;
   flex: 1;
-  background: #cfc6b4;
+  background: #cbd9ec;
 }
 
 .sponsors-rule span:first-child,
@@ -66,7 +66,7 @@
 .sponsor-grid {
   display: grid;
   grid-template-columns: repeat(4, minmax(0, 1fr));
-  border-left: 1px solid #d4cbb9;
+  border-left: 1px solid #cbd9ec;
   margin-top: 25px;
 }
 
@@ -78,23 +78,23 @@
   flex-direction: column;
   justify-content: space-between;
   padding: 19px 21px;
-  border-top: 1px solid #d4cbb9;
-  border-right: 1px solid #d4cbb9;
-  border-bottom: 1px solid #d4cbb9;
-  background: #f5f0e6;
+  border-top: 1px solid #cbd9ec;
+  border-right: 1px solid #cbd9ec;
+  border-bottom: 1px solid #cbd9ec;
+  background: #f4f8ff;
   transition: background .35s, transform .35s, box-shadow .35s;
 }
 
 .sponsor-card:hover,
 .sponsor-card:focus-visible {
   z-index: 1;
-  background: #fff9ed;
+  background: #ffffff;
   transform: translateY(-5px);
   box-shadow: 0 13px 26px #24372b16;
 }
 
 .sponsor-card-index {
-  color: #a19988;
+  color: #667b9c;
   font-size: 8px;
   letter-spacing: 1.2px;
 }
@@ -164,7 +164,7 @@
   place-items: center;
   width: 29px;
   height: 29px;
-  background: #f5f0e6;
+  background: #f4f8ff;
   font: normal 24px/1 var(--font-body), sans-serif;
 }
 
@@ -184,7 +184,7 @@
 .sponsor-card-bottom small {
   display: block;
   margin-top: 5px;
-  color: #858071;
+  color: #596b88;
   font-size: 8px;
 }
 
@@ -195,7 +195,7 @@
 
 .sponsors-demo-note {
   margin: 12px 0 42px;
-  color: #827e71;
+  color: #596b88;
   font-size: 9px;
   line-height: 1.5;
 }
@@ -205,7 +205,7 @@
   display: grid;
   grid-template-columns: 58% 42%;
   min-height: 420px;
-  background: #283e34;
+  background: #08275c;
   color: var(--paper);
 }
 
@@ -231,7 +231,7 @@
   content: "";
   position: absolute;
   inset: 0;
-  background: linear-gradient(180deg, #20362b44, transparent 37%, #20362b1f);
+  background: linear-gradient(180deg, #08275c44, transparent 37%, #08275c1f);
   pointer-events: none;
 }
 
@@ -242,7 +242,7 @@
   z-index: 1;
   padding: 8px 11px;
   border: 1px solid #fff9;
-  background: #24392db3;
+  background: #08275cb3;
   font-size: 7px;
   letter-spacing: 1.4px;
 }
@@ -277,7 +277,7 @@
 .sponsor-feature-copy p {
   max-width: 310px;
   margin-top: 18px;
-  color: #ced5c8;
+  color: #cbdcf5;
   font-size: 11px;
   line-height: 1.8;
 }
@@ -291,7 +291,7 @@
 }
 
 .sponsor-slide-count {
-  color: #e4d5af;
+  color: #ffe2a0;
   font: 20px var(--font-display), Georgia, serif;
 }
 
@@ -309,9 +309,9 @@
 .sponsor-slider-buttons button {
   width: 40px;
   height: 40px;
-  border: 1px solid #e4d5af88;
+  border: 1px solid #ffe2a088;
   background: transparent;
-  color: #e4d5af;
+  color: #ffe2a0;
   font-size: 23px;
   line-height: 1;
   transition: background .2s, color .2s;
@@ -319,13 +319,13 @@
 
 .sponsor-slider-buttons button:hover,
 .sponsor-slider-buttons button:focus-visible {
-  background: #e4d5af;
-  color: #283e34;
+  background: #ffe2a0;
+  color: #08275c;
 }
 
 .sponsor-slider-buttons button:focus-visible,
 .sponsor-slider-dots button:focus-visible {
-  outline-color: #e4d5af;
+  outline-color: #ffe2a0;
 }
 
 .sponsor-slider-dots {
@@ -357,7 +357,7 @@
   align-items: center;
   gap: 15px;
   padding-top: 31px;
-  color: #8a816e;
+  color: #596b88;
   font-size: 7px;
   letter-spacing: 2px;
 }

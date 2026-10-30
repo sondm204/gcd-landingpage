@@ -1,4 +1,148 @@
 /* Full-bleed landscape with independent, transform-only ambient layers. */
+/* Key visual: sky, golden heritage ribbons, and a connected globe. */
+.hero-immersive {
+  --hero-header-height: 90px;
+  position: relative;
+  isolation: isolate;
+  box-sizing: border-box;
+  height: 100vh;
+  height: 100dvh;
+  min-height: 0;
+  display: flex;
+  align-items: center;
+  padding-block: calc(var(--hero-header-height) + clamp(8px, 1.5dvh, 24px)) clamp(54px, 9dvh, 110px);
+  overflow: hidden;
+  color: #08275c;
+  background: #b9ddff;
+}
+.hero-immersive .hero-art { position: absolute; inset: 0; z-index: -3; animation: odyssey-arrive 1.6s ease-out both; }
+.hero-immersive .hero-art video { width: 100%; height: 100%; display: block; object-fit: cover; object-position: center center; }
+.hero-vignette { position: absolute; inset: 0; z-index: -2; pointer-events: none; background: radial-gradient(ellipse at 33% 47%, #fff9e8e6 0%, #fff9e899 25%, transparent 65%), linear-gradient(180deg, #e9f4ff55, transparent 30%, transparent 80%, #063875a6); }
+/* Keep this parent out of a stacking context so the white wordmark canvas blends into the artwork. */
+.hero-immersive .hero-copy {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: clamp(5px, 1dvh, 15px);
+  width: min(950px, 71%);
+  margin-left: 4.5%;
+  max-height: 100%;
+  /* Preserve access to content with unusually large text or very small viewports. */
+  overflow-y: auto;
+  text-align: center;
+}
+.hero-copy > * { flex-shrink: 0; }
+.hero-immersive .hero-event-name { display: flex; justify-content: center; align-items: center; gap: 15px; font-size: 11px; letter-spacing: .23em; color: #08275c; }
+.hero-event-name > span { width: 30px; height: 1px; background: #ae7c28; }
+.hero-immersive h1 { font: 500 clamp(32px, min(6.7vw, 9.5dvh), 108px)/.98 var(--font-display), Georgia, serif; letter-spacing: -.055em; margin: 0; color: #08275c; text-shadow: 0 1px 22px #fff6; }
+.hero-immersive h1 > span { display: block; }
+.hero-immersive h1 > span:first-child { font-size: 1.1em; margin-bottom: clamp(4px, 1dvh, 12px); }
+.hero-immersive h1 > span:last-child { font-size: .82em; white-space: nowrap; }
+.hero-immersive h1 em { color: #9d1519; font-style: normal; font-size: .83em; letter-spacing: -.05em; }
+.hero-copy .heritage-lockup { width: min(700px, 92%, 64dvh); margin: 0 auto; }
+.hero-slogan { display: flex; justify-content: center; align-items: center; gap: clamp(10px, 2dvh, 22px); font: 600 clamp(14px, min(2vw, 3.4dvh), 29px)/1.3 var(--font-display), Georgia, serif; letter-spacing: -.015em; }
+.hero-slogan > span:first-child { color: #9d1519; }
+.hero-slogan i { color: #b88022; font-size: 18px; font-style: normal; }
+.hero-message { margin: 0 auto; font-size: clamp(12px, 1.8dvh, 16px); font-weight: 500; color: #08275c; line-height: 1.65; text-shadow: 0 1px 3px #fff, 0 0 14px #fff; }
+.hero-event-details { display: flex; justify-content: center; gap: 22px; margin: clamp(2px, .6dvh, 8px) auto; padding: clamp(6px, 1dvh, 12px) 16px; border: 1px solid #ffffffc9; border-radius: 10px; background: #f7fbffe6; color: #08275c; text-align: left; }
+.hero-event-details > div { display: flex; align-items: center; gap: 12px; min-width: 0; }
+.hero-event-details > div + div { border-left: 1px solid #aabece; padding-left: 22px; }
+.hero-event-details svg { width: 26px; height: 30px; stroke: #124a93; stroke-width: 1.6; flex-shrink: 0; }
+.hero-event-details span { display: flex; flex-direction: column; gap: 6px; }
+.hero-event-details strong { font-size: clamp(12px, 1.6dvh, 14px); line-height: 1.6; font-weight: 600; }
+.hero-event-details small { font-size: 12px; line-height: 1.5; }
+.hero-event-details > div:first-child small { font-size: 9px; letter-spacing: .15em; }
+.hero-actions { display: flex; align-items: center; justify-content: center; gap: 26px; margin-top: clamp(2px, .8dvh, 12px); }
+.hero-actions .button { padding: clamp(8px, 1.5dvh, 15px) 22px; font-size: 14px; }
+.hero-schedule-link { font-size: 13px; font-weight: 600; color: #08275c; padding: 10px 14px; border: 1px solid #a9bed8; border-radius: 5px; background: #f7fbfff0; transition: background .2s, border-color .2s; }
+.hero-schedule-link:hover { background: #fff; border-color: #08275c; }
+.hero-schedule-link span { margin-left: 14px; }
+.hero-bottom { position: absolute; bottom: max(10px, env(safe-area-inset-bottom), 2dvh); left: 4.5%; right: 4.5%; display: flex; justify-content: center; color: #fff7df; font-size: 9px; letter-spacing: .18em; z-index: 2; }
+.hero-bottom a { display: flex; align-items: center; gap: 14px; }
+.scroll-pill { display: grid; place-items: center; border: 1px solid #ffe2a099; width: 24px; height: 36px; border-radius: 20px; font-size: 18px; animation: odyssey-nudge 3s ease-in-out infinite; }
+.hero-atmosphere { position: absolute; inset: 0; z-index: -1; pointer-events: none; }
+.odyssey-glow { position: absolute; width: 35vw; height: 35vw; border: 1px solid #ffe2a050; border-radius: 50%; right: -2%; top: 12%; transform: rotate(-28deg) scaleY(.38); animation: odyssey-orbit 20s ease-in-out infinite alternate; }
+.glow-two { width: 39vw; height: 39vw; right: -4%; top: 9%; animation-delay: -10s; border-color: #fff8; }
+.odyssey-spark { position: absolute; color: #fff4cd; font-size: 28px; text-shadow: 0 0 14px #ffcc57; animation: odyssey-twinkle 4.8s ease-in-out infinite alternate; }
+.spark-one { top: 24%; right: 27%; }.spark-two { top: 15%; right: 7%; animation-delay: -2s; }.spark-three { bottom: 20%; right: 24%; animation-delay: -3s; }
+.hero-enter { animation: odyssey-enter .9s cubic-bezier(.2,.7,.2,1) 1.25s both; }
+.hero-enter:nth-child(2) { animation-delay: 1.4s; }.hero-enter:nth-child(3) { animation-delay: 1.55s; }.hero-enter:nth-child(4) { animation-delay: 1.7s; }.hero-enter:nth-child(n+5) { animation-delay: 1.85s; }
+.hero-immersive[data-running="false"] .hero-atmosphere *, .hero-immersive[data-running="false"] .scroll-pill { animation-play-state: paused; }
+@keyframes odyssey-arrive { from { opacity: .4; transform: scale(1.03); } to { opacity: 1; transform: scale(1); } }
+@keyframes odyssey-enter { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
+@keyframes odyssey-orbit { to { transform: rotate(-18deg) scaleY(.45) translateY(-10px); } }
+@keyframes odyssey-twinkle { from { opacity: .3; transform: scale(.7); } to { opacity: 1; transform: scale(1.15); } }
+@keyframes odyssey-nudge { 50% { transform: translateY(5px); } }
+@media (min-width: 1800px) { .hero-immersive .hero-copy { margin-left: max(5%, calc((100vw - 1700px) / 2)); } }
+@media (max-width: 1100px) { .hero-immersive .hero-copy { width: 77%; margin-left: 2%; }.hero-event-details { gap: 14px; }.hero-event-details > div + div { padding-left: 14px; } }
+@media (max-width: 800px) {
+  .hero-immersive { --hero-header-height: 78px; }
+  .hero-immersive .hero-art video { object-position: 72% bottom; }
+  .hero-vignette { background: linear-gradient(180deg, #eaf5fff5 0%, #eff7fff2 38%, #fff7e8eb 60%, #fff7e855 78%, #08275c99); }
+  .hero-immersive .hero-copy { width: 90%; margin-inline: auto; }
+  .hero-immersive h1 { font-size: clamp(32px, min(9.6vw, 9.5dvh), 82px); }
+  .hero-slogan { font-size: clamp(14px, min(2.9vw, 3.2dvh), 24px); gap: 12px; }
+  .hero-event-details { flex-direction: column; align-items: center; gap: clamp(6px, 1.5dvh, 15px); }
+  .hero-event-details > div { justify-content: center; }.hero-event-details > div + div { padding: 0; border: 0; }
+  .hero-event-details > div:first-child small { display: none; }
+  .hero-bottom { font-size: 8px; letter-spacing: .08em; }
+  .odyssey-glow { top: auto; bottom: 5%; width: 80vw; height: 80vw; }.odyssey-spark { top: auto; bottom: 18%; }
+}
+@media (max-width: 480px) {
+  .hero-immersive .hero-event-name { font-size: 8px; letter-spacing: .12em; gap: 10px; }
+  .hero-event-name > span { width: 16px; }.hero-immersive h1 { font-size: clamp(30px, min(11.7vw, 8.4dvh), 60px); }
+  .hero-immersive h1 > span:last-child { white-space: normal; font-size: .85em; line-height: 1.1; }
+  .hero-immersive h1 em { display: block; margin-top: clamp(3px, 1dvh, 10px); font-size: .9em; }
+  .hero-copy .heritage-lockup { width: min(100%, 64dvh); }
+  .hero-slogan { font-size: 14px; gap: 9px; }.hero-slogan i { font-size: 12px; }
+  .hero-event-details { padding-inline: 12px; }.hero-event-details svg { width: 22px; }.hero-event-details strong { font-size: 12px; }.hero-event-details small { font-size: 11px; }
+  .hero-actions { gap: 8px; flex-wrap: wrap; }.hero-actions .button { padding: clamp(8px, 1.5dvh, 13px) 12px; font-size: 12px; gap: 10px; }.hero-schedule-link { font-size: 11px; padding: 8px; }.hero-schedule-link span { margin-left: 4px; }
+  .hero-bottom { font-size: 6.5px; }
+}
+@media (max-width: 360px) and (max-height: 650px) {
+  .hero-immersive .hero-copy { gap: 5px; }
+  .hero-immersive h1 { font-size: clamp(30px, 11vw, 40px); }
+  .hero-event-details { padding: 6px 10px; }
+  .hero-event-details strong { font-size: 11px; }.hero-event-details small { font-size: 10px; }
+  .hero-actions { gap: 6px; }
+  .hero-actions .button { font-size: 11px; padding: 8px; gap: 6px; }
+  .hero-actions .button > span { font-size: 18px; }
+  .hero-schedule-link { font-size: 10px; padding: 7px; }.hero-schedule-link span { margin-left: 2px; }
+}
+/* Short landscape screens need a wider composition rather than a tall stack. */
+@media (max-height: 500px) and (min-aspect-ratio: 4/3) {
+  .hero-immersive { padding-block: calc(var(--hero-header-height) + 6px) max(42px, env(safe-area-inset-bottom)); }
+  .hero-immersive .hero-copy { width: 90%; margin-inline: auto; display: grid; grid-template-columns: 1.1fr 1fr; grid-template-areas: "eyebrow eyebrow" "title lockup" "slogan message" "details actions"; gap: 6px 24px; }
+  .hero-event-name { grid-area: eyebrow; }
+  .hero-immersive h1 { grid-area: title; font-size: clamp(25px, min(5.6vw, 9dvh), 52px); }
+  .hero-immersive h1 > span:last-child { white-space: nowrap; font-size: .75em; }
+  .hero-immersive h1 em { display: inline; margin: 0; }
+  .hero-copy .heritage-lockup { grid-area: lockup; width: min(100%, 68dvh); }
+  .hero-slogan { grid-area: slogan; font-size: 13px; gap: 8px; }
+  .hero-message { grid-area: message; font-size: 11px; }
+  .hero-event-details { grid-area: details; flex-direction: column; align-items: center; gap: 3px; margin: 0; padding: 4px 8px; }
+  .hero-event-details > div + div { border: 0; padding: 0; }
+  .hero-event-details > div:first-child small { display: none; }
+  .hero-event-details svg { width: 18px; height: 20px; }
+  .hero-event-details strong { font-size: 10px; }.hero-event-details small { font-size: 9px; }
+  .hero-actions { grid-area: actions; flex-wrap: wrap; gap: 4px 12px; margin: 0; }
+  .hero-actions .button { padding: 8px 12px; font-size: 11px; gap: 10px; }.hero-schedule-link { font-size: 10px; padding-block: 4px; }
+  .hero-bottom { font-size: 7px; }.scroll-pill { height: 25px; width: 20px; font-size: 15px; }
+}
+@media (max-height: 360px) and (min-aspect-ratio: 4/3) {
+  .hero-immersive .hero-copy { gap: 3px 18px; }
+  .hero-immersive .hero-event-name { font-size: 8px; line-height: 1.3; }
+  .hero-immersive h1 { font-size: 24px; }
+  .hero-immersive h1 > span:first-child { margin-bottom: 2px; }
+  .hero-message { font-size: 10px; line-height: 1.4; }
+  .hero-slogan { font-size: 11px; }
+  .hero-event-details span { gap: 2px; }
+  .hero-event-details strong { font-size: 9px; }.hero-event-details small { font-size: 8px; }
+  .hero-actions .button { padding-block: 6px; font-size: 10px; }
+  .hero-actions .button > span { font-size: 18px; }
+}
+@media (prefers-reduced-motion: reduce) { .cloud-intro { display: none; }.hero-enter, .hero-immersive .hero-art, .hero-atmosphere *, .scroll-pill { animation: none !important; } }
 .cloud-intro {
   position: fixed;
   inset: 0;
@@ -158,737 +302,4 @@
     opacity: 0;
     transform: translate3d(var(--cloud-x), var(--cloud-y), 0) scale(1.2);
   }
-}
-
-.site-header.over-hero {
-  background: transparent;
-  backdrop-filter: none;
-  border-bottom-color: #52604a30;
-}
-
-.hero-immersive {
-  position: relative;
-  isolation: isolate;
-  width: 100%;
-  height: 100svh;
-  min-height: 700px;
-  overflow: hidden;
-  background: #d7d5b9;
-  color: #233e33;
-}
-
-.hero-immersive .hero-art {
-  position: absolute;
-  inset: -2% 0 -7%;
-  z-index: -3;
-  transform: translateY(var(--hero-shift));
-  animation: landscape-arrive 1.8s ease-out both;
-}
-
-.hero-immersive .hero-art img {
-  object-fit: cover;
-  object-position: center 58%;
-}
-
-.hero-vignette {
-  position: absolute;
-  inset: 0;
-  z-index: -1;
-  pointer-events: none;
-  background:
-    linear-gradient(180deg, #f3eddf99 0%, #f3eddf14 17%, transparent 60%, #17392c08 76%, #102b27b8 100%),
-    radial-gradient(ellipse at 50% 31%, #f6edda94 0%, #f3eddf55 27%, transparent 59%);
-}
-
-.hero-immersive .hero-topline {
-  position: absolute;
-  top: 117px;
-  left: 7.2%;
-  right: 7.2%;
-  display: flex;
-  justify-content: space-between;
-  font-size: 8px;
-  font-weight: 500;
-  letter-spacing: 2px;
-  color: #4e5d48;
-}
-
-.hero-immersive .hero-copy {
-  position: relative;
-  z-index: 2;
-  width: min(1000px, 90%);
-  margin-inline: auto;
-  padding-top: clamp(165px, 20vh, 220px);
-  text-align: center;
-}
-
-.hero-immersive .hero-copy .eyebrow {
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  gap: 17px;
-  font-size: 10px;
-  letter-spacing: 2.5px;
-}
-
-.little-star {
-  color: var(--red);
-  font-size: 20px;
-  font-weight: 400;
-}
-
-.hero-immersive h1 {
-  margin: 22px 0 22px;
-  font-size: clamp(66px, 7.1vw, 112px);
-  line-height: 1.12;
-  letter-spacing: -4px;
-  text-shadow: 0 2px 24px #f4e8c850;
-}
-
-.hero-immersive h1>span {
-  display: block;
-}
-
-.hero-immersive h1>span:first-child {
-  font-size: 1.06em;
-}
-
-.hero-immersive h1>span:last-child {
-  white-space: nowrap;
-}
-
-.hero-immersive h1 em {
-  color: #a13727;
-}
-
-.hero-immersive .hero-copy>p {
-  font-size: 13px;
-  font-weight: 500;
-  line-height: 1.9;
-  color: #344e3c;
-  margin: 0 0 24px;
-  text-shadow: 0 1px 12px #f8eddba6;
-}
-
-.hero-immersive .button {
-  box-shadow: 0 7px 26px #453f2520;
-}
-
-.hero-immersive .hero-caption {
-  margin-top: 23px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 12px;
-  font-size: 9px;
-  font-weight: 500;
-  letter-spacing: 1.5px;
-  color: #40513d;
-}
-
-.tiny-line {
-  width: 26px;
-  height: 1px;
-  background: #6e794e;
-}
-
-.hero-immersive .hero-bottom {
-  position: absolute;
-  bottom: 30px;
-  left: 7.2%;
-  right: 7.2%;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  gap: 20px;
-  z-index: 3;
-  color: #fff6df;
-  font-size: 8px;
-  letter-spacing: 1.4px;
-}
-
-.hero-bottom>a,
-.hero-bottom .hero-stops {
-  display: flex;
-  align-items: center;
-  gap: 14px;
-}
-
-.hero-bottom i {
-  width: 4px;
-  height: 4px;
-  border-radius: 50%;
-  background: #e8bd77;
-}
-
-.scroll-pill {
-  display: grid;
-  place-content: center;
-  width: 22px;
-  height: 36px;
-  border: 1px solid #fff6df80;
-  border-radius: 20px;
-  font-size: 18px;
-  animation: scroll-nudge 2.5s ease-in-out infinite;
-}
-
-.hero-motion-toggle {
-  display: flex;
-  align-items: center;
-  gap: 9px;
-  padding: 10px 13px;
-  background: #183a2d50;
-  border: 1px solid #fff6df55;
-  border-radius: 2px;
-  color: inherit;
-  font-size: 7px;
-  letter-spacing: 1px;
-  backdrop-filter: blur(5px);
-}
-
-.hero-motion-toggle>span {
-  font-size: 14px;
-}
-
-.hero-motion-toggle:hover:not(:disabled) {
-  background: #183a2d99;
-}
-
-.hero-motion-toggle:disabled {
-  opacity: .8;
-}
-
-.hero-motion-toggle:focus-visible,
-.hero-bottom a:focus-visible {
-  outline-color: #fff6df;
-}
-
-.hero-atmosphere {
-  position: absolute;
-  inset: 0;
-  pointer-events: none;
-  z-index: -2;
-}
-
-.hero-cloud {
-  position: absolute;
-  width: min(48vw, 800px);
-  height: auto;
-  left: -55%;
-  color: #fbf5e4;
-  opacity: .48;
-  filter: blur(3px);
-  animation: cloud-drift 95s linear infinite;
-}
-
-.cloud-one {
-  top: 10%;
-  animation-delay: -28s;
-}
-
-.cloud-two {
-  top: 27%;
-  width: 36vw;
-  opacity: .32;
-  animation-duration: 125s;
-  animation-delay: -88s;
-  filter: blur(5px);
-}
-
-.cloud-three {
-  top: 42%;
-  width: 53vw;
-  opacity: .23;
-  animation-duration: 150s;
-  animation-delay: -65s;
-  filter: blur(6px);
-}
-
-.bird-flock {
-  position: absolute;
-  left: -250px;
-  width: 235px;
-  height: 80px;
-  color: #344c3a;
-  animation: flock-flight 37s linear infinite;
-}
-
-.flock-near {
-  top: 18%;
-  animation-delay: -13s;
-}
-
-.flock-far {
-  top: 37%;
-  opacity: .65;
-  animation-duration: 49s;
-  animation-delay: -36s;
-}
-
-.flying-bird {
-  position: absolute;
-  overflow: visible;
-  height: auto;
-}
-
-.bird-wing {
-  transform-box: view-box;
-  transform-origin: 50% 60%;
-  animation: wing-beat 1.6s ease-in-out infinite;
-  animation-delay: var(--wing-delay);
-}
-
-.boat-course {
-  position: absolute;
-  left: 34%;
-  top: 69%;
-  width: clamp(95px, 10vw, 168px);
-  animation: boat-drift 24s ease-in-out infinite alternate;
-}
-
-.heritage-boat {
-  display: block;
-  width: 100%;
-  overflow: visible;
-  filter: drop-shadow(0 7px 5px #1b4b3925);
-}
-
-.boat-bob {
-  transform-origin: 50% 80%;
-  animation: boat-bob 4.5s ease-in-out infinite;
-}
-
-.boat-wake {
-  animation: wake-shimmer 3.5s ease-in-out infinite alternate;
-}
-
-.river-shimmer {
-  position: absolute;
-  left: 46%;
-  top: 87%;
-  width: 11%;
-  height: 4px;
-  border-radius: 50%;
-  background: #f5ecc687;
-  filter: blur(1px);
-  animation: water-glint 5s ease-in-out infinite alternate;
-}
-
-.shimmer-two {
-  top: 91%;
-  left: 53%;
-  width: 7%;
-  animation-delay: -2s;
-}
-
-.hero-enter {
-  animation: enter 1s cubic-bezier(.2, .7, .2, 1) 1.35s both;
-}
-
-.hero-enter:nth-child(2) {
-  animation-delay: 1.5s;
-}
-
-.hero-enter:nth-child(3) {
-  animation-delay: 1.65s;
-}
-
-.hero-enter:nth-child(4) {
-  animation-delay: 1.8s;
-}
-
-.hero-enter:nth-child(5) {
-  animation-delay: 1.95s;
-}
-
-.hero-immersive[data-running="false"] .hero-atmosphere *,
-.hero-immersive[data-running="false"] .scroll-pill {
-  animation-play-state: paused;
-}
-
-@keyframes landscape-arrive {
-  from {
-    opacity: .35;
-    scale: 1.035;
-  }
-
-  to {
-    opacity: 1;
-    scale: 1;
-  }
-}
-
-@keyframes cloud-drift {
-  from {
-    transform: translateX(0);
-  }
-
-  to {
-    transform: translateX(160vw);
-  }
-}
-
-@keyframes flock-flight {
-  0% {
-    transform: translate3d(0, 15px, 0);
-  }
-
-  35% {
-    transform: translate3d(calc(35vw + 90px), -25px, 0);
-  }
-
-  70% {
-    transform: translate3d(calc(70vw + 180px), 12px, 0);
-  }
-
-  100% {
-    transform: translate3d(calc(100vw + 270px), -15px, 0);
-  }
-}
-
-@keyframes wing-beat {
-
-  0%,
-  100% {
-    transform: scaleY(1);
-  }
-
-  50% {
-    transform: scaleY(.35);
-  }
-}
-
-@keyframes boat-drift {
-  from {
-    transform: translate3d(-4vw, 0, 0) rotate(-1deg);
-  }
-
-  to {
-    transform: translate3d(7vw, -12px, 0) rotate(1deg);
-  }
-}
-
-@keyframes boat-bob {
-
-  0%,
-  100% {
-    transform: translateY(0) rotate(-1deg);
-  }
-
-  50% {
-    transform: translateY(3px) rotate(1.2deg);
-  }
-}
-
-@keyframes wake-shimmer {
-  from {
-    opacity: .35;
-    transform: scaleX(.94);
-  }
-
-  to {
-    opacity: .8;
-    transform: scaleX(1.04);
-  }
-}
-
-@keyframes water-glint {
-  from {
-    opacity: .15;
-    transform: scaleX(.7);
-  }
-
-  to {
-    opacity: .6;
-    transform: scaleX(1.2);
-  }
-}
-
-@keyframes scroll-nudge {
-
-  0%,
-  100% {
-    transform: translateY(0);
-  }
-
-  50% {
-    transform: translateY(5px);
-  }
-}
-
-@media (min-width: 1700px) {
-  .hero-immersive .hero-copy {
-    padding-top: 21vh;
-  }
-}
-
-@media (max-height: 780px) and (min-width: 801px) {
-  .hero-immersive {
-    min-height: 640px;
-  }
-
-  .hero-immersive .hero-copy {
-    padding-top: 145px;
-  }
-
-  .hero-immersive h1 {
-    font-size: clamp(60px, 6.3vw, 88px);
-    margin-block: 14px;
-  }
-
-  .hero-immersive .hero-copy>p {
-    font-size: 12px;
-    margin-bottom: 17px;
-  }
-
-  .hero-immersive .hero-caption {
-    margin-top: 16px;
-  }
-}
-
-@media (max-width: 800px) {
-  .hero-immersive .hero-topline {
-    top: 99px;
-    font-size: 6px;
-    letter-spacing: 1.4px;
-  }
-
-  .hero-immersive .hero-copy {
-    padding-top: 165px;
-  }
-
-  .hero-immersive h1 {
-    font-size: clamp(46px, 8.3vw, 67px);
-    letter-spacing: -2px;
-  }
-
-  .hero-immersive .hero-copy .eyebrow {
-    font-size: 8px;
-    letter-spacing: 1.5px;
-    gap: 12px;
-  }
-
-  .hero-immersive .hero-copy>p {
-    font-size: 11px;
-  }
-
-  .hero-immersive .hero-bottom {
-    font-size: 7px;
-    gap: 12px;
-  }
-
-  .hero-bottom .hero-stops {
-    display: none;
-  }
-
-  .boat-course {
-    top: 64%;
-    left: 38%;
-    width: 135px;
-  }
-
-  .hero-cloud {
-    width: 70vw;
-    left: -70%;
-  }
-
-  .cloud-two {
-    width: 55vw;
-  }
-
-  .cloud-three {
-    width: 80vw;
-  }
-
-  @keyframes cloud-drift {
-    from {
-      transform: translateX(0);
-    }
-
-    to {
-      transform: translateX(180vw);
-    }
-  }
-}
-
-@media (max-width: 600px) {
-  .hero-immersive {
-    min-height: 700px;
-  }
-
-  .hero-immersive .hero-art {
-    inset: 0 0 -5%;
-  }
-
-  .hero-immersive .hero-art img {
-    object-position: 51% center;
-  }
-
-  .hero-vignette {
-    background:
-      linear-gradient(180deg, #f3eddfb3, #f3eddf14 21%, transparent 65%, #102b27c7 100%),
-      radial-gradient(ellipse at 50% 33%, #f6eddaac, #f3eddf66 35%, transparent 64%);
-  }
-
-  .hero-immersive .hero-topline {
-    top: 99px;
-    font-size: 5.5px;
-    left: 7%;
-    right: 7%;
-  }
-
-  .hero-topline>span:last-child {
-    display: none;
-  }
-
-  .hero-immersive .hero-copy {
-    width: 90%;
-    padding-top: max(150px, 19svh);
-  }
-
-  .hero-immersive .hero-copy .eyebrow {
-    font-size: 8px;
-    letter-spacing: 1.3px;
-    gap: 9px;
-  }
-
-  .little-star {
-    font-size: 15px;
-  }
-
-  .hero-immersive h1 {
-    font-size: clamp(37px, 11.3vw, 64px);
-    line-height: 1.22;
-    margin: 22px 0 20px;
-    letter-spacing: -1.5px;
-  }
-
-  .hero-immersive h1>span:first-child {
-    font-size: 1.34em;
-  }
-
-  .hero-immersive .hero-copy>p {
-    font-size: 10px;
-    line-height: 2;
-    margin-bottom: 21px;
-  }
-
-  .hero-immersive .button {
-    padding: 15px 18px;
-    gap: 25px;
-    font-size: 10px;
-  }
-
-  .hero-immersive .hero-caption {
-    margin-top: 21px;
-    gap: 8px;
-    font-size: 7px;
-    letter-spacing: 1px;
-  }
-
-  .tiny-line {
-    width: 18px;
-  }
-
-  .hero-immersive .hero-bottom {
-    bottom: 23px;
-    left: 7%;
-    right: 7%;
-    font-size: 6px;
-    letter-spacing: .6px;
-  }
-
-  .hero-bottom>a {
-    gap: 8px;
-  }
-
-  .hero-motion-toggle {
-    padding: 9px;
-    font-size: 5.5px;
-    letter-spacing: .6px;
-    gap: 6px;
-  }
-
-  .hero-motion-toggle>span {
-    font-size: 12px;
-  }
-
-  .scroll-pill {
-    height: 30px;
-    width: 19px;
-    font-size: 15px;
-  }
-
-  .bird-flock {
-    scale: .75;
-  }
-
-  .flock-near {
-    top: 15%;
-  }
-
-  .flock-far {
-    top: 57%;
-  }
-
-  .boat-course {
-    left: 30%;
-    top: 63%;
-    width: 120px;
-  }
-
-  .river-shimmer {
-    left: 40%;
-    top: 88%;
-    width: 20%;
-  }
-
-  .shimmer-two {
-    left: 52%;
-    top: 91%;
-    width: 15%;
-  }
-}
-
-@media (prefers-reduced-motion: reduce) {
-  .cloud-intro {
-    display: none;
-  }
-
-  .hero-immersive .hero-art {
-    transform: none;
-  }
-
-  .hero-immersive .hero-atmosphere * {
-    animation: none !important;
-  }
-
-  .hero-cloud {
-    left: 4%;
-  }
-
-  .cloud-two {
-    left: 62%;
-  }
-
-  .cloud-three {
-    left: 25%;
-  }
-
-  .flock-near {
-    left: 12%;
-  }
-
-  .flock-far {
-    left: 72%;
-  }
-}.hero-immersive .hero-event-name { font-size: clamp(12px, 1.2vw, 17px); letter-spacing: .12em; font-weight: 600; text-transform: uppercase; gap: 12px; }
-
-/* Global Citizens Day: balance the two-line event message. */
-.hero-immersive h1 { font-size: clamp(56px, 6.5vw, 100px); }
-.hero-immersive .hero-copy > p { font-size: 16px; }
-@media (max-width: 600px) {
-  .hero-immersive h1 { font-size: clamp(28px, 8.8vw, 50px); letter-spacing: -.035em; }
-  .hero-immersive h1 > span:first-child { font-size: 1.06em; }
-  .hero-immersive .hero-copy > p { font-size: 14px; }
 }

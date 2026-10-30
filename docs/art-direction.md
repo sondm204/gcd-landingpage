@@ -1,4 +1,12 @@
-# Một Dải Di Sản
+# Art direction — The Heritage Odyssey
+
+## Nhận diện hiện tại · 29/10/2026
+
+Thiết kế hiện tại theo key visual trong `public/keyvisual/`: `1.png` là nền địa cầu/dải di sản, `3.png` là poster đầy đủ dùng cho link preview, `4.png` là wordmark vàng. Chủ đề **Global Citizens Day 2026 — The Heritage Odyssey**, slogan **Vietnam Roots – Global Minds**. Bảng màu xanh navy, xanh royal, vàng ánh kim và trắng xanh; font Playfair Display và Be Vietnam Pro.
+
+Ngày và địa điểm lấy từ poster: **29/11/2026, Học viện Thanh thiếu niên Việt Nam, Số 3 Chùa Láng, Phường Láng, Hà Nội**. Cấu hình dùng chung tại `lib/event.ts`. Xem [design system hiện tại](../design.md) để triển khai tiếp.
+
+Các mục bên dưới là **lịch sử tạo tài sản của hướng thiết kế cũ**. Hero phong cảnh/collage đã được thay bằng key visual; ảnh mây mở đầu vẫn được sử dụng.
 
 ## Mây mở đầu
 

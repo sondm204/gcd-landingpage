@@ -44,7 +44,7 @@ export default function SpecialGuests() {
       <div className="guest-carousel-layout">
         <div className="guest-visual">
           <div className="guest-orbit-wrapper">
-          <div className="guest-shared-backdrop" aria-hidden="true"><span className="guest-orbit" /><span className="guest-orbit guest-orbit-outer" /><span className="guest-art-label">BẢN SẮC<br />& CẢM HỨNG</span><span className="guest-portrait-footer">VIETNAM ROOTS · GLOBAL MIND</span></div>
+          <div className="guest-shared-backdrop" aria-hidden="true"><span className="guest-orbit" /><span className="guest-orbit guest-orbit-outer" /><span className="guest-art-label">BẢN SẮC<br />& CẢM HỨNG</span><span className="guest-portrait-footer">VIETNAM ROOTS · GLOBAL MINDS</span></div>
           <div className="guest-orbit-stage" aria-hidden="true">
           {guests.map((guest, index) => <div key={guest.name} className={`guest-orbit-card ${index === active ? "is-front" : "is-behind"}`} style={{ "--guest-angle": `${(index - turn) * 360 / guests.length}deg` } as CSSProperties}>
             <span className="guest-portrait">{guest.image ? <Image src={guest.image} alt={guest.alt} fill sizes="(max-width: 800px) 70vw, 35vw" className="guest-photo" /> : <><svg className="guest-silhouette" viewBox="0 0 400 480" aria-hidden="true"><path d="M147 152c-9-17-12-36-8-54 4-37 25-60 61-60s57 23 61 60c4 18 1 37-8 54-4 21-16 42-30 51v25c5 16 25 22 49 30 45 15 69 43 76 91l14 131H38l14-131c7-48 31-76 76-91 24-8 44-14 49-30v-25c-14-9-26-30-30-51Z" /></svg><span className="guest-question" aria-hidden="true">?</span></>}</span>
