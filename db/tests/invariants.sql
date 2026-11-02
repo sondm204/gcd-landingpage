@@ -4,7 +4,11 @@ insert into public.booth_admins(user_id) values('11111111-1111-4111-8111-1111111
 do $$
 declare a jsonb; b jsonb; retry jsonb; payload jsonb;
 begin
-  assert (select count(*) = 40 from public.booth_positions), 'Must seed 40 positions';
+  assert (select count(*) = 25 from public.booth_public_map), 'Public plan must have exactly 25 positions';
+  assert (select count(*) = 24 from public.booth_positions where is_active and is_bookable), 'Exactly 24 booths must accept proposals';
+  assert (select count(*) = 3 from (select zone from public.booth_public_map where is_bookable group by zone having count(*)=8) zones), 'Each of three zones must have eight booths';
+  assert (select zone='Quầy đổi quà' and not is_bookable from public.booth_public_map where id=25), 'Gift counter must not accept registrations';
+  assert not exists(select 1 from public.booth_public_map where id>25), 'Retired booths must not be displayed';
   assert not has_table_privilege('anon', 'public.booth_proposals', 'select'), 'Anonymous users must not read PII';
   assert not has_table_privilege('authenticated', 'public.booth_proposals', 'select'), 'A login alone is not admin authorization';
   assert not has_function_privilege('anon', 'public.review_booth_proposal(uuid,text,uuid,text)', 'execute'), 'Anonymous review forbidden';
@@ -12,6 +16,12 @@ begin
   assert (select public = false from storage.buckets where id = 'booth-proposals'), 'Uploads must be private';
   assert not exists(select 1 from information_schema.columns where table_schema='public' and table_name='booth_public_map' and column_name in ('email','phone','contact_name','image_paths')), 'Public projection must not expose PII';
   payload := '{"position_id":1,"brand":"Example Brand","booth_name":"Example booth","contact_name":"Test User","email":"user@example.test","phone":"0901234567","website":"https://example.test","category":"Khác","description":"A sufficiently long booth description."}'::jsonb;
+  for retry in select to_jsonb(n) from generate_series(25,40) n loop
+    begin
+      perform public.submit_booth_proposal(gen_random_uuid(), 'reserved-position-test', jsonb_set(payload, '{position_id}', retry), '[]');
+      raise exception 'Reserved or retired position accepted a proposal';
+    exception when raise_exception then if sqlerrm <> 'INVALID_POSITION' then raise; end if; end;
+  end loop;
   a := public.submit_booth_proposal('22222222-2222-4222-8222-222222222222', 'fingerprint-a', payload, '[]');
   b := public.submit_booth_proposal('33333333-3333-4333-8333-333333333333', 'fingerprint-b', payload, '[]');
   assert (select count(*) = 2 from public.booth_proposals where position_id=1 and status='pending'), 'Competing pending proposals must be accepted';
