@@ -1,4 +1,5 @@
 import { z } from "zod";
+import { BOOTH_COUNT } from "./types";
 
 const safeWebsite = z.string().trim().max(300).refine((value) => {
   if (!value) return true;
@@ -7,7 +8,7 @@ const safeWebsite = z.string().trim().max(300).refine((value) => {
 }, "Website phải là liên kết http:// hoặc https:// hợp lệ.").transform((value) => value ? new URL(value).href : "");
 
 export const proposalSchema = z.object({
-  position_id: z.coerce.number().int().min(1).max(40),
+  position_id: z.coerce.number().int().min(1).max(BOOTH_COUNT, "Vui lòng chọn gian B01–B24. B25 là quầy đổi quà, không nhận đăng ký."),
   brand: z.string().trim().min(2, "Nhập tên thương hiệu.").max(120),
   booth_name: z.string().trim().min(2, "Nhập tên gian hàng.").max(120),
   contact_name: z.string().trim().min(2, "Nhập tên người liên hệ.").max(100),

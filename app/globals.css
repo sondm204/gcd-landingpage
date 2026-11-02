@@ -3,6 +3,7 @@
 @import "./hero.css";
 @import "./sponsors.css";
 @import "./event-program.css";
+@import "./organizer.css";
 
 :root {
   --paper: #f7faff;
@@ -364,8 +365,6 @@ main {
   padding-bottom: 105px;
   position: relative;
   border-bottom: 1px solid var(--line);
-  margin-inline: 4.5%;
-  padding-inline: 2.7%;
 }
 
 .intro-side {
@@ -1957,8 +1956,7 @@ main {
 
   .introduction {
     display: block;
-    margin-inline: 7%;
-    padding: 60px 0 66px;
+    padding-block: 60px 66px;
   }
 
   .intro-side {

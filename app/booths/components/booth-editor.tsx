@@ -20,7 +20,7 @@ export default function BoothEditor({ proposal, positions, onSaved, onCancel }: 
   const targetPosition = positions.find((item) => item.id === target);
   async function save(event: React.FormEvent<HTMLFormElement>) {
     event.preventDefault();
-    if (busy || imageError || retained.length + imageCount > 3) return;
+    if (busy || imageError || retained.length + imageCount > 3 || !targetPosition?.is_bookable) return;
     const body = new FormData(event.currentTarget);
     body.set("expected_updated_at", proposal.updated_at);
     body.set("retained_images", JSON.stringify(retained));
@@ -39,7 +39,7 @@ export default function BoothEditor({ proposal, positions, onSaved, onCancel }: 
     <fieldset disabled={busy}>
       <label className="booth-field">Thương hiệu / đơn vị *<input name="brand" defaultValue={proposal.brand} required minLength={2} maxLength={120} /></label>
       <label className="booth-field">Tên gian hàng *<input name="booth_name" defaultValue={proposal.booth_name} required minLength={2} maxLength={120} /></label>
-      <label className="booth-field">Vị trí gian hàng<select name="position_id" value={target} onChange={(event) => setTarget(Number(event.target.value))}>{positions.map((item) => <option key={item.id} value={item.id} disabled={item.is_booked && item.id !== proposal.position_id}>{item.code} · Khu {item.zone}{item.id === proposal.position_id ? " · Hiện tại" : item.is_booked ? " · Đã chốt" : item.pending_count ? ` · ${item.pending_count} đề xuất chờ` : " · Có thể chuyển đến"}</option>)}</select></label>
+      <label className="booth-field">Vị trí gian hàng<select name="position_id" value={target} onChange={(event) => setTarget(Number(event.target.value))}>{positions.filter((item) => item.is_bookable).map((item) => <option key={item.id} value={item.id} disabled={item.is_booked && item.id !== proposal.position_id}>{item.code} · Khu {item.zone}{item.id === proposal.position_id ? " · Hiện tại" : item.is_booked ? " · Đã chốt" : item.pending_count ? ` · ${item.pending_count} đề xuất chờ` : " · Có thể chuyển đến"}</option>)}</select></label>
       {moving && <div className="booth-alert">Chuyển từ <strong>{code(proposal.position_id)}</strong> sang <strong>{code(target)}</strong>. Ô cũ sẽ mở lại.{Boolean(targetPosition?.pending_count) && <p>{targetPosition?.pending_count} đề xuất đang chờ ở ô đích sẽ được đóng khi lưu.</p>}<label className="booth-consent"><input type="checkbox" name="confirm_move" required /><span>Tôi xác nhận chuyển vị trí và đóng các đề xuất đang chờ tại ô đích.</span></label></div>}
       <label className="booth-field">Nhóm sản phẩm / hoạt động<select name="category" defaultValue={proposal.category}>{categories.map((item) => <option key={item}>{item}</option>)}</select></label>
       <label className="booth-field">Người liên hệ *<input name="contact_name" defaultValue={proposal.contact_name} required minLength={2} maxLength={100} /></label>

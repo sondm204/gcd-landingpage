@@ -2,7 +2,7 @@
 
 ## Các trang và quy trình
 
-- `/booths`: sơ đồ 40 vị trí, chọn ô, xem trạng thái và gửi đề xuất không cần tài khoản. Liên kết từ phần hội chợ trên landing page.
+- `/booths`: sơ đồ 25 vị trí (24 gian đăng ký và 1 quầy đổi quà), hướng dẫn chọn một trong 3 khu, xem trạng thái và gửi đề xuất không cần tài khoản. Liên kết từ phần hội chợ trên landing page.
 - `/booths/admin/login`: đăng nhập email/mật khẩu Supabase Auth.
 - Sau khi đăng nhập, `/booths` chuyển sang chế độ quản trị ngay trên sơ đồ. Chọn một ô để xem các đề xuất tại vị trí đó, lọc trạng thái, xem liên hệ/ảnh riêng tư và duyệt hoặc từ chối. Khu tổng quan nhóm các hồ sơ theo vị trí. `/booths/admin` chuyển hướng về trang này.
 
@@ -69,7 +69,7 @@ Flyway là bước cập nhật database riêng, không nằm trong `next build`
 
 Migration tạo:
 
-- `booth_positions`: 40 vị trí, mã B01–B40, khu và toạ độ sơ đồ.
+- `booth_positions`: sơ đồ hiện tại có 25 vị trí hoạt động: Hạ Long B01–B08 (thiên nhiên), Văn Miếu B09–B16 (tri thức, di sản, truyền thống), Hội An B17–B24 (văn hóa Việt hướng tới khách quốc tế/xuất khẩu) và B25 (quầy đổi quà của ban tổ chức). Chỉ B01–B24 nhận đề xuất. Các hàng B26–B40 được giữ để bảo toàn lịch sử nhưng đã ngừng hoạt động và không xuất hiện trong public map.
 - `booth_proposals`: thông tin đăng ký, ảnh, mã tham chiếu, trạng thái xét duyệt.
 - `booth_admins`: danh sách tài khoản được cấp quyền.
 - `booth_review_events`: lịch sử quyết định.
@@ -112,7 +112,11 @@ Phần mô tả gian hàng không bắt buộc và không có độ dài tối t
 
 ## Chỉnh sơ đồ theo địa điểm thực tế
 
-Hiện là sơ đồ SVG ý tưởng 40 vị trí, không phải bản vẽ thi công. Toạ độ tính theo phần trăm trên viewBox 1000 × 760. Dữ liệu thật nằm trong `booth_positions`; bản preview khi chưa cấu hình nằm ở `conceptPositions()` trong `lib/booths/types.ts`. Khi thay bố cục, cập nhật bằng migration mới và đồng bộ bản preview. Nếu đổi số lượng vị trí, cần cập nhật validation, form/admin selector và quy tắc sơ đồ.
+Hiện là sơ đồ SVG ý tưởng 25 vị trí, không phải bản vẽ thi công. Toạ độ tính theo phần trăm trên viewBox 1000 × 760. Dữ liệu thật nằm trong `booth_positions`; bản preview khi chưa cấu hình nằm ở `conceptPositions()` trong `lib/booths/types.ts`. Cấu hình `BOOTH_ZONES` dùng chung cho thẻ giới thiệu, sơ đồ, gợi ý form và danh sách vị trí.
+
+Migration `V4__three_themed_booth_zones.sql` chuyển sang 3 khu × 8 gian và một quầy đổi quà. Chạy `pnpm db:migrate` trước khi triển khai mã mới; API kiểm tra đủ 25 vị trí và cờ `is_bookable` để tránh mở nhầm sơ đồ cũ. Migration không xóa đề xuất, ảnh hoặc lịch sử. Nếu B25–B40 còn đề xuất chờ hoặc đã duyệt, migration dừng với `BOOTH_REASSIGNMENT_REQUIRED`; cần xử lý các hồ sơ này bằng quy trình hiện tại trước khi áp dụng. Kiểm tra tương tự cả các hồ sơ B01–B24 nếu việc đổi chủ đề khu ảnh hưởng đến thỏa thuận đã có.
+
+Quầy B25 hiển thị trên sơ đồ với nhãn riêng, không có tương tác chọn; bị loại khỏi số lượng đang mở, selector đăng ký và selector chuyển gian quản trị. Validation API chỉ nhận ID 1–24. Trigger database kiểm tra `is_active` và `is_bookable` khi gửi, duyệt hoặc chuyển gian; gọi RPC trực tiếp cũng không thể đăng ký B25 hay các vị trí đã ngừng hoạt động. Đề xuất chờ vẫn không giữ chỗ. Chọn khu chỉ thay vị trí và gợi ý nội dung, không tự gửi hoặc xóa thông tin đã nhập.
 
 ## Kiểm thử
 
