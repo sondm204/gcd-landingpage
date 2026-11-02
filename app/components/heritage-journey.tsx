@@ -6,6 +6,7 @@ import Link from "next/link";
 import { useEffect, useRef, useState } from "react";
 import { Arrow, Lantern, Lotus, Sun } from "./ornaments";
 import HeroSection from "./hero-section";
+import OrganizerSection from "./organizer-section";
 import SponsorsSection from "./sponsors-section";
 import GlobalMindSection from "./global-mind-section";
 import EventSchedule from "./event-schedule";
@@ -187,6 +188,7 @@ export default function HeritageJourney() {
             ))}
           </div>
         </div>
+        <OrganizerSection />
         <section className="introduction section-pad" id="hanh-trinh">
           <div className="intro-side" data-reveal>
             <span className="eyebrow">TỪ GỐC RỄ VIỆT ĐẾN TƯ DUY TOÀN CẦU</span>
@@ -426,6 +428,7 @@ export default function HeritageJourney() {
       <nav className="journey-dots" aria-label="Các điểm dừng">
         {[
           ["khoi-hanh", "Khởi hành"],
+          ["don-vi-to-chuc", "Đơn vị tổ chức"],
           ["hoi-cho", "Hội chợ"],
           ["tranh-bien", "Tranh biện"],
           ["doi-thoai", "Workshop"],
