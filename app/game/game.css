@@ -1,3 +1,4 @@
+.game-craftPlay { display: block; text-align: center; padding: 15px; border-radius: 8px; background: #17375b; color: #fff2d4; font-size: 13px; font-weight: 600; }
 .game-lobby {
   --game-navy: #0b2b57;
   --game-gold: #efcd87;
