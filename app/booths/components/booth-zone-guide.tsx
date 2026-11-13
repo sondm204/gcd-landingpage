@@ -11,6 +11,7 @@ export default function BoothZoneGuide({ positions, selected, onSelect }: { posi
       return <article key={zone.name} className={`booth-zone-card${active ? " is-selected" : ""}`} style={{ borderTopColor: zone.color }}>
         <div className="booth-zone-card-top"><span style={{ color: zone.color }}>{zone.prefix}01–{zone.prefix}{String(zonePositionCount(zone.prefix)).padStart(2,"0")}</span><span>{zonePositionCount(zone.prefix)} GIAN</span></div>
         <div className="booth-zone-title"><span className="booth-zone-icon" style={{ color: zone.color, background: zone.background }}><BoothZoneIcon kind={zone.icon} /></span><h3>{zone.name}</h3></div><h4>{zone.theme}</h4>{zone.prefix === "TM" && <p><strong>Chi phí: 5.000.000đ / gian</strong></p>}<p>{zone.description}</p>
+        <p><strong>Loại 9m²: Kích thước 3m x 3m x 2.5m</strong></p>
         <span className="booth-zone-example-label">GỢI Ý NỘI DUNG GIAN HÀNG</span>
         <ul>{zone.examples.map((example) => <li key={example}>{example}</li>)}</ul>
         <div className="booth-zone-card-action"><small>{!zone.bookable ? "Đã bố trí · Không nhận đăng ký" : slots.length ? `${available.length}/${zonePositionCount(zone.prefix)} gian đang nhận đề xuất` : "Đang tải trạng thái"}</small>{zone.bookable && <button type="button" className="booth-button secondary compact" aria-pressed={active} onClick={() => onSelect(available[0]?.id ?? zone.firstId)}>Chọn {zone.name.toLowerCase()} <span aria-hidden="true">↗</span></button>}</div>

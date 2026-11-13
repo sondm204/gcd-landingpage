@@ -124,6 +124,7 @@ export default function BoothBooking() {
             <p className="booth-form-hint">{position?.pending_count ? `Vị trí này có ${position.pending_count} đề xuất đang chờ. Bạn vẫn có thể gửi đề xuất của mình.` : "Vị trí này chưa có đề xuất đang chờ."} Gửi đề xuất không đồng nghĩa với giữ chỗ.</p>
             <form id="booth-registration" ref={registrationForm} key={formVersion} onSubmit={submit}>
               <fieldset disabled={busy || !configured || Boolean(error)}>
+                <div className="booth-form-hint"><strong>Loại 9m²: Kích thước 3m x 3m x 2.5m</strong></div>
                 {selectedZone?.prefix === "TM" && <div className="booth-form-hint"><strong>Chi phí gian thương mại: 5.000.000đ / gian.</strong></div>}
                 {selectedZone?.prefix === "TM" && <input type="hidden" name="discount_code" value={discountCode} />}
                 <label className="booth-field">Thương hiệu / đơn vị *<input name="brand" value={brand} onChange={e => setBrand(e.target.value)} required minLength={2} maxLength={120} autoComplete="organization" placeholder="Tên thương hiệu của bạn" /></label>

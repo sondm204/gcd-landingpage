@@ -1,9 +1,9 @@
-// Event identity and logistics supplied in public/keyvisual/3.png.
+// Shared event identity and current logistics.
 export const event = {
   name: "Global Citizens Day 2026",
   theme: "The Heritage Odyssey",
   slogan: "Vietnam Roots – Global Minds",
-  date: "Chủ nhật, 29/11/2026",
-  venue: "Học viện Thanh thiếu niên Việt Nam",
-  address: "Số 3 Chùa Láng, Phường Láng, Hà Nội",
+  date: "Thứ Bảy, 05/12/2026",
+  venue: "Đại học Quốc gia Hà Nội",
+  address: "Cầu Giấy, Hà Nội",
 };
