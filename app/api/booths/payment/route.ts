@@ -1,11 +1,12 @@
 import { z } from "zod";
+import { isCommercialPosition } from "@/lib/booths/types";
 import { transferMemo } from "@/lib/booths/payment";
 import { quotePayment } from "@/lib/booths/vouchers";
 import { json, BoothError, responseError } from "@/lib/booths/server";
 
 export async function POST(request: Request) {
   try {
-    const parsed = z.object({ position: z.number().int().min(1).max(20), code: z.string().trim().max(50), requestKey: z.uuid() }).safeParse(await request.json());
+    const parsed = z.object({ position: z.number().int().refine(isCommercialPosition), code: z.string().trim().max(50), requestKey: z.uuid() }).safeParse(await request.json());
     if (!parsed.success) throw new BoothError(400, "Thông tin thanh toán không hợp lệ.");
     const payment = await quotePayment(parsed.data.position, parsed.data.code);
     const memo = transferMemo(parsed.data.position, parsed.data.requestKey);
