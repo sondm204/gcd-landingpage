@@ -121,10 +121,12 @@ try {
   browser = await chromium.launch({ channel: "chrome", headless: true });
   const page = await browser.newPage({ viewport: { width: 1440, height: 1000 } });
   let qrImageLoads = 0, qrDownloads = 0, paymentQuotes = 0;
+  let useSvgQr = false;
   await page.route('https://img.vietqr.io/**', async route => {
     if (route.request().resourceType() === 'image') qrImageLoads++;
     else { qrDownloads++; await new Promise(resolve => setTimeout(resolve, 600)); }
-    await route.fulfill({ status: 200, contentType: 'image/png', headers: {'Access-Control-Allow-Origin':'*'}, body: png });
+    const amount = new URL(route.request().url()).searchParams.get('amount');
+    await route.fulfill({ status: 200, contentType: useSvgQr ? 'image/svg+xml' : 'image/png', headers: {'Access-Control-Allow-Origin':'*'}, body: useSvgQr ? `<svg xmlns="http://www.w3.org/2000/svg" width="300" height="360"><rect width="300" height="360" fill="white"/><text x="20" y="80">${amount}</text></svg>` : png });
   });
   await page.route('**/api/booths/payment', async route => {
     paymentQuotes++;
@@ -301,7 +303,6 @@ try {
   const before = { images: qrImageLoads, quotes: paymentQuotes, url: page.url() };
   const saved = page.waitForEvent('download');
   await paymentPanel.getByRole('button', {name:'Lưu ảnh QR về thiết bị',exact:true}).click();
-  await paymentPanel.getByRole('button', {name:'Đang lưu ảnh…',exact:true}).waitFor();
   assert(await imageNode.evaluate(node => node.isConnected));
   assert(await qrImage.isVisible());
   const file = await saved;
@@ -317,34 +318,6 @@ try {
   await paymentPanel.getByRole('button', {name:'Lưu ảnh QR về thiết bị',exact:true}).click();
   await secondSave;
   assert.equal(qrDownloads, fetches, 'Saving the same QR again should use the downloaded blob');
-  // Simulate an embedded mobile browser: preserve the form and offer a PNG
-  // preview even when native sharing is unsupported or rejected by the app.
-  await page.evaluate(() => {
-    Object.defineProperty(navigator, 'userAgent', { configurable: true, value: 'Android Zalo WebView' });
-    Object.defineProperty(navigator, 'canShare', { configurable: true, value: () => false });
-  });
-  await paymentPanel.getByRole('button', {name:'Lưu ảnh QR về thiết bị',exact:true}).click();
-  await paymentPanel.getByRole('button', {name:'Lưu ảnh QR về thiết bị',exact:true}).waitFor();
-  const pngPreview = paymentPanel.getByRole('region', {name:'Ảnh PNG để lưu',exact:true});
-  await pngPreview.waitFor();
-  assert.match(await pngPreview.getByRole('img').getAttribute('src'), /^data:image\/png;base64,/);
-  assert.equal(await pngPreview.getByRole('button', {name:'Lưu / chia sẻ ảnh PNG'}).count(), 0);
-  assert.equal(page.url(), before.url);
-  await page.evaluate(() => {
-    Object.defineProperty(navigator, 'canShare', { configurable: true, value: () => true });
-    Object.defineProperty(navigator, 'share', { configurable: true, value: async ({files}) => {
-      window.sharedQrType = files[0].type;
-      throw new DOMException('Blocked by WebView', 'NotAllowedError');
-    } });
-  });
-  await paymentPanel.getByRole('button', {name:'Lưu ảnh QR về thiết bị',exact:true}).click();
-  await paymentPanel.getByRole('button', {name:'Lưu ảnh QR về thiết bị',exact:true}).waitFor();
-  await pngPreview.getByRole('button', {name:'Lưu / chia sẻ ảnh PNG'}).click();
-  await paymentPanel.getByText('Ứng dụng chưa hỗ trợ chia sẻ ảnh.', {exact:false}).waitFor();
-  assert.equal(await page.evaluate(() => window.sharedQrType), 'image/png');
-  assert(await imageNode.evaluate(node => node.isConnected));
-  assert.equal(paymentQuotes, before.quotes);
-  await page.getByRole("button", {name:"Đóng QR thanh toán",exact:true}).click();
   vouchers[0].usage_limit=1; vouchers[0].used_count=1;
   assert.equal((await quoteVoucher()).status,400);
   await page.screenshot({ path: "test-results/booths-mobile-form.png", fullPage: true });

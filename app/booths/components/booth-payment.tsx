@@ -1,5 +1,5 @@
 "use client";
-import Image from "next/image";
+import BoothQrImage from "./booth-qr-image";
 import { createPortal } from "react-dom";
 import { useEffect, useRef, useState } from "react";
 
@@ -43,10 +43,6 @@ function PaymentContent({
 }: PaymentProps) {
   const [draft, setDraft] = useState(code);
   const [busy, setBusy] = useState(false);
-  const [downloading, setDownloading] = useState(false);
-  const [downloadError, setDownloadError] = useState("");
-  const [preview, setPreview] = useState<{ qr: string; src: string; file: File; shareable: boolean } | null>(null);
-  const savedQr = useRef<{ src: string; blob: Blob } | null>(null);
   const applyRequest = useRef<AbortController | null>(null);
   useEffect(() => () => applyRequest.current?.abort(), []);
   async function apply() {
@@ -136,7 +132,7 @@ function PaymentContent({
           <input
             maxLength={50}
             value={draft}
-            disabled={busy || downloading}
+            disabled={busy}
             onChange={(event) => setDraft(event.target.value)}
             placeholder="Nhập mã ưu đãi"
           />
@@ -144,7 +140,7 @@ function PaymentContent({
         <button
           type="submit"
           className="booth-button secondary"
-          disabled={busy || downloading || brand.trim().length < 2}
+          disabled={busy || brand.trim().length < 2}
         >
           {busy ? "Đang xác nhận…" : "Xác nhận"}
         </button>
@@ -163,91 +159,7 @@ function PaymentContent({
             Nội dung chuyển khoản: <strong>{quote.memo}</strong>
           </p>
           {quote.qr ? (
-            <>
-              <Image
-                key={quote.qr}
-                src={quote.qr}
-                width={300}
-                height={360}
-                unoptimized
-                alt="QR chuyển khoản phí gian hàng"
-                style={{ maxWidth: "100%", height: "auto" }}
-              />
-              <button type="button" className="booth-button secondary" disabled={busy || downloading} onClick={async (event) => {
-                event.preventDefault();
-                event.stopPropagation();
-                setDownloading(true);
-                setDownloadError("");
-                try {
-                  let blob: Blob;
-                  if (savedQr.current?.src === quote.qr) {
-                    blob = savedQr.current.blob;
-                  } else {
-                    try {
-                      const direct = await fetch(quote.qr!);
-                      if (!direct.ok || !direct.headers.get("content-type")?.startsWith("image/")) throw new Error("Direct download failed");
-                      blob = await direct.blob();
-                    } catch {
-                      const response = await fetch("/api/booths/payment/download", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ qr: quote.qr }) });
-                      if (!response.ok) { const data = await response.json(); throw new Error(data.error || "Chưa lưu được ảnh QR. Vui lòng thử lại."); }
-                      blob = await response.blob();
-                    }
-                    if (blob.type !== "image/png") {
-                      const source = URL.createObjectURL(blob);
-                      try {
-                        const image = new window.Image();
-                        image.src = source;
-                        await image.decode();
-                        const canvas = document.createElement("canvas");
-                        canvas.width = image.naturalWidth || 1024;
-                        canvas.height = image.naturalHeight || 1024;
-                        const context = canvas.getContext("2d");
-                        if (!context) throw new Error("Không chuyển được ảnh QR sang PNG.");
-                        context.fillStyle = "#fff";
-                        context.fillRect(0, 0, canvas.width, canvas.height);
-                        context.drawImage(image, 0, 0, canvas.width, canvas.height);
-                        blob = await new Promise<Blob>((resolve, reject) => canvas.toBlob(result => result ? resolve(result) : reject(new Error("Không chuyển được ảnh QR sang PNG.")), "image/png"));
-                      } finally {
-                        URL.revokeObjectURL(source);
-                      }
-                    }
-                    savedQr.current = { src: quote.qr!, blob };
-                  }
-                  const filename = `GCD-TM${String(position === 34 ? 21 : position).padStart(2,"0")}-QR.png`;
-                  const file = new File([blob], filename, { type: "image/png" });
-                  const src = await new Promise<string>((resolve, reject) => {
-                    const reader = new FileReader();
-                    reader.onload = () => resolve(String(reader.result));
-                    reader.onerror = () => reject(new Error("Không mở được ảnh QR."));
-                    reader.readAsDataURL(blob);
-                  });
-                  let shareable = false;
-                  try { shareable = Boolean(navigator.canShare?.({ files: [file] })); } catch { /* Some WebViews block file sharing. */ }
-                  setPreview({ qr: quote.qr!, src, file, shareable });
-                  // Embedded mobile browsers may silently ignore blob downloads.
-                  // Keep the prepared PNG on this page, with a fresh gesture for sharing.
-                  if (/Android|iPhone|iPad|iPod|Zalo|FBAN|FBAV|Instagram/i.test(navigator.userAgent) || (navigator.platform === "MacIntel" && navigator.maxTouchPoints > 1)) return;
-                  const url = URL.createObjectURL(blob);
-                  const link = document.createElement("a"); link.href=url; link.download=`GCD-TM${String(position === 34 ? 21 : position).padStart(2,"0")}-QR.png`; document.body.appendChild(link); link.click(); link.remove();
-                  setTimeout(() => URL.revokeObjectURL(url),1000);
-                } catch (err) { setDownloadError(err instanceof Error ? err.message : "Chưa tải được ảnh QR."); }
-                finally { setDownloading(false); }
-              }}>{downloading ? "Đang lưu ảnh…" : "Lưu ảnh QR về thiết bị"}</button>
-              {preview?.qr === quote.qr && <div className="booth-qr-save-preview" aria-label="Ảnh PNG để lưu" role="region">
-                <strong>Ảnh QR đã sẵn sàng (PNG)</strong>
-                <p>Nhấn giữ ảnh bên dưới và chọn lưu ảnh nếu có. Nếu ứng dụng không hỗ trợ, bạn có thể chụp màn hình ảnh QR hoặc mở trang bằng Safari / Chrome qua menu của ứng dụng.</p>
-                <Image src={preview.src} width={300} height={360} unoptimized alt="Ảnh QR PNG để lưu hoặc chụp màn hình" style={{ display: "block", maxWidth: "100%", height: "auto", margin: "12px auto", background: "#fff", userSelect: "auto", WebkitTouchCallout: "default" }} />
-                {preview.shareable && <button type="button" className="booth-button secondary" disabled={downloading} onClick={async () => {
-                  setDownloadError("");
-                  setDownloading(true);
-                  try { await navigator.share({ files: [preview.file] }); }
-                  catch (err) {
-                    if (!(err instanceof Error && err.name === "AbortError")) setDownloadError("Ứng dụng chưa hỗ trợ chia sẻ ảnh. Hãy nhấn giữ ảnh hoặc chụp màn hình QR bên trên.");
-                  } finally { setDownloading(false); }
-                }}>Lưu / chia sẻ ảnh PNG</button>}
-              </div>}
-              {downloadError && <p role="alert" className="booth-payment-error">{downloadError}</p>}
-            </>
+            <BoothQrImage key={quote.qr} qr={quote.qr} position={position} />
           ) : (
             <p>
               {quote.amount === 0
