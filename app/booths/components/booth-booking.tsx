@@ -3,6 +3,8 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import { BOOTH_COUNT, POSITION_COUNT, BOOTH_ZONES, zoneForPosition, type BoothPosition } from "@/lib/booths/types";
 import BoothZoneGuide from "./booth-zone-guide";
+import BoothPayment from "./booth-payment";
+import BoothVouchers from "./booth-vouchers";
 import BoothZoneIcon from "./booth-zone-icon";
 import BoothMap from "./booth-map";
 import Image from "next/image";
@@ -28,6 +30,8 @@ export default function BoothBooking() {
   const [authError, setAuthError] = useState("");
   const [logoutBusy, setLogoutBusy] = useState(false);
   const requestKey = useRef<string | null>(null);
+  const [paymentKey, setPaymentKey] = useState("");
+  const [discountCode, setDiscountCode] = useState("");
   const messageRef = useRef<HTMLDivElement>(null);
 
   const refresh = useCallback(async (signal?: AbortSignal) => {
@@ -36,6 +40,7 @@ export default function BoothBooking() {
       const data = await response.json();
       if (!response.ok) throw new Error(data.error);
       setPositions(data.positions); setConfigured(data.configured); setError("");
+      requestKey.current ||= crypto.randomUUID(); setPaymentKey(requestKey.current);
       try {
         const session = await fetch("/api/booths/admin/session", { cache: "no-store", signal });
         const account = await session.json();
@@ -63,7 +68,6 @@ export default function BoothBooking() {
   const booked = bookablePositions.filter((item) => item.is_booked).length;
   function selectPosition(id: number) {
     if (busy || !zoneForPosition(id)?.bookable) return;
-    if (selected !== id) requestKey.current = null;
     setSelected(id);
     setSubmitError("");
   }
@@ -100,13 +104,14 @@ export default function BoothBooking() {
     <section className="booths-intro"><div><span className="booth-kicker">DÀNH CHO THƯƠNG HIỆU & ĐƠN VỊ ĐỒNG HÀNH</span><h1>Chọn một góc nhỏ.<br /><em>Mở ngàn kết nối.</em></h1><p>Sơ đồ gồm 5 gian văn hoá, 5 gian tài trợ, 20 gian thương mại và 3 gian BTC. Chọn gian thương mại hoặc tài trợ phù hợp để gửi đề xuất tham gia.</p></div><div className="booths-intro-aside"><span className="booths-big-number">{POSITION_COUNT}<span>VỊ TRÍ DỰ KIẾN</span></span><p><strong>{BOOTH_COUNT} gian nhận đề xuất</strong><br />5 gian văn hoá và 3 gian BTC đã bố trí.<br />Chỉ xác nhận sau khi xét duyệt.</p></div></section>
     <BoothZoneGuide positions={positions} selected={selected} onSelect={(id) => { selectPosition(id); document.getElementById("booth-plan")?.scrollIntoView({ behavior: window.matchMedia("(prefers-reduced-motion: reduce)").matches ? "instant" : "smooth", block: "start" }); }} />
     <div className="booth-process"><span><b>01</b> Chọn chủ đề & vị trí</span><span><b>02</b> Gửi câu chuyện gian hàng</span><span><b>03</b> Chờ ban tổ chức xét duyệt</span></div>
-    {admin && <div className="booth-admin-mode"><div><span className="booth-kicker">CHẾ ĐỘ QUẢN TRỊ</span><p>{admin.email} · Chọn ô để xem đề xuất, xét duyệt hoặc sửa gian hàng đã chốt.</p></div><button type="button" className="booth-button secondary compact" disabled={logoutBusy} onClick={logout}>{logoutBusy ? "Đang đăng xuất…" : "Đăng xuất ↗"}</button></div>}
+    {admin && <div className="booth-admin-mode"><div><span className="booth-kicker">CHẾ ĐỘ QUẢN TRỊ</span><p>{admin.email} · Chọn ô để xem đề xuất, xét duyệt hoặc sửa gian hàng đã chốt.</p></div><div className="booth-admin-toolbar"><BoothVouchers /><button type="button" className="booth-button secondary compact" disabled={logoutBusy} onClick={logout}>{logoutBusy ? "Đang đăng xuất…" : "Đăng xuất ↗"}</button></div></div>}
     {error && <div className="booth-alert error" role="alert">{error} <button type="button" onClick={() => void refresh()}>Tải lại sơ đồ</button></div>}
     {!loading && !configured && !error && <div className="booth-alert">Đây là bản xem trước sơ đồ. Cổng nhận đề xuất chưa mở; chức năng gửi sẽ hoạt động khi ban tổ chức hoàn tất cấu hình.</div>}
     {loading ? <div className="booth-loading" role="status">Đang mở sơ đồ gian hàng…</div> : positions.length > 0 && <>
       <div className="booth-availability"><span><strong>{bookablePositions.length - booked}</strong> gian đang nhận đề xuất</span><span><strong>{booked}</strong> gian đã xác nhận / {BOOTH_COUNT}</span><small>Không tính gian văn hoá và BTC · Cập nhật mỗi 30 giây</small></div>
       <div id="booth-plan" className={`booth-booking-grid ${admin ? "is-admin" : ""}`}>
         <div className="booth-map-column"><BoothMap positions={positions} selected={selected} onSelect={selectPosition} />
+          {!admin && selected <= 20 && paymentKey && !success && <BoothPayment key={`${selected}:${paymentKey}`} position={selected} requestKey={paymentKey} code={discountCode} onApply={setDiscountCode} />}
           {admin && <section className="booth-group-overview" aria-label="Nhóm đề xuất theo vị trí"><span className="booth-kicker">TỔNG QUAN THEO VỊ TRÍ</span><h2>Những ô đang có hồ sơ.</h2><p>Bấm một nhóm để xem hồ sơ tương ứng bên cạnh.</p><div>{positions.filter((entry) => entry.pending_count>0 || entry.is_booked).map((entry) => <button type="button" key={entry.id} className={selected===entry.id ? "selected" : ""} aria-pressed={selected===entry.id} onClick={()=>setSelected(entry.id)}><strong>{entry.code}</strong><span>{entry.pending_count} chờ{entry.is_booked ? " · Đã chốt" : ""}</span>{entry.confirmed_brand && <small>{entry.confirmed_brand}</small>}</button>)}</div>{!positions.some((entry)=>entry.pending_count>0||entry.is_booked) && <p>Chưa có đề xuất đang chờ hoặc gian hàng đã chốt.</p>}</section>}
         </div>
         {!authReady || authError ? <aside className="booth-form-card"><p role="status">{authError || "Đang kiểm tra phiên đăng nhập…"}</p><Link href="/booths/admin/login">Đăng nhập quản trị ↗</Link></aside> : admin && position ? <BoothAdminPanel key={position.id} position={position} positions={positions} onSelect={setSelected} onChanged={refresh} onUnauthorized={unauthorized} /> :
@@ -114,10 +119,12 @@ export default function BoothBooking() {
           <div className="booth-form-heading"><span className="booth-kicker">VỊ TRÍ BẠN QUAN TÂM</span><div><h2>{position?.code}</h2><span>Khu {position?.zone}<br />{position?.is_booked ? "Đã xác nhận" : "Đang nhận đề xuất"}</span></div></div>
           <label className="booth-field">Chọn nhanh vị trí<select value={selected} onChange={(event) => selectPosition(Number(event.target.value))}>{BOOTH_ZONES.map((zone) => <optgroup key={zone.name} label={`${zone.name} · ${zone.theme}`}>{bookablePositions.filter((item) => item.zone === zone.name).map((item) => <option value={item.id} key={item.id}>{item.code} · Khu {item.zone}{item.is_booked ? " · Đã xác nhận" : item.pending_count ? ` · ${item.pending_count} đề xuất` : " · Đang mở"}</option>)}</optgroup>)}</select></label>
           {selectedZone && <div className="booth-selected-zone" style={{ borderLeftColor: selectedZone.color, background: selectedZone.background }}><div className="booth-selected-zone-title"><BoothZoneIcon kind={selectedZone.icon} color={selectedZone.color} /><strong>{selectedZone.name} · {selectedZone.theme}</strong></div><p>{selectedZone.description}</p><small>Gợi ý: {selectedZone.examples.join("; ")}.</small></div>}
-          {position?.is_booked ? <div className="booth-reserved"><span>ĐÃ XÁC NHẬN</span><h3>{position.confirmed_booth}</h3><p>{position.confirmed_brand}</p><p>Vị trí này đã được ban tổ chức chốt. Mời bạn chọn một vị trí khác trên sơ đồ.</p></div> : success ? <div className="booth-success" role="status" tabIndex={-1} ref={messageRef}><span className="booth-kicker">ĐÃ NHẬN ĐỀ XUẤT</span><h3>Cảm ơn bạn đã đồng hành.</h3><p>Đề xuất cho vị trí <strong>{success.code}</strong> đang chờ xét duyệt.</p><div className="booth-reference">{success.reference}</div><p>Lưu mã này để trao đổi với ban tổ chức. Đây chưa phải xác nhận giữ chỗ; ban tổ chức sẽ liên hệ qua email hoặc số điện thoại bạn cung cấp.</p><button className="booth-button secondary" type="button" onClick={() => { setSuccess(null); requestKey.current = null; setPreviews([]); setFormVersion((value) => value + 1); }}>Gửi một đề xuất khác</button></div> : <>
+          {position?.is_booked ? <div className="booth-reserved"><span>ĐÃ XÁC NHẬN</span><h3>{position.confirmed_booth}</h3><p>{position.confirmed_brand}</p><p>Vị trí này đã được ban tổ chức chốt. Mời bạn chọn một vị trí khác trên sơ đồ.</p></div> : success ? <div className="booth-success" role="status" tabIndex={-1} ref={messageRef}><span className="booth-kicker">ĐÃ NHẬN ĐỀ XUẤT</span><h3>Cảm ơn bạn đã đồng hành.</h3><p>Đề xuất cho vị trí <strong>{success.code}</strong> đang chờ xét duyệt.</p><div className="booth-reference">{success.reference}</div><p>Lưu mã này để trao đổi với ban tổ chức. Đây chưa phải xác nhận giữ chỗ; ban tổ chức sẽ liên hệ qua email hoặc số điện thoại bạn cung cấp.</p><button className="booth-button secondary" type="button" onClick={() => { setSuccess(null); requestKey.current = crypto.randomUUID(); setPaymentKey(requestKey.current); setDiscountCode(""); setPreviews([]); setFormVersion((value) => value + 1); }}>Gửi một đề xuất khác</button></div> : <>
             <p className="booth-form-hint">{position?.pending_count ? `Vị trí này có ${position.pending_count} đề xuất đang chờ. Bạn vẫn có thể gửi đề xuất của mình.` : "Vị trí này chưa có đề xuất đang chờ."} Gửi đề xuất không đồng nghĩa với giữ chỗ.</p>
             <form key={formVersion} onSubmit={submit}>
               <fieldset disabled={busy || !configured || Boolean(error)}>
+                {selectedZone?.prefix === "TM" && <div className="booth-form-hint"><strong>Chi phí gian thương mại: 5.000.000đ / gian.</strong></div>}
+                {selectedZone?.prefix === "TM" && <input type="hidden" name="discount_code" value={discountCode} />}
                 <label className="booth-field">Thương hiệu / đơn vị *<input name="brand" required minLength={2} maxLength={120} autoComplete="organization" placeholder="Tên thương hiệu của bạn" /></label>
                 <label className="booth-field">Tên gian hàng *<input name="booth_name" required minLength={2} maxLength={120} placeholder="Một cái tên kể câu chuyện riêng" /></label>
                 <label className="booth-field">Nhóm sản phẩm / hoạt động *<select name="category" required defaultValue=""><option value="" disabled>Chọn lĩnh vực</option>{categories.map((item) => <option key={item}>{item}</option>)}</select></label>
@@ -133,6 +140,7 @@ export default function BoothBooking() {
                 {previews.length > 0 && <div className="booth-image-previews">{previews.map((url, index) => <span key={url}><Image src={url} width={70} height={70} unoptimized alt={`Ảnh đính kèm ${index + 1}`} /></span>)}</div>}
                 {imageError && <p className="booth-inline-error" role="alert">{imageError}</p>}
                 <div className="booth-honeypot" aria-hidden="true"><label>Không nhập trường này<input name="website_confirm" tabIndex={-1} autoComplete="off" /></label></div>
+                {selectedZone?.prefix === "TM" && <label className="booth-field">Ảnh chuyển khoản (không bắt buộc)<input name="payment_receipt" type="file" accept="image/jpeg,image/png,image/webp" /><small>Một ảnh JPEG, PNG hoặc WebP, tối đa 1 MB. Chỉ BTC được xem để đối soát.</small></label>}
                 <label className="booth-consent"><input type="checkbox" name="consent" required /><span>Tôi đồng ý để ban tổ chức lưu thông tin và liên hệ xét duyệt. Tên thương hiệu/gian hàng có thể hiển thị công khai sau khi được duyệt; thông tin liên hệ và ảnh chỉ dành cho quản trị.</span></label>
                 {submitError && <div className="booth-alert error" role="alert" ref={messageRef} tabIndex={-1}>{submitError}</div>}
                 <button type="submit" className="booth-button" disabled={Boolean(imageError)}>{busy ? "Đang gửi đề xuất…" : `Gửi đề xuất cho ${position?.code}`}<span aria-hidden="true">↗</span></button>
@@ -145,6 +153,6 @@ export default function BoothBooking() {
     <section className="booth-faq"><span className="booth-kicker">TRƯỚC KHI GỬI ĐỀ XUẤT</span><h2>Một vài điều cần biết.</h2>
       <details><summary>Tôi nên chọn loại gian nào?</summary><p>Chọn gian thương mại để giới thiệu, bán sản phẩm hoặc dịch vụ. Chọn gian tài trợ để đề xuất đồng hành và quảng bá theo thỏa thuận với ban tổ chức. Gửi đề xuất chưa đồng nghĩa được xác nhận tham gia.</p></details>
       <details><summary>Tôi có thể đăng ký gian văn hoá hoặc BTC không?</summary><p>Không. VH01–VH05 đã có đơn vị phụ trách. BTC01–BTC02 hỗ trợ khách và BTC03 phục vụ đổi quà. Chỉ TM01–TM20 và TT01–TT05 nhận đề xuất mới.</p></details>
-      <details><summary>Gửi đề xuất có giữ chỗ cho tôi không?</summary><p>Chưa. Một vị trí có thể nhận nhiều đề xuất cùng lúc. Chỉ đề xuất được admin duyệt mới xác nhận vị trí; các đề xuất khác của cùng vị trí sẽ được đóng.</p></details><details><summary>Tôi có cần tạo tài khoản không?</summary><p>Không. Bạn chỉ cần điền thông tin liên hệ chính xác để ban tổ chức có thể trao đổi và phản hồi.</p></details><details><summary>Chi phí, diện tích và tiện ích gian hàng thế nào?</summary><p>Đây là sơ đồ ý tưởng. Chi phí, mặt bằng thực tế, lịch tổ chức và tiện ích sẽ được ban tổ chức trao đổi trước khi chốt tham gia. Website chưa thực hiện thu phí hoặc thanh toán.</p></details></section>
+      <details><summary>Gửi đề xuất có giữ chỗ cho tôi không?</summary><p>Chưa. Một vị trí có thể nhận nhiều đề xuất cùng lúc. Chỉ đề xuất được admin duyệt mới xác nhận vị trí; các đề xuất khác của cùng vị trí sẽ được đóng.</p></details><details><summary>Tôi có cần tạo tài khoản không?</summary><p>Không. Bạn chỉ cần điền thông tin liên hệ chính xác để ban tổ chức có thể trao đổi và phản hồi.</p></details><details><summary>Chi phí, diện tích và tiện ích gian hàng thế nào?</summary><p>Đây là sơ đồ ý tưởng. Chi phí, mặt bằng thực tế, lịch tổ chức và tiện ích sẽ được ban tổ chức trao đổi trước khi chốt tham gia. Gian thương mại có giá 5.000.000đ/gian; mã giảm giá hợp lệ được tính trước khi tạo QR. Ban tổ chức đối soát chuyển khoản trước khi xác nhận.</p></details></section>
   </main>;
 }

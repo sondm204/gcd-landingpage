@@ -98,6 +98,8 @@ export type BoothProposal = {
   category: string; description: string; image_paths: string[]; status: ProposalStatus;
   created_at: string; updated_at: string; reviewed_at: string | null; review_note: string | null;
   image_urls?: string[];
+  payment?: { base: number; discount: number; amount: number; discount_code: string; memo: string; receipt_path: string | null } | null;
+  receipt_url?: string;
 };
 
 // Coordinates are percentages of the supplied square plan.

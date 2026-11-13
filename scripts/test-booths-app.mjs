@@ -11,6 +11,7 @@ const serviceKey = "test-server-only-service-key";
 const adminId = "11111111-1111-4111-8111-111111111111";
 const nonAdminId = "22222222-2222-4222-8222-222222222222";
 const proposals = [];
+const vouchers = [];
 let activeAdmin = true;
 const uploads = new Map();
 const png = Buffer.from("iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mP8/x8AAwMCAO+jhX0AAAAASUVORK5CYII=", "base64");
@@ -40,6 +41,16 @@ const backend = createServer(async (req, res) => {
     if (url.pathname === "/auth/v1/logout") { res.writeHead(204); return res.end(); }
     if (req.headers.apikey !== serviceKey && !url.pathname.startsWith("/storage/v1/object/sign/")) return json(res, 403, { message: "Service role required" });
     if (url.pathname === "/rest/v1/booth_admins") return json(res, 200, activeAdmin && url.searchParams.get("user_id") === `eq.${adminId}` ? [{ user_id: adminId }] : []);
+    if (url.pathname === "/rest/v1/booth_vouchers") {
+      if (req.method === "POST") {
+        if (vouchers.some(v => v.code === body.code)) return json(res,409,{code:"23505"});
+        vouchers.push({...body,id:randomUUID(),active:true,used_count:0,created_at:new Date().toISOString()});
+        return json(res,201,{});
+      }
+      let rows = vouchers.filter(v => (!url.searchParams.has("id") || `eq.${v.id}` === url.searchParams.get("id")) && (!url.searchParams.has("code") || `eq.${v.code}` === url.searchParams.get("code")) && (!url.searchParams.has("active") || `eq.${v.active}` === url.searchParams.get("active")));
+      if (req.method === "PATCH") rows.forEach(v => Object.assign(v,body));
+      return json(res,200,req.headers.accept?.includes("vnd.pgrst.object") ? rows[0] ?? null : rows);
+    }
     if (url.pathname === "/rest/v1/booth_public_map") {
       const map = publicMap(); const id = url.searchParams.get("id");
       const rows = id ? map.filter((item) => item.id === Number(id.slice(3))) : map;
@@ -168,6 +179,25 @@ try {
   await page.getByLabel("Mật khẩu", { exact: true }).fill("test-password");
   await page.getByRole("button", { name: "Đăng nhập quản trị" }).click();
   await page.locator(".booth-admin-mode").waitFor();
+  await page.getByRole("button", {name:"Quản lý voucher",exact:true}).click();
+  await page.getByLabel("Mã voucher", {exact:true}).fill("TEST10");
+  await page.getByLabel(/^Mức giảm/).fill("10");
+  await page.getByLabel("Số lượt sử dụng tối đa",{exact:false}).fill("2");
+  await page.getByRole("button", {name:"Thêm voucher",exact:true}).click();
+  await page.getByRole("button", {name:"Tắt",exact:true}).waitFor();
+  const quoteVoucher = () => fetch(`${origin}/api/booths/payment`, {method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({position:1,code:"TEST10",requestKey:randomUUID()})});
+  assert.equal((await (await quoteVoucher()).json()).amount,4500000);
+  vouchers[0].usage_limit=null;
+  assert.equal((await quoteVoucher()).status,200);
+  vouchers[0].usage_limit=2; vouchers[0].used_count=2;
+  assert.equal((await quoteVoucher()).status,400);
+  vouchers[0].used_count=0;
+  await page.getByRole("button", {name:"Tắt",exact:true}).click();
+  await page.getByRole("button", {name:"Bật",exact:true}).waitFor();
+  assert.equal((await quoteVoucher()).status,400);
+  await page.getByRole("button", {name:"Bật",exact:true}).click();
+  await page.getByRole("button", {name:"Tắt",exact:true}).waitFor();
+  await page.getByRole("button", {name:"Đóng quản lý voucher",exact:true}).click();
   await page.getByLabel("Tài khoản quản trị", { exact: true }).click();
   await page.locator(".booth-account-popup").getByText("admin@example.test", { exact: true }).waitFor();
   await page.keyboard.press("Escape");
@@ -218,7 +248,7 @@ try {
   await page.getByLabel("Tài khoản quản trị", { exact: true }).click();
   await page.locator(".booth-account-popup").getByRole("button", { name: "Đăng xuất", exact: true }).click();
   await page.getByRole("link", { name: "Đăng nhập quản trị", exact: true }).waitFor();
-  await page.locator(".booth-form-card").waitFor();
+  await page.locator("aside.booth-form-card").waitFor();
   await page.goto(`${origin}/booths`);
   await page.getByLabel("Chọn nhanh vị trí").selectOption("13");
   await page.locator(".booth-reserved").waitFor();
@@ -229,6 +259,16 @@ try {
     await page.screenshot({ path: `test-results/booths-${width}.png`, fullPage: true });
   }
   await page.getByLabel("Chọn nhanh vị trí").selectOption("12");
+  const paymentPanel = page.getByRole("region", {name:"Thanh toán gian thương mại",exact:true});
+  await paymentPanel.getByLabel("Mã giảm giá (không bắt buộc)").fill("TEST10");
+  await paymentPanel.getByRole("button", {name:"Xác nhận",exact:true}).click();
+  await paymentPanel.getByText("Cần chuyển: 4.500.000đ", {exact:true}).waitFor();
+  await paymentPanel.getByLabel("Mã giảm giá (không bắt buộc)").fill("INVALID");
+  await paymentPanel.getByRole("button", {name:"Xác nhận",exact:true}).click();
+  await paymentPanel.getByText("Cần chuyển: 5.000.000đ", {exact:true}).waitFor();
+  assert.equal(await page.locator('input[name="discount_code"]').inputValue(), "");
+  vouchers[0].usage_limit=1; vouchers[0].used_count=1;
+  assert.equal((await quoteVoucher()).status,400);
   await page.screenshot({ path: "test-results/booths-mobile-form.png", fullPage: true });
   await submitSecond(randomUUID(),201,"24");
   assert.equal(proposals.at(-1).position_id,24);
@@ -243,7 +283,7 @@ try {
   const previewSubmit = await fetch(`${previewOrigin}/api/booths/proposals`, { method: "POST", headers: { Origin: previewOrigin } }); assert.equal(previewSubmit.status, 503);
   await page.goto(`${previewOrigin}/booths`);
   await page.locator(".booth-map-spot").first().waitFor();
-  assert(await page.locator('.booth-form-card button[type="submit"]').isDisabled());
+  assert(await page.locator('aside.booth-form-card button[type="submit"]').isDisabled());
   await page.screenshot({ path: "test-results/booths-unconfigured.png", fullPage: true });
   console.log("PASS: Next.js validation/auth/CSRF, private image upload, anonymous competing submissions, idempotent retry, admin login/approval/logout, public confirmation and responsive UI.");
 } catch (error) {

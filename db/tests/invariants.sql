@@ -12,6 +12,8 @@ begin
   assert (select count(*)=5 from public.booth_public_map where code like 'TT%' and is_bookable), '5 sponsor booths';
   assert not exists(select 1 from public.booth_public_map where id>33), 'Retired booths hidden';
   assert not has_table_privilege('anon', 'public.booth_proposals', 'select'), 'Anonymous users must not read PII';
+  assert not has_table_privilege('anon', 'public.booth_vouchers', 'select'), 'Public cannot enumerate discount codes';
+  assert not has_table_privilege('authenticated', 'public.booth_vouchers', 'insert'), 'Auth alone cannot create vouchers';
   assert not has_table_privilege('authenticated', 'public.booth_proposals', 'select'), 'A login alone is not admin authorization';
   assert not has_function_privilege('anon', 'public.review_booth_proposal(uuid,text,uuid,text)', 'execute'), 'Anonymous review forbidden';
   assert not has_function_privilege('authenticated', 'public.submit_booth_proposal(uuid,text,jsonb,jsonb)', 'execute'), 'Writes must go through server validation';
@@ -66,3 +68,18 @@ insert into public.booth_proposals(id, request_key, fingerprint, position_id, br
 values
 ('aaaaaaaa-aaaa-4aaa-8aaa-aaaaaaaaaaaa',gen_random_uuid(),'race-a',3,'Race A','Booth A','Contact A','a@example.test','0901234567','Khác','Concurrent approval test proposal A.'),
 ('bbbbbbbb-bbbb-4bbb-8bbb-bbbbbbbbbbbb',gen_random_uuid(),'race-b',3,'Race B','Booth B','Contact B','b@example.test','0901234567','Khác','Concurrent approval test proposal B.');
+
+do $$
+declare payload jsonb; key uuid := gen_random_uuid();
+begin
+  insert into public.booth_vouchers(code,type,value,usage_limit,created_by) values('ONCE','percent',10,1,'11111111-1111-4111-8111-111111111111');
+  payload := '{"position_id":20,"brand":"Voucher Test","booth_name":"Voucher Booth","contact_name":"Test User","email":"voucher@example.test","phone":"0901234567","category":"Khác","description":"Voucher test","payment":{"discount_code":"ONCE","base":5000000,"discount":500000,"amount":4500000}}'::jsonb;
+  perform public.submit_booth_proposal(key,'voucher-test',payload,'[]');
+  perform public.submit_booth_proposal(key,'voucher-test',payload,'[]');
+  assert (select used_count=1 from public.booth_vouchers where code='ONCE'), 'Retry cannot consume another voucher use';
+  begin
+    perform public.submit_booth_proposal(gen_random_uuid(),'voucher-exhausted',payload,'[]');
+    raise exception 'Exhausted voucher accepted';
+  exception when raise_exception then if sqlerrm<>'VOUCHER_UNAVAILABLE' then raise; end if; end;
+  assert (select count(*)=1 from public.booth_proposals where position_id=20), 'Exhausted voucher must roll back the registration';
+end; $$;

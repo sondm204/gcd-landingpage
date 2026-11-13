@@ -51,9 +51,9 @@ export default function BoothMap({ positions, selected, onSelect }: { positions:
             const color=BOOTH_ZONES.find(z=>z.name===booth.zone)?.color;
             return <g key={booth.id} className={`booth-map-spot ${booth.is_booked ? "is-booked" : booth.pending_count ? "is-pending" : "is-open"} ${selected===booth.id ? "is-selected" : ""}`} role="button" tabIndex={0} aria-label={`${booth.code} · ${booth.zone} — ${status}`} aria-pressed={selected===booth.id} onClick={()=>onSelect(booth.id)} onKeyDown={e=>{if(e.key==='Enter'||e.key===' '){e.preventDefault();onSelect(booth.id);}}}>
               <title>{booth.code}: {status}{booth.confirmed_brand ? ` · ${booth.confirmed_brand}` : ""}</title>
-              <rect className="booth-map-spot-fill" x={x} y={y} width={w} height={h} rx="10" style={{ stroke: color }} />
-              <text x={x+w/2} y={y+h/2+7} textAnchor="middle" style={{ fontSize: 23 }}>{booth.code}</text>
-              {selected===booth.id && <rect className="booth-map-spot-outline" x={x-4} y={y-4} width={w+8} height={h+8} rx="13" />}
+              <rect className="booth-map-spot-fill" x={x} y={y} width={w} height={h} rx="10" style={{ stroke: color, ...(selected===booth.id || booth.is_booked ? { fill: color } : {}) }} />
+              <text x={x+w/2} y={y+h/2+7} textAnchor="middle" style={{ fontSize: 23, fill: selected===booth.id || booth.is_booked ? "#fff" : color }}>{booth.code}</text>
+              {selected===booth.id && <rect className="booth-map-spot-outline" x={x-4} y={y-4} width={w+8} height={h+8} rx="13" style={{ stroke: color }} />}
             </g>;
           })}
           <g fontSize="19" fontWeight="600">
