@@ -4,19 +4,23 @@ insert into public.booth_admins(user_id) values('11111111-1111-4111-8111-1111111
 do $$
 declare a jsonb; b jsonb; retry jsonb; payload jsonb;
 begin
-  assert (select count(*) = 25 from public.booth_public_map), 'Public plan must have exactly 25 positions';
-  assert (select count(*) = 24 from public.booth_positions where is_active and is_bookable), 'Exactly 24 booths must accept proposals';
-  assert (select count(*) = 3 from (select zone from public.booth_public_map where is_bookable group by zone having count(*)=8) zones), 'Each of three zones must have eight booths';
-  assert (select zone='Quầy đổi quà' and not is_bookable from public.booth_public_map where id=25), 'Gift counter must not accept registrations';
-  assert not exists(select 1 from public.booth_public_map where id>25), 'Retired booths must not be displayed';
+  assert (select count(*) = 33 from public.booth_public_map), 'Public plan must have 33 positions';
+  assert (select count(*) = 25 from public.booth_positions where is_active and is_bookable), '25 booths accept proposals';
+  assert (select count(*)=5 from public.booth_public_map where code like 'VH%' and not is_bookable), 'Culture booths must be reserved';
+  assert (select count(*)=3 from public.booth_public_map where code like 'BTC%' and not is_bookable), 'Organizer booths must be reserved';
+  assert (select count(*)=20 from public.booth_public_map where code like 'TM%' and is_bookable), '20 commercial booths';
+  assert (select count(*)=5 from public.booth_public_map where code like 'TT%' and is_bookable), '5 sponsor booths';
+  assert not exists(select 1 from public.booth_public_map where id>33), 'Retired booths hidden';
   assert not has_table_privilege('anon', 'public.booth_proposals', 'select'), 'Anonymous users must not read PII';
+  assert not has_table_privilege('anon', 'public.booth_vouchers', 'select'), 'Public cannot enumerate discount codes';
+  assert not has_table_privilege('authenticated', 'public.booth_vouchers', 'insert'), 'Auth alone cannot create vouchers';
   assert not has_table_privilege('authenticated', 'public.booth_proposals', 'select'), 'A login alone is not admin authorization';
   assert not has_function_privilege('anon', 'public.review_booth_proposal(uuid,text,uuid,text)', 'execute'), 'Anonymous review forbidden';
   assert not has_function_privilege('authenticated', 'public.submit_booth_proposal(uuid,text,jsonb,jsonb)', 'execute'), 'Writes must go through server validation';
   assert (select public = false from storage.buckets where id = 'booth-proposals'), 'Uploads must be private';
   assert not exists(select 1 from information_schema.columns where table_schema='public' and table_name='booth_public_map' and column_name in ('email','phone','contact_name','image_paths')), 'Public projection must not expose PII';
   payload := '{"position_id":1,"brand":"Example Brand","booth_name":"Example booth","contact_name":"Test User","email":"user@example.test","phone":"0901234567","website":"https://example.test","category":"Khác","description":"A sufficiently long booth description."}'::jsonb;
-  for retry in select to_jsonb(n) from generate_series(25,40) n loop
+  for retry in select to_jsonb(n) from generate_series(26,40) n loop
     begin
       perform public.submit_booth_proposal(gen_random_uuid(), 'reserved-position-test', jsonb_set(payload, '{position_id}', retry), '[]');
       raise exception 'Reserved or retired position accepted a proposal';
@@ -64,3 +68,18 @@ insert into public.booth_proposals(id, request_key, fingerprint, position_id, br
 values
 ('aaaaaaaa-aaaa-4aaa-8aaa-aaaaaaaaaaaa',gen_random_uuid(),'race-a',3,'Race A','Booth A','Contact A','a@example.test','0901234567','Khác','Concurrent approval test proposal A.'),
 ('bbbbbbbb-bbbb-4bbb-8bbb-bbbbbbbbbbbb',gen_random_uuid(),'race-b',3,'Race B','Booth B','Contact B','b@example.test','0901234567','Khác','Concurrent approval test proposal B.');
+
+do $$
+declare payload jsonb; key uuid := gen_random_uuid();
+begin
+  insert into public.booth_vouchers(code,type,value,usage_limit,created_by) values('ONCE','percent',10,1,'11111111-1111-4111-8111-111111111111');
+  payload := '{"position_id":20,"brand":"Voucher Test","booth_name":"Voucher Booth","contact_name":"Test User","email":"voucher@example.test","phone":"0901234567","category":"Khác","description":"Voucher test","payment":{"discount_code":"ONCE","base":5000000,"discount":500000,"amount":4500000}}'::jsonb;
+  perform public.submit_booth_proposal(key,'voucher-test',payload,'[]');
+  perform public.submit_booth_proposal(key,'voucher-test',payload,'[]');
+  assert (select used_count=1 from public.booth_vouchers where code='ONCE'), 'Retry cannot consume another voucher use';
+  begin
+    perform public.submit_booth_proposal(gen_random_uuid(),'voucher-exhausted',payload,'[]');
+    raise exception 'Exhausted voucher accepted';
+  exception when raise_exception then if sqlerrm<>'VOUCHER_UNAVAILABLE' then raise; end if; end;
+  assert (select count(*)=1 from public.booth_proposals where position_id=20), 'Exhausted voucher must roll back the registration';
+end; $$;

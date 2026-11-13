@@ -2,9 +2,9 @@
 
 import Image from "next/image";
 import { useEffect, useState } from "react";
-import type { BoothPosition, BoothProposal } from "@/lib/booths/types";
+import { conceptPositions, type BoothPosition, type BoothProposal } from "@/lib/booths/types";
 
-const code = (id: number) => `B${String(id).padStart(2,"0")}`;
+const code = (id: number) => conceptPositions().find(p => p.id === id)?.code ?? String(id);
 const categories = ["Thủ công & làng nghề", "Ẩm thực", "Văn hoá & sáng tạo", "Thương hiệu & cộng đồng", "Khác"];
 
 export default function BoothEditor({ proposal, positions, onSaved, onCancel }: { proposal: BoothProposal; positions: BoothPosition[]; onSaved: (position: number) => Promise<void>; onCancel: () => void }) {

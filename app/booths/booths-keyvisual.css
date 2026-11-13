@@ -34,7 +34,7 @@
 .booth-zone-heading { max-width: 780px; margin-bottom: 24px; }
 .booth-zone-heading h2 { font: 500 clamp(27px, 3vw, 38px)/1.25 var(--font-display), Georgia, serif; margin: 12px 0; }
 .booth-zone-heading p { font-size: 14px; line-height: 1.85; color: #395b89; }
-.booth-zone-grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 20px; }
+.booth-zone-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 20px; }
 .booth-zone-card { display: flex; flex-direction: column; padding: 26px; background: #fff; border: 1px solid #cbd9ec; border-top: 4px solid; border-radius: 10px; min-width: 0; }
 .booth-zone-card.is-selected { box-shadow: 0 0 0 2px #125ac425, 0 8px 24px #125ac410; }
 .booth-zone-card-top { display: flex; justify-content: space-between; gap: 12px; font-size: 10px; letter-spacing: .09em; }
@@ -59,5 +59,20 @@
 .booth-selected-zone small { display: block; font-size: 11px; }
 .booth-map-legend i.service { background: #fff1ca; border: 1px solid #ab7b20; }
 #booth-plan { scroll-margin-top: 110px; }
+.booth-admin-toolbar { display: flex; flex-wrap: wrap; gap: 12px; }
+.booth-voucher-dialog { margin: auto; width: min(760px, calc(100% - 32px)); max-height: 90svh; overflow-y: auto; border: 1px solid #cbd9ec; border-radius: 14px; padding: clamp(20px, 4vw, 36px); background: #fff; color: var(--ink); }
+.booth-voucher-dialog::backdrop { background: #061e49a6; backdrop-filter: blur(4px); }
+.booth-voucher-close { display: flex; margin-left: auto; }
+.booth-voucher-dialog .booth-form-card { padding: 0; border: 0; box-shadow: none; }
+.booth-voucher-dialog .booth-voucher-toggle { min-width: 76px; min-height: 38px; margin-left: 0; padding: 8px 24px; border-radius: 8px; font-weight: 600; text-decoration: none; flex-shrink: 0; transition: background .2s, border-color .2s; }
+.booth-voucher-dialog .booth-voucher-toggle.is-disable { color: #a13232; background: #fff1f0; border-color: #ecc4bf; }
+.booth-voucher-dialog .booth-voucher-toggle.is-disable:hover:not(:disabled) { background: #ffe2df; border-color: #dba29a; }
+.booth-voucher-dialog .booth-voucher-toggle.is-enable { color: #176647; background: #eaf7ef; border-color: #b6dbc6; }
+.booth-voucher-dialog .booth-voucher-toggle.is-enable:hover:not(:disabled) { background: #d7efdf; border-color: #87bd9f; }
+.booth-voucher-toggle:focus-visible { outline: 2px solid #125ac4; outline-offset: 3px; }
+.booth-voucher-dialog .booth-voucher-save { min-width: 96px; min-height: 46px; margin-left: 0; padding: 10px 20px; border-radius: 8px; color: #fff; background: #125ac4; border: 1px solid #125ac4; text-decoration: none; font-weight: 600; white-space: nowrap; }
+.booth-voucher-dialog .booth-voucher-save:hover:not(:disabled) { background: #0d4394; border-color: #0d4394; }
+.booth-voucher-save:focus-visible { outline: 2px solid #125ac4; outline-offset: 3px; }
+.booth-payment-error { color: #a12b35; background: #fff0f1; border: 1px solid #edc1c6; padding: 12px 16px; border-radius: 8px; margin-block: 16px; line-height: 1.7; }
 @media (max-width: 950px) { .booth-zone-grid { grid-template-columns: 1fr; }.booth-zone-card { padding: 24px; }.booth-zone-card h3 { margin-top: 12px; }.booth-zone-card-action { flex-direction: row; align-items: center; justify-content: space-between; gap: 16px; } }
 @media (max-width: 480px) { .booth-zone-card-action { flex-direction: column; align-items: stretch; } }

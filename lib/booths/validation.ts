@@ -8,7 +8,8 @@ const safeWebsite = z.string().trim().max(300).refine((value) => {
 }, "Website phải là liên kết http:// hoặc https:// hợp lệ.").transform((value) => value ? new URL(value).href : "");
 
 export const proposalSchema = z.object({
-  position_id: z.coerce.number().int().min(1).max(BOOTH_COUNT, "Vui lòng chọn gian B01–B24. B25 là quầy đổi quà, không nhận đăng ký."),
+  discount_code: z.string().trim().toUpperCase().max(50).default(""),
+  position_id: z.coerce.number().int().min(1).max(BOOTH_COUNT, "Chỉ nhận đăng ký gian TM01–TM20 và TT01–TT05. Gian văn hoá và BTC đã được bố trí."),
   brand: z.string().trim().min(2, "Nhập tên thương hiệu.").max(120),
   booth_name: z.string().trim().min(2, "Nhập tên gian hàng.").max(120),
   contact_name: z.string().trim().min(2, "Nhập tên người liên hệ.").max(100),
@@ -31,7 +32,7 @@ export const editBoothSchema = proposalSchema.omit({ consent: true, website_conf
 });
 export const loginSchema = z.object({ email: z.email().trim().toLowerCase().max(254), password: z.string().min(1).max(256) });
 export const MAX_IMAGE_BYTES = 1024 * 1024;
-export const MAX_REQUEST_BYTES = 3 * MAX_IMAGE_BYTES + 64 * 1024;
+export const MAX_REQUEST_BYTES = 4 * MAX_IMAGE_BYTES + 64 * 1024;
 
 export function imageExtension(bytes: Uint8Array, mime: string): string | null {
   if (mime === "image/jpeg" && bytes[0] === 0xff && bytes[1] === 0xd8 && bytes[2] === 0xff) return "jpg";
