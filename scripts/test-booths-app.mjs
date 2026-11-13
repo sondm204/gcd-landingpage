@@ -113,19 +113,19 @@ try {
   const unauthorized = await fetch(`${origin}/api/booths/admin/proposals`); assert.equal(unauthorized.status, 401);
   const foreign = await fetch(`${origin}/api/booths/proposals`, { method: "POST", headers: { Origin: "https://foreign.test" } }); assert.equal(foreign.status, 403);
   await page.goto(`${origin}/booths`);
-  await page.getByRole("button", { name: /^B12 ·/ }).waitFor();
-  assert.equal(await page.locator(".booth-map-spot").count(), 24);
-  assert.equal(await page.locator(".booth-map-service").count(), 1);
-  assert.equal(await page.getByLabel("Chọn nhanh vị trí").locator('option[value="25"]').count(), 0);
-  for (const [zone, firstId, topic] of [["Hạ Long", "1", "Thiên nhiên"], ["Văn Miếu", "9", "Tri thức"], ["Hội An", "17", "Văn hóa Việt"]]) {
-    await page.getByRole("button", { name: `Chọn khu ${zone}` }).click();
+  await page.getByRole("button", { name: /^TM12 ·/ }).waitFor();
+  assert.equal(await page.locator(".booth-map-spot").count(), 25);
+  assert.equal(await page.locator(".booth-map-service").count(), 8);
+  assert.equal(await page.getByLabel("Chọn nhanh vị trí").locator('option[value="26"]').count(), 0);
+  for (const [zone, firstId, topic] of [["gian thương mại", "1", "sản phẩm"], ["gian tài trợ", "21", "nhà tài trợ"]]) {
+    await page.getByRole("button", { name: `Chọn ${zone}` }).click();
     assert.equal(await page.getByLabel("Chọn nhanh vị trí").inputValue(), firstId);
     assert((await page.locator(".booth-selected-zone").textContent()).includes(topic));
   }
   const initialMap = await (await fetch(`${origin}/api/booths`)).json();
-  assert.equal(initialMap.positions.length, 25);
-  assert.equal(initialMap.positions.filter((entry) => entry.is_bookable).length, 24);
-  for (const zone of ["Hạ Long", "Văn Miếu", "Hội An"]) assert.equal(initialMap.positions.filter((entry) => entry.zone === zone).length, 8);
+  assert.equal(initialMap.positions.length, 33);
+  assert.equal(initialMap.positions.filter((entry) => entry.is_bookable).length, 25);
+  assert.equal(initialMap.positions.filter(entry => !entry.is_bookable).length, 8);
   await page.getByLabel("Chọn nhanh vị trí").selectOption("12");
   await page.getByLabel("Thương hiệu / đơn vị *", { exact: true }).fill("Gốm Việt");
   await page.getByLabel("Tên gian hàng *", { exact: true }).fill("Câu chuyện đất");
@@ -137,7 +137,7 @@ try {
   await page.locator('textarea[name="description"]').fill("");
   await page.locator('input[name="images"]').setInputFiles({ name: "booth.png", mimeType: "image/png", buffer: png });
   await page.locator('input[name="consent"]').check();
-  await page.getByRole("button", { name: "Gửi đề xuất cho B12" }).click();
+  await page.getByRole("button", { name: "Gửi đề xuất cho TM12" }).click();
   await page.locator(".booth-reference").waitFor();
   assert.equal(proposals.length, 1); assert.equal(uploads.size, 1); assert.equal(proposals[0].status, "pending");
   assert.equal(proposals[0].description, "");
@@ -153,7 +153,7 @@ try {
   };
   const second = await submitSecond(), retry = await submitSecond();
   assert.equal(second.reference, retry.reference); assert.equal(proposals.length, 2);
-  for (const invalidId of ["25", "26", "40", "0"]) await submitSecond(randomUUID(), 400, invalidId);
+  for (const invalidId of ["26", "30", "31", "33", "40", "0"]) await submitSecond(randomUUID(), 400, invalidId);
   assert.equal(proposals.length, 2); assert.equal(uploads.size, 1);
   await submitSecond(randomUUID(),201,"13");
   const blockedReview = await fetch(`${origin}/api/booths/admin/proposals/${proposals[0].id}`, { method: "PATCH", headers: { Origin: origin, "Content-Type": "application/json" }, body: JSON.stringify({ decision: "approved" }) }); assert.equal(blockedReview.status, 401);
@@ -172,7 +172,7 @@ try {
   await page.locator(".booth-account-popup").getByText("admin@example.test", { exact: true }).waitFor();
   await page.keyboard.press("Escape");
   assert.equal(await page.locator(".booth-account").getAttribute("open"), null);
-  await page.locator(".booth-group-overview button").filter({hasText:"B12"}).click();
+  await page.locator(".booth-group-overview button").filter({hasText:"TM12"}).click();
   await page.locator(".booth-admin-item").first().waitFor();
   const authCookies = (await page.context().cookies()).filter((cookie) => cookie.name.includes("auth-token"));
   assert(authCookies.length > 0 && authCookies.every((cookie) => cookie.httpOnly && cookie.sameSite === "Lax"));
@@ -180,10 +180,10 @@ try {
   activeAdmin = false;
   const revoked = await page.evaluate(async (id) => (await fetch(`/api/booths/admin/proposals/${id}`, { method: "PATCH", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ decision: "approved" }) })).status, proposals[0].id);
   assert.equal(revoked, 403); assert.equal(proposals[0].status, "pending"); activeAdmin = true;
-  await page.getByRole("button", { name: /B12 · Gốm Việt/ }).click();
+  await page.getByRole("button", { name: /TM12 · Gốm Việt/ }).click();
   await page.locator(".booth-admin-images img").waitFor();
   await page.screenshot({ path: "test-results/booths-admin.png", fullPage: true });
-  await page.getByRole("button", { name: "Duyệt & chốt B12" }).click();
+  await page.getByRole("button", { name: "Duyệt & chốt TM12" }).click();
   await page.getByRole("button", { name: "Xác nhận duyệt", exact: true }).click();
   await page.getByRole("button", { name:"Sửa thông tin / ảnh / vị trí",exact:true }).waitFor();
   assert.equal(proposals.filter((item) => item.status === "approved").length, 1);
@@ -191,7 +191,7 @@ try {
   await submitSecond(randomUUID(), 409);
   const originalStamp=proposals[0].updated_at;
   await page.getByRole("button", { name:"Sửa thông tin / ảnh / vị trí",exact:true }).click();
-  assert.equal(await page.locator('.booth-edit-form select[name="position_id"] option').count(), 24);
+  assert.equal(await page.locator('.booth-edit-form select[name="position_id"] option').count(), 25);
   await page.locator('.booth-edit-form input[name="brand"]').fill("Gốm Việt mới");
   await page.locator('.booth-edit-form input[name="booth_name"]').fill("Đất và tương lai");
   await page.locator('.booth-edit-form select[name="position_id"]').selectOption("13");
@@ -211,7 +211,7 @@ try {
   assert.equal(stale,409);assert.equal(proposals[0].brand,"Gốm Việt mới");
   const reservedMove = await page.evaluate(async ({id, stamp}) => {
     const form = new FormData();
-    for (const [key,value] of Object.entries({position_id:"25",brand:"Gift Counter Move",booth_name:"Invalid Booth",contact_name:"Contact Test",email:"test@example.test",phone:"0901234567",website:"",category:"Khác",description:"",expected_updated_at:stamp,retained_images:"[]",confirm_move:"true",note:""})) form.set(key,value);
+    for (const [key,value] of Object.entries({position_id:"26",brand:"Gift Counter Move",booth_name:"Invalid Booth",contact_name:"Contact Test",email:"test@example.test",phone:"0901234567",website:"",category:"Khác",description:"",expected_updated_at:stamp,retained_images:"[]",confirm_move:"true",note:""})) form.set(key,value);
     return (await fetch(`/api/booths/admin/proposals/${id}/details`, {method:"PATCH",body:form})).status;
   }, {id:proposals[0].id, stamp:proposals[0].updated_at});
   assert.equal(reservedMove,400); assert.equal(proposals[0].position_id,13);
@@ -222,7 +222,7 @@ try {
   await page.goto(`${origin}/booths`);
   await page.getByLabel("Chọn nhanh vị trí").selectOption("13");
   await page.locator(".booth-reserved").waitFor();
-  assert.equal(await page.getByRole("button", { name: "Gửi đề xuất cho B13" }).count(), 0);
+  assert.equal(await page.getByRole("button", { name: "Gửi đề xuất cho TM13" }).count(), 0);
   for (const width of [1440, 390]) {
     await page.setViewportSize({ width, height: 844 });
     assert(!await page.evaluate(() => document.documentElement.scrollWidth > innerWidth));
@@ -239,7 +239,7 @@ try {
   preview = spawn(process.execPath, ["node_modules/next/dist/bin/next", "start", "-p", String(previewPort)], { windowsHide: true, stdio: "ignore", env: { ...process.env, APP_ORIGIN: previewOrigin, SUPABASE_URL: "", SUPABASE_PUBLISHABLE_KEY: "", SUPABASE_SERVICE_ROLE_KEY: "", BOOTH_RATE_LIMIT_SECRET: "" } });
   for (let i=0; i<100; i++) { try { if ((await fetch(previewOrigin)).ok) break; } catch {} await new Promise((done) => setTimeout(done, 200)); }
   const previewMap = await (await fetch(`${previewOrigin}/api/booths`)).json();
-  assert.equal(previewMap.configured, false); assert.equal(previewMap.positions.length, 25);
+  assert.equal(previewMap.configured, false); assert.equal(previewMap.positions.length, 33);
   const previewSubmit = await fetch(`${previewOrigin}/api/booths/proposals`, { method: "POST", headers: { Origin: previewOrigin } }); assert.equal(previewSubmit.status, 503);
   await page.goto(`${previewOrigin}/booths`);
   await page.locator(".booth-map-spot").first().waitFor();

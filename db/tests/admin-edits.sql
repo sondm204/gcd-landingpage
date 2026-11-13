@@ -15,7 +15,7 @@ begin
   select updated_at into v_new_stamp from public.booth_proposals where id=v_id;
   assert v_new_stamp>v_stamp, 'Updates need a new concurrency token';
   begin
-    perform public.update_confirmed_booth(v_id,'11111111-1111-4111-8111-111111111111',v_new_stamp,jsonb_set(payload,'{position_id}','25'),'[]','Invalid gift counter move');
+    perform public.update_confirmed_booth(v_id,'11111111-1111-4111-8111-111111111111',v_new_stamp,jsonb_set(payload,'{position_id}','26'),'[]','Invalid gift counter move');
     raise exception 'Gift counter must reject admin moves';
   exception when raise_exception then if sqlerrm<>'INVALID_POSITION' then raise; end if; end;
   begin

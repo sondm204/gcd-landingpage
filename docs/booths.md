@@ -1,5 +1,18 @@
 # Đặt vị trí gian hàng — Global Citizens Day 2026
 
+## Sơ đồ hiện hành: 33 gian theo loại
+
+Tham khảo mặt bằng `public/images/So-do-GCD-vuong.png`; sơ đồ được vẽ hoàn toàn bằng SVG trong `booth-map.tsx`, không tải ảnh mẫu. Giữ cùng mã và vị trí:
+
+- TM01–TM20: 20 gian thương mại, nhận đề xuất (ID nội bộ 1–20).
+- TT01–TT05: 5 gian tài trợ, nhận đề xuất (ID 21–25).
+- VH01–VH05: 5 gian văn hoá đã bố trí, không nhận đăng ký (ID 26–30).
+- BTC01–BTC03: 3 gian BTC hỗ trợ khách và đổi quà, không nhận đăng ký (ID 31–33).
+
+Chạy migration `V5__booth_categories_and_cultural_reservations.sql` trước khi triển khai mã mới. Các ID và hồ sơ cũ được giữ; mã hiển thị và loại gian thay đổi theo sơ đồ mới, cần rà soát phân loại các hồ sơ hiện hữu. Các vị trí 34–40 không hiển thị. Migration dừng nếu ID 26–40 còn hồ sơ chờ hoặc đã xác nhận. Validation API chỉ nhận ID 1–25; trigger `booth_proposal_bookable_position` từ V4 chặn cả RPC gửi, duyệt và chuyển gian vào vị trí không nhận đăng ký. Số lượng đang mở không tính văn hoá/BTC.
+
+Các mô tả B01–B25 và ba khu địa danh phía dưới là lịch sử cấu hình V4, được thay thế bởi sơ đồ V5 này.
+
 ## Các trang và quy trình
 
 - `/booths`: sơ đồ 25 vị trí (24 gian đăng ký và 1 quầy đổi quà), hướng dẫn chọn một trong 3 khu, xem trạng thái và gửi đề xuất không cần tài khoản. Liên kết từ phần hội chợ trên landing page.

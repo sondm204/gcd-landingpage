@@ -1,28 +1,77 @@
 export type ProposalStatus = "pending" | "approved" | "rejected";
-export const BOOTH_COUNT = 24;
-export const POSITION_COUNT = 25;
+export const BOOTH_COUNT = 25;
+export const POSITION_COUNT = 33;
 export const BOOTH_ZONES = [
   {
-    name: "Hạ Long", icon: "nature", firstId: 1, lastId: 8, color: "#176b67", background: "#e9f6f1",
-    theme: "Thiên nhiên & cuộc sống xanh",
-    description: "Kể câu chuyện về thiên nhiên, môi trường và cách con người sống hài hòa với cảnh quan địa phương.",
-    examples: ["Sản phẩm thân thiện môi trường", "Du lịch sinh thái, khám phá thiên nhiên", "Trải nghiệm bảo tồn và sống xanh"],
-    prompt: "Sản phẩm hoặc trải nghiệm của bạn giúp khách hiểu và gắn kết với thiên nhiên như thế nào?",
+    "name": "Gian thương mại",
+    "icon": "culture",
+    "firstId": 1,
+    "lastId": 20,
+    "prefix": "TM",
+    "color": "#3452a1",
+    "background": "#edf1ff",
+    "theme": "Giới thiệu sản phẩm & thương hiệu",
+    "description": "Dành cho cửa hàng, thương hiệu và đơn vị giới thiệu sản phẩm, dịch vụ tại sự kiện.",
+    "examples": [
+      "Sản phẩm và quà tặng",
+      "Ẩm thực và dịch vụ",
+      "Trải nghiệm thương hiệu"
+    ],
+    "prompt": "Bạn sẽ mang sản phẩm và trải nghiệm gì đến sự kiện?",
+    "bookable": true
   },
   {
-    name: "Văn Miếu", icon: "knowledge", firstId: 9, lastId: 16, color: "#8a4e24", background: "#fff4e5",
-    theme: "Tri thức, di sản & giá trị truyền thống",
-    description: "Chia sẻ kiến thức, gìn giữ di sản và giúp khách khám phá những giá trị truyền thống qua trải nghiệm thực tế.",
-    examples: ["Sách, thư pháp và văn hóa chữ", "Workshop làng nghề, tìm hiểu di sản", "Hoạt động giáo dục và kể chuyện truyền thống"],
-    prompt: "Bạn sẽ chia sẻ kiến thức, câu chuyện di sản hoặc giá trị truyền thống nào với khách tham dự?",
+    "name": "Gian tài trợ",
+    "icon": "knowledge",
+    "firstId": 21,
+    "lastId": 25,
+    "prefix": "TT",
+    "color": "#9a650e",
+    "background": "#fff4e5",
+    "theme": "Không gian dành cho nhà tài trợ",
+    "description": "Dành cho đơn vị đề xuất đồng hành và tài trợ; hình thức tham gia được ban tổ chức trao đổi trước khi xác nhận.",
+    "examples": [
+      "Giới thiệu nhà tài trợ",
+      "Trải nghiệm thương hiệu",
+      "Hoạt động đồng hành"
+    ],
+    "prompt": "Bạn đề xuất hình thức đồng hành và hoạt động nào?",
+    "bookable": true
   },
   {
-    name: "Hội An", icon: "culture", firstId: 17, lastId: 24, color: "#3452a1", background: "#edf1ff",
-    theme: "Văn hóa Việt vươn ra thế giới",
-    description: "Giới thiệu cách sản phẩm và câu chuyện văn hóa Việt đến với khách quốc tế, hướng tới thị trường xuất khẩu.",
-    examples: ["Thủ công, quà tặng mang bản sắc Việt", "Ẩm thực, sản phẩm văn hóa hướng tới khách quốc tế", "Thiết kế sáng tạo và câu chuyện thương hiệu Việt"],
-    prompt: "Bạn sẽ kể câu chuyện văn hóa Việt và giới thiệu sản phẩm tới khách quốc tế như thế nào?",
+    "name": "Gian văn hoá",
+    "icon": "culture",
+    "firstId": 26,
+    "lastId": 30,
+    "prefix": "VH",
+    "color": "#087d73",
+    "background": "#e9f6f1",
+    "theme": "Trải nghiệm văn hoá",
+    "description": "Đã có đơn vị phụ trách, không nhận đăng ký mới.",
+    "examples": [
+      "Trải nghiệm văn hoá",
+      "Hoạt động truyền thống"
+    ],
+    "prompt": "",
+    "bookable": false
   },
+  {
+    "name": "Gian BTC",
+    "icon": "knowledge",
+    "firstId": 31,
+    "lastId": 33,
+    "prefix": "BTC",
+    "color": "#793c91",
+    "background": "#f5ecfa",
+    "theme": "Hỗ trợ khách & đổi quà",
+    "description": "Ban tổ chức vận hành; không nhận đăng ký.",
+    "examples": [
+      "BTC01–BTC02: hỗ trợ khách",
+      "BTC03: đổi quà"
+    ],
+    "prompt": "",
+    "bookable": false
+  }
 ] as const;
 
 export function zoneForPosition(id: number) {
@@ -51,14 +100,20 @@ export type BoothProposal = {
   image_urls?: string[];
 };
 
-// Coordinates are percentages of a 1000 × 760 concept plan.
+// Coordinates are percentages of the supplied square plan.
 export function conceptPositions(): BoothPosition[] {
   return Array.from({ length: POSITION_COUNT }, (_, i) => {
-    const id = i + 1;
-    const bookable = id <= BOOTH_COUNT;
-    const group = Math.floor(i / 8), slot = i % 8;
-    const x = bookable ? 11 + group * 28 + (slot % 2) * 11 : 45.5;
-    const y = bookable ? 33 + Math.floor(slot / 2) * 11 : 86;
-    return { id, code: `B${String(id).padStart(2, "0")}`, zone: zoneForPosition(id)?.name ?? "Quầy đổi quà", x, y, width: 9, height: 8, pending_count: 0, confirmed_brand: null, confirmed_booth: null, is_booked: false, is_bookable: bookable };
+    const id = i + 1, group = zoneForPosition(id)!;
+    const n = id - group.firstId + 1;
+    let x: number, y: number, w = 78, h = 52;
+    if (id <= 20) {
+      if (n <= 4) { x = 454; y = 707 + (n - 1) * 71; }
+      else if (n <= 11) { x = 454 + (n - 5) * 93; y = 1028; }
+      else if (n <= 17) { x = 788 + (n - 12) * 93; y = 781; }
+      else { x = 1123; y = 1028 + (n - 18) * 65; }
+    } else if (id <= 25) { x = n <= 3 ? 788 + (n - 1) * 93 : 788; y = n <= 3 ? 523 : 595 + (n - 4) * 72; h = 58; }
+    else if (id <= 30) { x = n <= 4 ? 117 + (n - 1) * 93 : 396; y = n <= 4 ? 467 : 541; h = 58; }
+    else { x = n === 1 ? 1272 : 117; y = n === 1 ? 691 : n === 2 ? 707 : 1028; w = n === 1 ? 226 : 265; h = 82; }
+    return { id, code: group.prefix + String(n).padStart(2, '0'), zone: group.name, x: x/16, y: y/16, width: w/16, height: h/16, pending_count: 0, confirmed_brand: null, confirmed_booth: null, is_booked: false, is_bookable: group.bookable };
   });
 }

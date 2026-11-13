@@ -34,7 +34,7 @@
 .booth-zone-heading { max-width: 780px; margin-bottom: 24px; }
 .booth-zone-heading h2 { font: 500 clamp(27px, 3vw, 38px)/1.25 var(--font-display), Georgia, serif; margin: 12px 0; }
 .booth-zone-heading p { font-size: 14px; line-height: 1.85; color: #395b89; }
-.booth-zone-grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 20px; }
+.booth-zone-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 20px; }
 .booth-zone-card { display: flex; flex-direction: column; padding: 26px; background: #fff; border: 1px solid #cbd9ec; border-top: 4px solid; border-radius: 10px; min-width: 0; }
 .booth-zone-card.is-selected { box-shadow: 0 0 0 2px #125ac425, 0 8px 24px #125ac410; }
 .booth-zone-card-top { display: flex; justify-content: space-between; gap: 12px; font-size: 10px; letter-spacing: .09em; }

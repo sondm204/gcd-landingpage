@@ -1,7 +1,7 @@
 import type { SVGProps } from "react";
 import type { BOOTH_ZONES } from "@/lib/booths/types";
 
-type ZoneIcon = (typeof BOOTH_ZONES)[number]["icon"];
+type ZoneIcon = "nature" | "culture" | "knowledge" | (typeof BOOTH_ZONES)[number]["icon"];
 
 export default function BoothZoneIcon({ kind, ...props }: SVGProps<SVGSVGElement> & { kind: ZoneIcon }) {
   return <svg viewBox="0 0 48 48" width={32} height={32} fill="currentColor" aria-hidden="true" focusable="false" {...props}>
