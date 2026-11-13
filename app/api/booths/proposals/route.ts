@@ -52,7 +52,7 @@ export async function POST(request: Request) {
       uploaded.push(path);
       if (receiptImages.includes(image)) receiptPath = path;
     }
-    const { data, error } = await db.rpc("submit_booth_proposal", { p_request_key: key.data, p_fingerprint: fingerprint, p_data: { ...input, payment: payment ? { ...payment, memo: transferMemo(input.position_id, key.data), receipt_path: receiptPath } : null }, p_images: uploaded.filter(path => path !== receiptPath) });
+    const { data, error } = await db.rpc("submit_booth_proposal", { p_request_key: key.data, p_fingerprint: fingerprint, p_data: { ...input, payment: payment ? { ...payment, memo: transferMemo(input.position_id, input.brand), receipt_path: receiptPath } : null }, p_images: uploaded.filter(path => path !== receiptPath) });
     if (error) {
       if (/VOUCHER_UNAVAILABLE|VOUCHER_CHANGED/.test(error.message)) throw new BoothError(409, "Voucher đã hết lượt hoặc thay đổi. Vui lòng xác nhận lại mã và số tiền trước khi gửi.");
       if (error.message.includes("BOOTH_TAKEN")) throw new BoothError(409, "Vị trí vừa được xác nhận cho gian hàng khác. Vui lòng chọn lại.");

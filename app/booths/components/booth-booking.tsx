@@ -31,8 +31,10 @@ export default function BoothBooking() {
   const [logoutBusy, setLogoutBusy] = useState(false);
   const requestKey = useRef<string | null>(null);
   const [paymentKey, setPaymentKey] = useState("");
+  const [brand, setBrand] = useState("");
   const [discountCode, setDiscountCode] = useState("");
   const messageRef = useRef<HTMLDivElement>(null);
+  const registrationForm = useRef<HTMLFormElement>(null);
 
   const refresh = useCallback(async (signal?: AbortSignal) => {
     try {
@@ -111,7 +113,6 @@ export default function BoothBooking() {
       <div className="booth-availability"><span><strong>{bookablePositions.length - booked}</strong> gian đang nhận đề xuất</span><span><strong>{booked}</strong> gian đã xác nhận / {BOOTH_COUNT}</span><small>Không tính gian văn hoá và BTC · Cập nhật mỗi 30 giây</small></div>
       <div id="booth-plan" className={`booth-booking-grid ${admin ? "is-admin" : ""}`}>
         <div className="booth-map-column"><BoothMap positions={positions} selected={selected} onSelect={selectPosition} />
-          {!admin && isCommercialPosition(selected) && paymentKey && !success && <BoothPayment key={`${selected}:${paymentKey}`} position={selected} requestKey={paymentKey} code={discountCode} onApply={setDiscountCode} />}
           {admin && <section className="booth-group-overview" aria-label="Nhóm đề xuất theo vị trí"><span className="booth-kicker">TỔNG QUAN THEO VỊ TRÍ</span><h2>Những ô đang có hồ sơ.</h2><p>Bấm một nhóm để xem hồ sơ tương ứng bên cạnh.</p><div>{positions.filter((entry) => entry.pending_count>0 || entry.is_booked).map((entry) => <button type="button" key={entry.id} className={selected===entry.id ? "selected" : ""} aria-pressed={selected===entry.id} onClick={()=>setSelected(entry.id)}><strong>{entry.code}</strong><span>{entry.pending_count} chờ{entry.is_booked ? " · Đã chốt" : ""}</span>{entry.confirmed_brand && <small>{entry.confirmed_brand}</small>}</button>)}</div>{!positions.some((entry)=>entry.pending_count>0||entry.is_booked) && <p>Chưa có đề xuất đang chờ hoặc gian hàng đã chốt.</p>}</section>}
         </div>
         {!authReady || authError ? <aside className="booth-form-card"><p role="status">{authError || "Đang kiểm tra phiên đăng nhập…"}</p><Link href="/booths/admin/login">Đăng nhập quản trị ↗</Link></aside> : admin && position ? <BoothAdminPanel key={position.id} position={position} positions={positions} onSelect={setSelected} onChanged={refresh} onUnauthorized={unauthorized} /> :
@@ -121,11 +122,11 @@ export default function BoothBooking() {
           {selectedZone && <div className="booth-selected-zone" style={{ borderLeftColor: selectedZone.color, background: selectedZone.background }}><div className="booth-selected-zone-title"><BoothZoneIcon kind={selectedZone.icon} color={selectedZone.color} /><strong>{selectedZone.name} · {selectedZone.theme}</strong></div><p>{selectedZone.description}</p><small>Gợi ý: {selectedZone.examples.join("; ")}.</small></div>}
           {position?.is_booked ? <div className="booth-reserved"><span>ĐÃ XÁC NHẬN</span><h3>{position.confirmed_booth}</h3><p>{position.confirmed_brand}</p><p>Vị trí này đã được ban tổ chức chốt. Mời bạn chọn một vị trí khác trên sơ đồ.</p></div> : success ? <div className="booth-success" role="status" tabIndex={-1} ref={messageRef}><span className="booth-kicker">ĐÃ NHẬN ĐỀ XUẤT</span><h3>Cảm ơn bạn đã đồng hành.</h3><p>Đề xuất cho vị trí <strong>{success.code}</strong> đang chờ xét duyệt.</p><div className="booth-reference">{success.reference}</div><p>Lưu mã này để trao đổi với ban tổ chức. Đây chưa phải xác nhận giữ chỗ; ban tổ chức sẽ liên hệ qua email hoặc số điện thoại bạn cung cấp.</p><button className="booth-button secondary" type="button" onClick={() => { setSuccess(null); requestKey.current = crypto.randomUUID(); setPaymentKey(requestKey.current); setDiscountCode(""); setPreviews([]); setFormVersion((value) => value + 1); }}>Gửi một đề xuất khác</button></div> : <>
             <p className="booth-form-hint">{position?.pending_count ? `Vị trí này có ${position.pending_count} đề xuất đang chờ. Bạn vẫn có thể gửi đề xuất của mình.` : "Vị trí này chưa có đề xuất đang chờ."} Gửi đề xuất không đồng nghĩa với giữ chỗ.</p>
-            <form key={formVersion} onSubmit={submit}>
+            <form id="booth-registration" ref={registrationForm} key={formVersion} onSubmit={submit}>
               <fieldset disabled={busy || !configured || Boolean(error)}>
                 {selectedZone?.prefix === "TM" && <div className="booth-form-hint"><strong>Chi phí gian thương mại: 5.000.000đ / gian.</strong></div>}
                 {selectedZone?.prefix === "TM" && <input type="hidden" name="discount_code" value={discountCode} />}
-                <label className="booth-field">Thương hiệu / đơn vị *<input name="brand" required minLength={2} maxLength={120} autoComplete="organization" placeholder="Tên thương hiệu của bạn" /></label>
+                <label className="booth-field">Thương hiệu / đơn vị *<input name="brand" value={brand} onChange={e => setBrand(e.target.value)} required minLength={2} maxLength={120} autoComplete="organization" placeholder="Tên thương hiệu của bạn" /></label>
                 <label className="booth-field">Tên gian hàng *<input name="booth_name" required minLength={2} maxLength={120} placeholder="Một cái tên kể câu chuyện riêng" /></label>
                 <label className="booth-field">Nhóm sản phẩm / hoạt động *<select name="category" required defaultValue=""><option value="" disabled>Chọn lĩnh vực</option>{categories.map((item) => <option key={item}>{item}</option>)}</select></label>
                 <label className="booth-field">Người liên hệ *<input name="contact_name" required minLength={2} maxLength={100} autoComplete="name" /></label>
@@ -140,10 +141,9 @@ export default function BoothBooking() {
                 {previews.length > 0 && <div className="booth-image-previews">{previews.map((url, index) => <span key={url}><Image src={url} width={70} height={70} unoptimized alt={`Ảnh đính kèm ${index + 1}`} /></span>)}</div>}
                 {imageError && <p className="booth-inline-error" role="alert">{imageError}</p>}
                 <div className="booth-honeypot" aria-hidden="true"><label>Không nhập trường này<input name="website_confirm" tabIndex={-1} autoComplete="off" /></label></div>
-                {selectedZone?.prefix === "TM" && <label className="booth-field">Ảnh chuyển khoản (không bắt buộc)<input name="payment_receipt" type="file" accept="image/jpeg,image/png,image/webp" /><small>Một ảnh JPEG, PNG hoặc WebP, tối đa 1 MB. Chỉ BTC được xem để đối soát.</small></label>}
                 <label className="booth-consent"><input type="checkbox" name="consent" required /><span>Tôi đồng ý để ban tổ chức lưu thông tin và liên hệ xét duyệt. Tên thương hiệu/gian hàng có thể hiển thị công khai sau khi được duyệt; thông tin liên hệ và ảnh chỉ dành cho quản trị.</span></label>
                 {submitError && <div className="booth-alert error" role="alert" ref={messageRef} tabIndex={-1}>{submitError}</div>}
-                <button type="submit" className="booth-button" disabled={Boolean(imageError)}>{busy ? "Đang gửi đề xuất…" : `Gửi đề xuất cho ${position?.code}`}<span aria-hidden="true">↗</span></button>
+                {isCommercialPosition(selected) ? <BoothPayment key={selected + ":" + paymentKey + ":" + brand} position={selected} brand={brand} requestKey={paymentKey} code={discountCode} onApply={setDiscountCode} disabled={busy || !configured || Boolean(error)} submitError={submitError} onPrepare={() => Boolean(registrationForm.current?.reportValidity()) && !imageError} onComplete={() => registrationForm.current?.requestSubmit()} /> : <button type="submit" className="booth-button" disabled={Boolean(imageError)}>{busy ? "Đang gửi đề xuất…" : `Gửi đề xuất cho ${position?.code}`}<span aria-hidden="true">↗</span></button>}
               </fieldset>
             </form>
           </>}

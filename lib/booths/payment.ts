@@ -16,6 +16,7 @@ export function calculatePayment(position: number, code: string, config = "[]") 
   return { base: COMMERCIAL_PRICE, discount, amount: COMMERCIAL_PRICE - discount, discount_code: normalized };
 }
 
-export function transferMemo(position: number, requestKey: string) {
-  return `GCD TM${String(position === 34 ? 21 : position).padStart(2, "0")} ${requestKey.replaceAll("-", "").slice(0, 12).toUpperCase()}`;
+export function transferMemo(position: number, brand: string) {
+  const name = brand.normalize("NFD").replace(/[\u0300-\u036f]/g, "").replace(/[đĐ]/g, "D").toUpperCase().replace(/[^A-Z0-9 ]/g, " ").replace(/\s+/g, " ").trim();
+  return `JCITL GCD TM${String(position === 34 ? 21 : position).padStart(2, "0")} ${name}`.slice(0, 50).trim();
 }
