@@ -18,12 +18,6 @@ export default function BoothMap({ positions, selected, onSelect }: { positions:
           </defs>
           <rect x="70" y="210" width="1460" height="1160" fill="#eff5fc" />
           <rect x="92" y="245" width="1416" height="1000" rx="28" fill="#fff" stroke="#cbd9ec" strokeWidth="2" />
-          <g aria-label="Lối đi tham quan" pointerEvents="none">
-            {["M1480 944H1210V873H800", "M752 977H579V590H410", "M577 1003H414V1085"].map(path => <g key={path}>
-              <path d={path} fill="none" stroke="#cbdedb" strokeWidth="52" strokeLinejoin="round" strokeLinecap="round" />
-              <path d={path} fill="none" stroke="#edf5f3" strokeWidth="48" strokeLinejoin="round" strokeLinecap="round" />
-            </g>)}
-          </g>
           <g aria-label="Thảm đỏ đi thẳng vào Cửa 1" pointerEvents="none">
             <rect x="649" y="405" width="84" height="595" rx="4" fill="#a72f49" />
             <path d="M656 410V994M726 410V994" stroke="#e5b775" strokeWidth="2" />
@@ -72,7 +66,6 @@ export default function BoothMap({ positions, selected, onSelect }: { positions:
           </g>
           <path d="M120 1333H174" stroke="#087d73" strokeWidth="4" markerEnd={`url(#${markerId}-visit)`} /><text x="194" y="1340" fontSize="18" fill="#395b79">Hướng tham quan gợi ý</text>
           <path d="M690 1333H744" stroke="#ad3650" strokeWidth="4" markerEnd={`url(#${markerId}-hall)`} /><text x="764" y="1340" fontSize="18" fill="#395b79">Vào hội trường theo giờ</text>
-          <path d="M1170 1333H1224" stroke="#d4e5df" strokeWidth="16" strokeLinecap="round" /><text x="1244" y="1340" fontSize="18" fill="#395b79">Lối đi</text>
         </svg>
       </div>
     </div>
