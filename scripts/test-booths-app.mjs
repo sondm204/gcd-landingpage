@@ -317,6 +317,33 @@ try {
   await paymentPanel.getByRole('button', {name:'Lưu ảnh QR về thiết bị',exact:true}).click();
   await secondSave;
   assert.equal(qrDownloads, fetches, 'Saving the same QR again should use the downloaded blob');
+  // Simulate an embedded mobile browser: preserve the form and offer a PNG
+  // preview even when native sharing is unsupported or rejected by the app.
+  await page.evaluate(() => {
+    Object.defineProperty(navigator, 'userAgent', { configurable: true, value: 'Android Zalo WebView' });
+    Object.defineProperty(navigator, 'canShare', { configurable: true, value: () => false });
+  });
+  await paymentPanel.getByRole('button', {name:'Lưu ảnh QR về thiết bị',exact:true}).click();
+  await paymentPanel.getByRole('button', {name:'Lưu ảnh QR về thiết bị',exact:true}).waitFor();
+  const pngPreview = paymentPanel.getByRole('region', {name:'Ảnh PNG để lưu',exact:true});
+  await pngPreview.waitFor();
+  assert.match(await pngPreview.getByRole('img').getAttribute('src'), /^data:image\/png;base64,/);
+  assert.equal(await pngPreview.getByRole('button', {name:'Lưu / chia sẻ ảnh PNG'}).count(), 0);
+  assert.equal(page.url(), before.url);
+  await page.evaluate(() => {
+    Object.defineProperty(navigator, 'canShare', { configurable: true, value: () => true });
+    Object.defineProperty(navigator, 'share', { configurable: true, value: async ({files}) => {
+      window.sharedQrType = files[0].type;
+      throw new DOMException('Blocked by WebView', 'NotAllowedError');
+    } });
+  });
+  await paymentPanel.getByRole('button', {name:'Lưu ảnh QR về thiết bị',exact:true}).click();
+  await paymentPanel.getByRole('button', {name:'Lưu ảnh QR về thiết bị',exact:true}).waitFor();
+  await pngPreview.getByRole('button', {name:'Lưu / chia sẻ ảnh PNG'}).click();
+  await paymentPanel.getByText('Ứng dụng chưa hỗ trợ chia sẻ ảnh.', {exact:false}).waitFor();
+  assert.equal(await page.evaluate(() => window.sharedQrType), 'image/png');
+  assert(await imageNode.evaluate(node => node.isConnected));
+  assert.equal(paymentQuotes, before.quotes);
   await page.getByRole("button", {name:"Đóng QR thanh toán",exact:true}).click();
   vouchers[0].usage_limit=1; vouchers[0].used_count=1;
   assert.equal((await quoteVoucher()).status,400);
