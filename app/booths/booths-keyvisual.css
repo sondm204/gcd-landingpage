@@ -80,5 +80,31 @@
 .booth-qr-dialog h2 { font: 500 28px/1.3 var(--font-display), Georgia, serif; margin-bottom: 18px; }
 .booth-qr-dialog p { margin-block: 12px; line-height: 1.8; }
 .booth-qr-dialog img { display: block; margin: 20px auto; }
+.booth-qr-save-preview { margin-top: 16px; padding: 16px; border: 1px solid #cbd9ec; border-radius: 10px; background: #f5f9ff; color: #173b70; }
+.booth-qr-save-preview .booth-button { margin: 8px 8px 0 0; text-decoration: none; white-space: normal; }
 @media (max-width: 950px) { .booth-zone-grid { grid-template-columns: 1fr; }.booth-zone-card { padding: 24px; }.booth-zone-card h3 { margin-top: 12px; }.booth-zone-card-action { flex-direction: row; align-items: center; justify-content: space-between; gap: 16px; } }
 @media (max-width: 480px) { .booth-zone-card-action { flex-direction: column; align-items: stretch; } }
+
+/* Keep the mobile booking page focused on choosing a position and registering. */
+@media (max-width: 700px) {
+  .booths-main { padding: 20px 4% 40px; }
+  .booths-main .booths-intro { padding: 18px; margin-bottom: 16px; }
+  .booths-main .booths-intro h1 { font-size: 28px; margin: 8px 0 0; }
+  .booths-main .booths-intro h1 br { display: none; }
+  .booths-main .booths-intro h1 em { margin-left: .2em; }
+  .booths-main .booths-intro .booth-kicker { font-size: 9px; letter-spacing: .06em; }
+  .booths-main .booths-intro p,
+  .booths-main .booths-intro-aside,
+  .booths-main .booth-zone-guide,
+  .booths-main .booth-process { display: none; }
+  .booths-main .booth-availability { padding: 10px 0 14px; gap: 6px 16px; font-size: 12px; }
+  .booths-main .booth-availability strong { font-size: 19px; }
+  .booths-main .booth-availability small { display: none; }
+  .booths-main .booth-booking-grid { gap: 18px; }
+  .booths-main .booth-form-card { padding: 18px; }
+  .booths-main .booth-selected-zone { padding: 10px 12px; margin-bottom: 14px; }
+  .booths-main .booth-selected-zone p,
+  .booths-main .booth-selected-zone small { display: none; }
+  .booths-main .booth-faq { margin-top: 28px; }
+  .booths-main .booth-faq h2 { font-size: 24px; }
+}
