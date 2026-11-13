@@ -148,7 +148,9 @@ try {
   await page.locator('textarea[name="description"]').fill("");
   await page.locator('input[name="images"]').setInputFiles({ name: "booth.png", mimeType: "image/png", buffer: png });
   await page.locator('input[name="consent"]').check();
-  await page.getByRole("button", { name: "Gửi đề xuất cho TM12" }).click();
+  await page.getByRole("button", { name: "Nhận mã", exact: true }).click();
+  assert.equal(await page.locator('input[name="payment_receipt"]').evaluate(input => input.form?.id), "booth-registration");
+  await page.getByRole("button", { name: "Hoàn thành", exact: true }).click();
   await page.locator(".booth-reference").waitFor();
   assert.equal(proposals.length, 1); assert.equal(uploads.size, 1); assert.equal(proposals[0].status, "pending");
   assert.equal(proposals[0].description, "");
@@ -185,7 +187,7 @@ try {
   await page.getByLabel("Số lượt sử dụng tối đa",{exact:false}).fill("2");
   await page.getByRole("button", {name:"Thêm voucher",exact:true}).click();
   await page.getByRole("button", {name:"Tắt",exact:true}).waitFor();
-  const quoteVoucher = () => fetch(`${origin}/api/booths/payment`, {method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({position:1,code:"TEST10",requestKey:randomUUID()})});
+  const quoteVoucher = () => fetch(`${origin}/api/booths/payment`, {method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({position:1,brand:"Voucher Test",code:"TEST10",requestKey:randomUUID()})});
   assert.equal((await (await quoteVoucher()).json()).amount,4500000);
   vouchers[0].usage_limit=null;
   assert.equal((await quoteVoucher()).status,200);
@@ -260,6 +262,17 @@ try {
   }
   await page.getByLabel("Chọn nhanh vị trí").selectOption("12");
   const paymentPanel = page.getByRole("region", {name:"Thanh toán gian thương mại",exact:true});
+  await page.getByRole("button", {name:"Nhận mã",exact:true}).click();
+  assert.equal(await page.locator('.booth-qr-dialog').count(),0);
+  await page.locator('input[name="brand"]').fill("Gốm Việt");
+  await page.locator('input[name="booth_name"]').fill("Gian hàng gốm");
+  await page.locator('select[name="category"]').selectOption("Thủ công & làng nghề");
+  await page.locator('input[name="contact_name"]').fill("Nguyễn An");
+  await page.locator('input[name="phone"]').fill("0901234567");
+  await page.locator('input[name="email"]').fill("qr@example.test");
+  await page.locator('input[name="consent"]').check();
+  await page.getByRole("button", {name:"Nhận mã",exact:true}).click();
+  await page.getByRole("dialog", {name:"QR thanh toán gian thương mại",exact:true}).waitFor();
   await paymentPanel.getByLabel("Mã giảm giá (không bắt buộc)").fill("TEST10");
   await paymentPanel.getByRole("button", {name:"Xác nhận",exact:true}).click();
   await paymentPanel.getByText("Cần chuyển: 4.500.000đ", {exact:true}).waitFor();
@@ -267,6 +280,7 @@ try {
   await paymentPanel.getByRole("button", {name:"Xác nhận",exact:true}).click();
   await paymentPanel.getByText("Cần chuyển: 5.000.000đ", {exact:true}).waitFor();
   assert.equal(await page.locator('input[name="discount_code"]').inputValue(), "");
+  await page.getByRole("button", {name:"Đóng QR thanh toán",exact:true}).click();
   vouchers[0].usage_limit=1; vouchers[0].used_count=1;
   assert.equal((await quoteVoucher()).status,400);
   await page.screenshot({ path: "test-results/booths-mobile-form.png", fullPage: true });
@@ -285,7 +299,7 @@ try {
   const previewSubmit = await fetch(`${previewOrigin}/api/booths/proposals`, { method: "POST", headers: { Origin: previewOrigin } }); assert.equal(previewSubmit.status, 503);
   await page.goto(`${previewOrigin}/booths`);
   await page.locator(".booth-map-spot").first().waitFor();
-  assert(await page.locator('aside.booth-form-card button[type="submit"]').isDisabled());
+  assert(await page.getByRole('button', {name:'Nhận mã',exact:true}).isDisabled());
   await page.screenshot({ path: "test-results/booths-unconfigured.png", fullPage: true });
   console.log("PASS: Next.js validation/auth/CSRF, private image upload, anonymous competing submissions, idempotent retry, admin login/approval/logout, public confirmation and responsive UI.");
 } catch (error) {

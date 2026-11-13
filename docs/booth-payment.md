@@ -1,5 +1,9 @@
 # Phí gian thương mại và chuyển khoản
 
+## Nội dung chuyển khoản hiện tại
+
+Định dạng: `JCITL GCD <mã gian> <tên đơn vị>`, ví dụ `JCITL GCD TM01 GOM VIET`. Tên lấy từ ô **Thương hiệu / đơn vị**, chuẩn hóa thành chữ hoa không dấu, bỏ ký tự đặc biệt. Nội dung rút gọn tối đa 50 ký tự để phù hợp VietQR. Chưa nhập tên thì chưa tạo QR; sửa tên sẽ tạo lại QR. Nội dung này được dùng thống nhất trong QR hiển thị, ảnh tải về và dữ liệu thanh toán của hồ sơ mới. Cú pháp có mã phiên ở các mô tả cũ bên dưới không còn áp dụng cho hồ sơ mới.
+
 ## Giới hạn lượt dùng (V8)
 
 Admin có thể nhập số lượt tối đa khi tạo voucher; để trống là không giới hạn. Hiển thị số đã dùng và số lượt còn lại. Một lượt được tính khi hồ sơ gửi thành công, không tính lúc xem QR; gửi lại cùng phiên không trừ lần hai. Database khóa hàng voucher khi kiểm tra và trừ lượt để tránh dùng quá số lượng. Hồ sơ bị từ chối không tự hoàn lượt. Mã hết lượt hoặc không hợp lệ bị bỏ khi xác nhận, QR trở về giá gốc. Chạy migration V8 trước khi triển khai.

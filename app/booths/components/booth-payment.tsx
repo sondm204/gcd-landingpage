@@ -1,18 +1,46 @@
 "use client";
 import Image from "next/image";
+import { createPortal } from "react-dom";
 import { useEffect, useRef, useState } from "react";
 
-export default function BoothPayment({
-  position,
-  requestKey,
-  code,
-  onApply,
-}: {
+type PaymentProps = {
   position: number;
+  brand: string;
   requestKey: string;
   code: string;
   onApply: (code: string) => void;
-}) {
+};
+
+export default function BoothPayment({ onPrepare, onComplete, disabled, submitError, ...props }: PaymentProps & { onPrepare: () => boolean; onComplete: () => void; disabled: boolean; submitError: string }) {
+  const [open, setOpen] = useState(false);
+  const dialog = useRef<HTMLDialogElement>(null);
+  useEffect(() => {
+    if (!open) { dialog.current?.close(); return; }
+    dialog.current?.showModal();
+    const previous = document.body.style.overflow;
+    document.body.style.overflow = "hidden";
+    return () => { document.body.style.overflow = previous; };
+  }, [open]);
+  return <div className="booth-qr-launcher">
+    <button type="button" className="booth-button" disabled={disabled} onClick={() => { if (onPrepare()) setOpen(true); }}>Nhận QR code</button>
+    <p>Điền đầy đủ thông tin bắt buộc trong form đăng ký trước khi tạo QR. Có thể áp mã giảm giá trong dialog.</p>
+    {open && createPortal(<dialog ref={dialog} className="booth-voucher-dialog booth-qr-dialog" aria-labelledby="booth-qr-title" onCancel={event => { if (disabled) event.preventDefault(); else setOpen(false); }} onClose={() => setOpen(false)}>
+      <button type="button" className="booth-button secondary compact booth-voucher-close" aria-label="Đóng QR thanh toán" onClick={() => setOpen(false)}>Đóng ✕</button>
+      {open && <PaymentContent {...props} />}
+      <label className="booth-field">Ảnh chuyển khoản (không bắt buộc)<input form="booth-registration" name="payment_receipt" type="file" accept="image/jpeg,image/png,image/webp" disabled={disabled} /><small>Một ảnh JPEG, PNG hoặc WebP, tối đa 1 MB.</small></label>
+      {submitError && <p role="alert" className="booth-payment-error">{submitError}</p>}
+      <button type="button" className="booth-button" disabled={disabled} onClick={onComplete}>{disabled ? "Đang gửi…" : "Hoàn thành"}</button>
+    </dialog>, document.body)}
+  </div>;
+}
+
+function PaymentContent({
+  position,
+  brand,
+  requestKey,
+  code,
+  onApply,
+}: PaymentProps) {
   const [draft, setDraft] = useState(code);
   const [busy, setBusy] = useState(false);
   const applyRequest = useRef<AbortController | null>(null);
@@ -27,7 +55,7 @@ export default function BoothPayment({
       const response = await fetch("/api/booths/payment", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ position, code: draft, requestKey }),
+        body: JSON.stringify({ position, brand, code: draft, requestKey }),
         signal: controller.signal,
       });
       const data = await response.json();
@@ -40,7 +68,7 @@ export default function BoothPayment({
         onApply("");
         setError(`${err instanceof Error ? err.message : "Chưa áp dụng được mã."}`);
         try {
-          const response = await fetch("/api/booths/payment", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ position, code: "", requestKey }), signal: controller.signal });
+          const response = await fetch("/api/booths/payment", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ position, brand, code: "", requestKey }), signal: controller.signal });
           if (response.ok) setQuote(await response.json());
         } catch { /* Hide QR until a valid base quote is available. */ }
       }
@@ -59,13 +87,14 @@ export default function BoothPayment({
   } | null>(null);
   const [error, setError] = useState("");
   useEffect(() => {
+    if (brand.trim().length < 2) return;
     const controller = new AbortController();
     const timer = setTimeout(async () => {
       try {
         const response = await fetch("/api/booths/payment", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ position, code, requestKey }),
+          body: JSON.stringify({ position, brand, code, requestKey }),
           signal: controller.signal,
         });
         const data = await response.json();
@@ -82,18 +111,19 @@ export default function BoothPayment({
       clearTimeout(timer);
       controller.abort();
     };
-  }, [position, requestKey, code]);
+  }, [position, brand, requestKey, code]);
   return (
     <section
       className="booth-form-card"
       style={{ marginTop: 20 }}
       aria-label="Thanh toán gian thương mại"
     >
-      <h2>Chi phí gian thương mại</h2>
+      <h2 id="booth-qr-title">QR thanh toán gian thương mại</h2>
       <p>Giá niêm yết: 5.000.000đ / gian</p>
       <form
         onSubmit={(event) => {
           event.preventDefault();
+          event.stopPropagation();
           void apply();
         }}
       >
@@ -110,13 +140,15 @@ export default function BoothPayment({
         <button
           type="submit"
           className="booth-button secondary"
-          disabled={busy}
+          disabled={busy || brand.trim().length < 2}
         >
           {busy ? "Đang xác nhận…" : "Xác nhận"}
         </button>
         <p>{code}</p>
       </form>
       {error && <p role="alert" className="booth-payment-error">{error}</p>}
+      {brand.trim().length < 2 && <p>Nhập tên “Thương hiệu / đơn vị” trong form đăng ký để tạo QR đúng nội dung chuyển khoản.</p>}
+      <p>Tên đơn vị trong nội dung chuyển khoản được chuyển thành không dấu; nội dung tối đa 50 ký tự.</p>
       {!busy && quote && (
         <>
           <p>
@@ -140,7 +172,7 @@ export default function BoothPayment({
               <button type="button" className="booth-button secondary" disabled={busy} onClick={async () => {
                 setBusy(true);
                 try {
-                  const response = await fetch("/api/booths/payment/download", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ position, code, requestKey }) });
+                  const response = await fetch("/api/booths/payment/download", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ position, brand, code, requestKey }) });
                   if (!response.ok) throw new Error("Chưa lưu được QR. Vui lòng xác nhận lại mã giảm giá.");
                   const url = URL.createObjectURL(await response.blob());
                   const link = document.createElement("a"); link.href=url; link.download=`GCD-TM${String(position).padStart(2,"0")}-QR.png`; link.click();

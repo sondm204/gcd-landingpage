@@ -11,9 +11,8 @@ test('commercial fee, percent and fixed discounts are calculated on the server',
   assert.throws(() => calculatePayment(21, 'TEN', rules));
   assert.equal(calculatePayment(21, '', rules), null);
 });
-test('transfer memo identifies booth and registration without contact details', () => {
-  const memo = transferMemo(1, '12345678-1234-4123-8123-123456789012');
-  assert.equal(memo, 'GCD TM01 123456781234');
-  assert(memo.length <= 25);
-  assert(transferMemo(34, '12345678-1234-4123-8123-123456789012').startsWith('GCD TM21 '));
+test('transfer memo uses organization name and the requested prefix', () => {
+  assert.equal(transferMemo(1, 'Đơn vị Gốm Việt'), 'JCITL GCD TM01 DON VI GOM VIET');
+  assert.equal(transferMemo(34, 'Gốm Việt'), 'JCITL GCD TM21 GOM VIET');
+  assert(transferMemo(1, 'A'.repeat(120)).length <= 50);
 });
