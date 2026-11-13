@@ -120,6 +120,19 @@ try {
   for (let i=0; i<100; i++) { try { if ((await fetch(origin)).ok) break; } catch {} await new Promise((done) => setTimeout(done, 200)); }
   browser = await chromium.launch({ channel: "chrome", headless: true });
   const page = await browser.newPage({ viewport: { width: 1440, height: 1000 } });
+  let qrImageLoads = 0, qrDownloads = 0, paymentQuotes = 0;
+  await page.route('https://img.vietqr.io/**', async route => {
+    if (route.request().resourceType() === 'image') qrImageLoads++;
+    else { qrDownloads++; await new Promise(resolve => setTimeout(resolve, 600)); }
+    await route.fulfill({ status: 200, contentType: 'image/png', headers: {'Access-Control-Allow-Origin':'*'}, body: png });
+  });
+  await page.route('**/api/booths/payment', async route => {
+    paymentQuotes++;
+    const response = await route.fetch();
+    const data = await response.json();
+    if (response.ok() && data.amount > 0) data.qr = `https://img.vietqr.io/image/test-qr.png?amount=${data.amount}`;
+    await route.fulfill({ response, json: data });
+  });
   const pageErrors = []; page.on("pageerror", (err) => pageErrors.push(err.message));
   const unauthorized = await fetch(`${origin}/api/booths/admin/proposals`); assert.equal(unauthorized.status, 401);
   const foreign = await fetch(`${origin}/api/booths/proposals`, { method: "POST", headers: { Origin: "https://foreign.test" } }); assert.equal(foreign.status, 403);
@@ -148,7 +161,7 @@ try {
   await page.locator('textarea[name="description"]').fill("");
   await page.locator('input[name="images"]').setInputFiles({ name: "booth.png", mimeType: "image/png", buffer: png });
   await page.locator('input[name="consent"]').check();
-  await page.getByRole("button", { name: "Nhận mã", exact: true }).click();
+  await page.getByRole("button", { name: "Nhận QR code", exact: true }).click();
   assert.equal(await page.locator('input[name="payment_receipt"]').evaluate(input => input.form?.id), "booth-registration");
   await page.getByRole("button", { name: "Hoàn thành", exact: true }).click();
   await page.locator(".booth-reference").waitFor();
@@ -262,7 +275,7 @@ try {
   }
   await page.getByLabel("Chọn nhanh vị trí").selectOption("12");
   const paymentPanel = page.getByRole("region", {name:"Thanh toán gian thương mại",exact:true});
-  await page.getByRole("button", {name:"Nhận mã",exact:true}).click();
+  await page.getByRole("button", {name:"Nhận QR code",exact:true}).click();
   assert.equal(await page.locator('.booth-qr-dialog').count(),0);
   await page.locator('input[name="brand"]').fill("Gốm Việt");
   await page.locator('input[name="booth_name"]').fill("Gian hàng gốm");
@@ -271,7 +284,7 @@ try {
   await page.locator('input[name="phone"]').fill("0901234567");
   await page.locator('input[name="email"]').fill("qr@example.test");
   await page.locator('input[name="consent"]').check();
-  await page.getByRole("button", {name:"Nhận mã",exact:true}).click();
+  await page.getByRole("button", {name:"Nhận QR code",exact:true}).click();
   await page.getByRole("dialog", {name:"QR thanh toán gian thương mại",exact:true}).waitFor();
   await paymentPanel.getByLabel("Mã giảm giá (không bắt buộc)").fill("TEST10");
   await paymentPanel.getByRole("button", {name:"Xác nhận",exact:true}).click();
@@ -280,6 +293,30 @@ try {
   await paymentPanel.getByRole("button", {name:"Xác nhận",exact:true}).click();
   await paymentPanel.getByText("Cần chuyển: 5.000.000đ", {exact:true}).waitFor();
   assert.equal(await page.locator('input[name="discount_code"]').inputValue(), "");
+  // Saving an image must preserve the QR node, quote, dialog and current page.
+  const qrImage = paymentPanel.getByAltText('QR chuyển khoản phí gian hàng');
+  await qrImage.waitFor();
+  await page.waitForTimeout(500); // Finish the quote refresh following voucher removal.
+  const imageNode = await qrImage.elementHandle();
+  const before = { images: qrImageLoads, quotes: paymentQuotes, url: page.url() };
+  const saved = page.waitForEvent('download');
+  await paymentPanel.getByRole('button', {name:'Lưu ảnh QR về thiết bị',exact:true}).click();
+  await paymentPanel.getByRole('button', {name:'Đang lưu ảnh…',exact:true}).waitFor();
+  assert(await imageNode.evaluate(node => node.isConnected));
+  assert(await qrImage.isVisible());
+  const file = await saved;
+  assert.equal(file.suggestedFilename(), 'GCD-TM12-QR.png');
+  await paymentPanel.getByRole('button', {name:'Lưu ảnh QR về thiết bị',exact:true}).waitFor();
+  assert.equal(page.url(), before.url);
+  assert.equal(qrImageLoads, before.images);
+  assert.equal(paymentQuotes, before.quotes);
+  assert(await imageNode.evaluate(node => node.isConnected));
+  assert(await page.getByRole('dialog', {name:'QR thanh toán gian thương mại',exact:true}).isVisible());
+  const fetches = qrDownloads;
+  const secondSave = page.waitForEvent('download');
+  await paymentPanel.getByRole('button', {name:'Lưu ảnh QR về thiết bị',exact:true}).click();
+  await secondSave;
+  assert.equal(qrDownloads, fetches, 'Saving the same QR again should use the downloaded blob');
   await page.getByRole("button", {name:"Đóng QR thanh toán",exact:true}).click();
   vouchers[0].usage_limit=1; vouchers[0].used_count=1;
   assert.equal((await quoteVoucher()).status,400);
@@ -299,7 +336,7 @@ try {
   const previewSubmit = await fetch(`${previewOrigin}/api/booths/proposals`, { method: "POST", headers: { Origin: previewOrigin } }); assert.equal(previewSubmit.status, 503);
   await page.goto(`${previewOrigin}/booths`);
   await page.locator(".booth-map-spot").first().waitFor();
-  assert(await page.getByRole('button', {name:'Nhận mã',exact:true}).isDisabled());
+  assert(await page.getByRole('button', {name:'Nhận QR code',exact:true}).isDisabled());
   await page.screenshot({ path: "test-results/booths-unconfigured.png", fullPage: true });
   console.log("PASS: Next.js validation/auth/CSRF, private image upload, anonymous competing submissions, idempotent retry, admin login/approval/logout, public confirmation and responsive UI.");
 } catch (error) {
