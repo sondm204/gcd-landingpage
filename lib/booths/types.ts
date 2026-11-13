@@ -1,6 +1,6 @@
 export type ProposalStatus = "pending" | "approved" | "rejected";
-export const BOOTH_COUNT = 25;
-export const POSITION_COUNT = 33;
+export const BOOTH_COUNT = 26;
+export const POSITION_COUNT = 34;
 export const BOOTH_ZONES = [
   {
     "name": "Gian thương mại",
@@ -75,8 +75,12 @@ export const BOOTH_ZONES = [
 ] as const;
 
 export function zoneForPosition(id: number) {
+  if (id === 34) return BOOTH_ZONES[0];
   return BOOTH_ZONES.find((zone) => id >= zone.firstId && id <= zone.lastId);
 }
+export const isCommercialPosition = (id: number) => (id >= 1 && id <= 20) || id === 34;
+export const isBookablePosition = (id: number) => (id >= 1 && id <= 25) || id === 34;
+export const zonePositionCount = (prefix: string) => prefix === "TM" ? 21 : prefix === "BTC" ? 3 : 5;
 
 export type BoothPosition = {
   id: number;
@@ -106,15 +110,16 @@ export type BoothProposal = {
 export function conceptPositions(): BoothPosition[] {
   return Array.from({ length: POSITION_COUNT }, (_, i) => {
     const id = i + 1, group = zoneForPosition(id)!;
-    const n = id - group.firstId + 1;
+    const n = id === 34 ? 21 : id - group.firstId + 1;
     let x: number, y: number, w = 78, h = 52;
-    if (id <= 20) {
+    if (id === 34) { x=788; y=728; h=46; }
+    else if (id <= 20) {
       if (n <= 4) { x = 454; y = 707 + (n - 1) * 71; }
       else if (n <= 11) { x = 454 + (n - 5) * 93; y = 1028; }
-      else if (n <= 17) { x = 788 + (n - 12) * 93; y = 781; }
+      else if (n <= 17) { x = 788 + (n - 12) * 93; y = 793; }
       else { x = 1123; y = 1028 + (n - 18) * 65; }
-    } else if (id <= 25) { x = n <= 3 ? 788 + (n - 1) * 93 : 788; y = n <= 3 ? 523 : 595 + (n - 4) * 72; h = 58; }
-    else if (id <= 30) { x = n <= 4 ? 117 + (n - 1) * 93 : 396; y = n <= 4 ? 467 : 541; h = 58; }
+    } else if (id <= 25) { x = n <= 3 ? 788 + (n - 1) * 93 : 788; y = n <= 3 ? 523 : 591 + (n - 4) * 68; h = 50; }
+    else if (id <= 30) { x = n <= 4 ? 117 + (n - 1) * 93 : 454; y = n <= 4 ? 467 : 630; h = 58; }
     else { x = n === 1 ? 1272 : 117; y = n === 1 ? 691 : n === 2 ? 707 : 1028; w = n === 1 ? 226 : 265; h = 82; }
     return { id, code: group.prefix + String(n).padStart(2, '0'), zone: group.name, x: x/16, y: y/16, width: w/16, height: h/16, pending_count: 0, confirmed_brand: null, confirmed_booth: null, is_booked: false, is_bookable: group.bookable };
   });

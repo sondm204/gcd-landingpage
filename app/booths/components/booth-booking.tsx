@@ -1,7 +1,7 @@
 "use client";
 
 import { useCallback, useEffect, useRef, useState } from "react";
-import { BOOTH_COUNT, POSITION_COUNT, BOOTH_ZONES, zoneForPosition, type BoothPosition } from "@/lib/booths/types";
+import { isCommercialPosition, BOOTH_COUNT, POSITION_COUNT, BOOTH_ZONES, zoneForPosition, type BoothPosition } from "@/lib/booths/types";
 import BoothZoneGuide from "./booth-zone-guide";
 import BoothPayment from "./booth-payment";
 import BoothVouchers from "./booth-vouchers";
@@ -101,7 +101,7 @@ export default function BoothBooking() {
   }
 
   return <main className="booths-main">
-    <section className="booths-intro"><div><span className="booth-kicker">DÀNH CHO THƯƠNG HIỆU & ĐƠN VỊ ĐỒNG HÀNH</span><h1>Chọn một góc nhỏ.<br /><em>Mở ngàn kết nối.</em></h1><p>Sơ đồ gồm 5 gian văn hoá, 5 gian tài trợ, 20 gian thương mại và 3 gian BTC. Chọn gian thương mại hoặc tài trợ phù hợp để gửi đề xuất tham gia.</p></div><div className="booths-intro-aside"><span className="booths-big-number">{POSITION_COUNT}<span>VỊ TRÍ DỰ KIẾN</span></span><p><strong>{BOOTH_COUNT} gian nhận đề xuất</strong><br />5 gian văn hoá và 3 gian BTC đã bố trí.<br />Chỉ xác nhận sau khi xét duyệt.</p></div></section>
+    <section className="booths-intro"><div><span className="booth-kicker">DÀNH CHO THƯƠNG HIỆU & ĐƠN VỊ ĐỒNG HÀNH</span><h1>Chọn một góc nhỏ.<br /><em>Mở ngàn kết nối.</em></h1><p>Sơ đồ gồm 5 gian văn hoá, 5 gian tài trợ, 21 gian thương mại và 3 gian BTC. Chọn gian thương mại hoặc tài trợ phù hợp để gửi đề xuất tham gia.</p></div><div className="booths-intro-aside"><span className="booths-big-number">{POSITION_COUNT}<span>VỊ TRÍ DỰ KIẾN</span></span><p><strong>{BOOTH_COUNT} gian nhận đề xuất</strong><br />5 gian văn hoá và 3 gian BTC đã bố trí.<br />Chỉ xác nhận sau khi xét duyệt.</p></div></section>
     <BoothZoneGuide positions={positions} selected={selected} onSelect={(id) => { selectPosition(id); document.getElementById("booth-plan")?.scrollIntoView({ behavior: window.matchMedia("(prefers-reduced-motion: reduce)").matches ? "instant" : "smooth", block: "start" }); }} />
     <div className="booth-process"><span><b>01</b> Chọn chủ đề & vị trí</span><span><b>02</b> Gửi câu chuyện gian hàng</span><span><b>03</b> Chờ ban tổ chức xét duyệt</span></div>
     {admin && <div className="booth-admin-mode"><div><span className="booth-kicker">CHẾ ĐỘ QUẢN TRỊ</span><p>{admin.email} · Chọn ô để xem đề xuất, xét duyệt hoặc sửa gian hàng đã chốt.</p></div><div className="booth-admin-toolbar"><BoothVouchers /><button type="button" className="booth-button secondary compact" disabled={logoutBusy} onClick={logout}>{logoutBusy ? "Đang đăng xuất…" : "Đăng xuất ↗"}</button></div></div>}
@@ -111,7 +111,7 @@ export default function BoothBooking() {
       <div className="booth-availability"><span><strong>{bookablePositions.length - booked}</strong> gian đang nhận đề xuất</span><span><strong>{booked}</strong> gian đã xác nhận / {BOOTH_COUNT}</span><small>Không tính gian văn hoá và BTC · Cập nhật mỗi 30 giây</small></div>
       <div id="booth-plan" className={`booth-booking-grid ${admin ? "is-admin" : ""}`}>
         <div className="booth-map-column"><BoothMap positions={positions} selected={selected} onSelect={selectPosition} />
-          {!admin && selected <= 20 && paymentKey && !success && <BoothPayment key={`${selected}:${paymentKey}`} position={selected} requestKey={paymentKey} code={discountCode} onApply={setDiscountCode} />}
+          {!admin && isCommercialPosition(selected) && paymentKey && !success && <BoothPayment key={`${selected}:${paymentKey}`} position={selected} requestKey={paymentKey} code={discountCode} onApply={setDiscountCode} />}
           {admin && <section className="booth-group-overview" aria-label="Nhóm đề xuất theo vị trí"><span className="booth-kicker">TỔNG QUAN THEO VỊ TRÍ</span><h2>Những ô đang có hồ sơ.</h2><p>Bấm một nhóm để xem hồ sơ tương ứng bên cạnh.</p><div>{positions.filter((entry) => entry.pending_count>0 || entry.is_booked).map((entry) => <button type="button" key={entry.id} className={selected===entry.id ? "selected" : ""} aria-pressed={selected===entry.id} onClick={()=>setSelected(entry.id)}><strong>{entry.code}</strong><span>{entry.pending_count} chờ{entry.is_booked ? " · Đã chốt" : ""}</span>{entry.confirmed_brand && <small>{entry.confirmed_brand}</small>}</button>)}</div>{!positions.some((entry)=>entry.pending_count>0||entry.is_booked) && <p>Chưa có đề xuất đang chờ hoặc gian hàng đã chốt.</p>}</section>}
         </div>
         {!authReady || authError ? <aside className="booth-form-card"><p role="status">{authError || "Đang kiểm tra phiên đăng nhập…"}</p><Link href="/booths/admin/login">Đăng nhập quản trị ↗</Link></aside> : admin && position ? <BoothAdminPanel key={position.id} position={position} positions={positions} onSelect={setSelected} onChanged={refresh} onUnauthorized={unauthorized} /> :
@@ -152,7 +152,7 @@ export default function BoothBooking() {
     </>}
     <section className="booth-faq"><span className="booth-kicker">TRƯỚC KHI GỬI ĐỀ XUẤT</span><h2>Một vài điều cần biết.</h2>
       <details><summary>Tôi nên chọn loại gian nào?</summary><p>Chọn gian thương mại để giới thiệu, bán sản phẩm hoặc dịch vụ. Chọn gian tài trợ để đề xuất đồng hành và quảng bá theo thỏa thuận với ban tổ chức. Gửi đề xuất chưa đồng nghĩa được xác nhận tham gia.</p></details>
-      <details><summary>Tôi có thể đăng ký gian văn hoá hoặc BTC không?</summary><p>Không. VH01–VH05 đã có đơn vị phụ trách. BTC01–BTC02 hỗ trợ khách và BTC03 phục vụ đổi quà. Chỉ TM01–TM20 và TT01–TT05 nhận đề xuất mới.</p></details>
+      <details><summary>Tôi có thể đăng ký gian văn hoá hoặc BTC không?</summary><p>Không. VH01–VH05 đã có đơn vị phụ trách. BTC01–BTC02 hỗ trợ khách và BTC03 phục vụ đổi quà. Chỉ TM01–TM21 và TT01–TT05 nhận đề xuất mới.</p></details>
       <details><summary>Gửi đề xuất có giữ chỗ cho tôi không?</summary><p>Chưa. Một vị trí có thể nhận nhiều đề xuất cùng lúc. Chỉ đề xuất được admin duyệt mới xác nhận vị trí; các đề xuất khác của cùng vị trí sẽ được đóng.</p></details><details><summary>Tôi có cần tạo tài khoản không?</summary><p>Không. Bạn chỉ cần điền thông tin liên hệ chính xác để ban tổ chức có thể trao đổi và phản hồi.</p></details><details><summary>Chi phí, diện tích và tiện ích gian hàng thế nào?</summary><p>Đây là sơ đồ ý tưởng. Chi phí, mặt bằng thực tế, lịch tổ chức và tiện ích sẽ được ban tổ chức trao đổi trước khi chốt tham gia. Gian thương mại có giá 5.000.000đ/gian; mã giảm giá hợp lệ được tính trước khi tạo QR. Ban tổ chức đối soát chuyển khoản trước khi xác nhận.</p></details></section>
   </main>;
 }

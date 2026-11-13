@@ -1,22 +1,33 @@
 "use client";
 
 import { useId, useState } from "react";
-import { BOOTH_ZONES, type BoothPosition } from "@/lib/booths/types";
+import { BOOTH_ZONES, zonePositionCount, type BoothPosition } from "@/lib/booths/types";
 
 export default function BoothMap({ positions, selected, onSelect }: { positions: BoothPosition[]; selected: number; onSelect: (id: number) => void }) {
   const [zoom, setZoom] = useState(1);
   const markerId = useId().replace(/:/g, "");
   return <div className="booth-map-card">
-    <div className="booth-map-top"><div><span className="booth-kicker">MẶT BẰNG DỰ KIẾN · 33 GIAN</span><h2>Chọn gian thương mại hoặc tài trợ.</h2></div><div className="booth-map-tools"><button type="button" aria-label="Thu nhỏ sơ đồ" disabled={zoom <= 1} onClick={() => setZoom(Math.max(1, zoom - .5))}>−</button><button type="button" aria-label="Đặt lại sơ đồ" onClick={() => setZoom(1)}>⟲</button><button type="button" aria-label="Phóng to sơ đồ" disabled={zoom >= 3} onClick={() => setZoom(Math.min(3, zoom + .5))}>+</button></div></div>
-    <div className="booth-map-viewport" tabIndex={0} aria-label="Sơ đồ 33 gian; phóng to và cuộn ngang để xem chi tiết">
+    <div className="booth-map-top"><div><span className="booth-kicker">MẶT BẰNG DỰ KIẾN · 34 GIAN</span><h2>Chọn gian thương mại hoặc tài trợ.</h2></div><div className="booth-map-tools"><button type="button" aria-label="Thu nhỏ sơ đồ" disabled={zoom <= 1} onClick={() => setZoom(Math.max(1, zoom - .5))}>−</button><button type="button" aria-label="Đặt lại sơ đồ" onClick={() => setZoom(1)}>⟲</button><button type="button" aria-label="Phóng to sơ đồ" disabled={zoom >= 3} onClick={() => setZoom(Math.min(3, zoom + .5))}>+</button></div></div>
+    <div className="booth-map-viewport" tabIndex={0} aria-label="Sơ đồ 34 gian; phóng to và cuộn ngang để xem chi tiết">
       <div className="booth-map-canvas" style={{ width: `${zoom * 100}%` }}>
         <svg viewBox="70 210 1460 1160" role="group" aria-label="Sơ đồ gian hàng Global Citizens Day">
           <defs>
             <marker id={`${markerId}-visit`} markerWidth="8" markerHeight="8" refX="6" refY="4" orient="auto"><path d="M0 0 8 4 0 8Z" fill="#087d73" /></marker>
             <marker id={`${markerId}-hall`} markerWidth="8" markerHeight="8" refX="6" refY="4" orient="auto"><path d="M0 0 8 4 0 8Z" fill="#ad3650" /></marker>
+            <marker id={`${markerId}-carpet`} markerWidth="8" markerHeight="8" refX="6" refY="4" orient="auto"><path d="M0 0 8 4 0 8Z" fill="#fff8eb" /></marker>
           </defs>
           <rect x="70" y="210" width="1460" height="1160" fill="#eff5fc" />
           <rect x="92" y="245" width="1416" height="1000" rx="28" fill="#fff" stroke="#cbd9ec" strokeWidth="2" />
+          <g aria-label="Lối đi tham quan" pointerEvents="none">
+            {["M1480 944H1210V873H800", "M752 977H579V590H410", "M577 1003H414V1085"].map(path => <g key={path}>
+              <path d={path} fill="none" stroke="#cbdedb" strokeWidth="52" strokeLinejoin="round" strokeLinecap="round" />
+              <path d={path} fill="none" stroke="#edf5f3" strokeWidth="48" strokeLinejoin="round" strokeLinecap="round" />
+            </g>)}
+          </g>
+          <g aria-label="Thảm đỏ đi thẳng vào Cửa 1" pointerEvents="none">
+            <rect x="649" y="405" width="84" height="595" rx="4" fill="#a72f49" />
+            <path d="M656 410V994M726 410V994" stroke="#e5b775" strokeWidth="2" />
+          </g>
           <rect x="482" y="275" width="650" height="132" rx="20" fill="#153b55" />
           <text x="807" y="340" textAnchor="middle" fontSize="36" fontWeight="700" fill="#fff">HỘI TRƯỜNG</text>
           {[617,877].map((x,index)=><g key={x}><rect x={x} y="361" width="148" height="44" rx="10" fill="#e6f0f6" /><text x={x+74} y="390" textAnchor="middle" fill="#153b55" fontSize="23">Cửa {index+1}</text></g>)}
@@ -24,16 +35,16 @@ export default function BoothMap({ positions, selected, onSelect }: { positions:
           <text x="248" y="353" textAnchor="middle" fontSize="23" fill="#087d73">Backdrop GCD</text>
           <text x="117" y="433" fontSize="25" fontWeight="700" fill="#087d73">TRẢI NGHIỆM VĂN HOÁ</text>
           <text x="790" y="493" fontSize="27" fontWeight="700" fill="#9a650e">NHÀ TÀI TRỢ</text>
-          <rect x="1180" y="440" width="290" height="70" rx="12" fill="#fff8e9" stroke="#ead8ad" />
-          <text x="1325" y="483" textAnchor="middle" fontSize="23" fill="#9a650e">Backdrop Trống Đồng</text>
-          <circle cx="1325" cy="573" r="32" fill="#fff4e5" stroke="#c69b48" strokeDasharray="5 5" strokeWidth="2" />
-          <text x="1325" y="581" textAnchor="middle" fontSize="22" fontWeight="600" fill="#9a650e">360°</text>
-          <text x="1325" y="646" textAnchor="middle" fontSize="20" fill="#9a650e">Khu chờ Camera 360°</text>
-          <text x="277" y="656" textAnchor="middle" fontSize="22" fill="#087d73">Khu chờ trải nghiệm</text>
-          {["M1480 944H1210V873H800", "M752 977H579V653H510", "M577 1003H414V1085"].map((path) => <path key={path} d={path} fill="none" stroke="#087d73" strokeWidth="6" strokeLinejoin="round" markerEnd={`url(#${markerId}-visit)`} />)}
-          <path d="M690 891V445" fill="none" stroke="#ad3650" strokeWidth="6" markerEnd={`url(#${markerId}-hall)`} />
+          <rect x="1035" y="438" width="290" height="70" rx="12" fill="#fff8e9" stroke="#ead8ad" />
+          <text x="1180" y="481" textAnchor="middle" fontSize="23" fill="#9a650e">Backdrop Trống Đồng</text>
+          <circle cx="1180" cy="548" r="32" fill="#fff4e5" stroke="#c69b48" strokeDasharray="5 5" strokeWidth="2" />
+          <text x="1180" y="556" textAnchor="middle" fontSize="22" fontWeight="600" fill="#9a650e">360°</text>
+          <text x="1180" y="620" textAnchor="middle" fontSize="20" fill="#9a650e">Khu chờ Camera 360°</text>
+          <text x="277" y="590" textAnchor="middle" fontSize="22" fill="#087d73">Khu chờ trải nghiệm</text>
+          {["M1480 944H1210V873H800", "M752 977H579V590H410", "M577 1003H414V1085"].map((path) => <path key={path} d={path} fill="none" stroke="#087d73" strokeWidth="6" strokeLinejoin="round" markerEnd={`url(#${markerId}-visit)`} />)}
+          <path d="M691 891V445" fill="none" stroke="#fff8eb" strokeWidth="5" markerEnd={`url(#${markerId}-carpet)`} />
           <text x="1395" y="920" textAnchor="middle" fontSize="27" fontWeight="700" fill="#087d73">LỐI VÀO</text>
-          <text x="690" y="960" textAnchor="middle" fontSize="22" fill="#ad3650">Thảm đỏ</text>
+          <text x="691" y="1023" textAnchor="middle" fontSize="18" fontWeight="600" fill="#a72f49">THẢM ĐỎ · CỬA 1</text>
           <text x="247" y="1170" textAnchor="middle" fontSize="22" fill="#793c91">Khu chờ đổi quà</text>
           {positions.map((booth) => {
             const x=booth.x*16, y=booth.y*16, w=booth.width*16, h=booth.height*16;
@@ -57,14 +68,15 @@ export default function BoothMap({ positions, selected, onSelect }: { positions:
             </g>;
           })}
           <g fontSize="19" fontWeight="600">
-            {BOOTH_ZONES.map((zone,index)=><g key={zone.name} transform={`translate(${117+index*350} 1290)`}><rect y="-18" width="18" height="18" rx="3" fill={zone.background} stroke={zone.color} /><text x="28" fill={zone.color}>{zone.lastId-zone.firstId+1} {zone.name.toLowerCase()}</text></g>)}
+            {BOOTH_ZONES.map((zone,index)=><g key={zone.name} transform={`translate(${117+index*350} 1290)`}><rect y="-18" width="18" height="18" rx="3" fill={zone.background} stroke={zone.color} /><text x="28" fill={zone.color}>{zonePositionCount(zone.prefix)} {zone.name.toLowerCase()}</text></g>)}
           </g>
           <path d="M120 1333H174" stroke="#087d73" strokeWidth="4" markerEnd={`url(#${markerId}-visit)`} /><text x="194" y="1340" fontSize="18" fill="#395b79">Hướng tham quan gợi ý</text>
           <path d="M690 1333H744" stroke="#ad3650" strokeWidth="4" markerEnd={`url(#${markerId}-hall)`} /><text x="764" y="1340" fontSize="18" fill="#395b79">Vào hội trường theo giờ</text>
+          <path d="M1170 1333H1224" stroke="#d4e5df" strokeWidth="16" strokeLinecap="round" /><text x="1244" y="1340" fontSize="18" fill="#395b79">Lối đi</text>
         </svg>
       </div>
     </div>
     <div className="booth-map-legend"><span><i className="open" />Nhận đề xuất</span><span><i className="pending" />Có đề xuất</span><span><i className="booked" />Đã xác nhận</span><span>VH: đã bố trí · BTC: phục vụ sự kiện</span></div>
-    <p className="booth-map-note">5 gian văn hoá đã có đơn vị phụ trách và 3 gian BTC không nhận đăng ký. Bạn có thể chọn 20 gian thương mại hoặc 5 gian tài trợ. Sơ đồ đề xuất, không theo tỷ lệ; mặt bằng và lối đi được ban tổ chức xác nhận với địa điểm.</p>
+    <p className="booth-map-note">5 gian văn hoá đã có đơn vị phụ trách và 3 gian BTC không nhận đăng ký. Bạn có thể chọn 21 gian thương mại hoặc 5 gian tài trợ. Sơ đồ đề xuất, không theo tỷ lệ; mặt bằng và lối đi được ban tổ chức xác nhận với địa điểm.</p>
   </div>;
 }

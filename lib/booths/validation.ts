@@ -1,5 +1,5 @@
 import { z } from "zod";
-import { BOOTH_COUNT } from "./types";
+import { isBookablePosition } from "./types";
 
 const safeWebsite = z.string().trim().max(300).refine((value) => {
   if (!value) return true;
@@ -9,7 +9,7 @@ const safeWebsite = z.string().trim().max(300).refine((value) => {
 
 export const proposalSchema = z.object({
   discount_code: z.string().trim().toUpperCase().max(50).default(""),
-  position_id: z.coerce.number().int().min(1).max(BOOTH_COUNT, "Chỉ nhận đăng ký gian TM01–TM20 và TT01–TT05. Gian văn hoá và BTC đã được bố trí."),
+  position_id: z.coerce.number().int().refine(isBookablePosition, "Chỉ nhận đăng ký gian TM01–TM21 và TT01–TT05. Gian văn hoá và BTC đã được bố trí."),
   brand: z.string().trim().min(2, "Nhập tên thương hiệu.").max(120),
   booth_name: z.string().trim().min(2, "Nhập tên gian hàng.").max(120),
   contact_name: z.string().trim().min(2, "Nhập tên người liên hệ.").max(100),

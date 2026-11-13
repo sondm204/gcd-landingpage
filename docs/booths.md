@@ -1,5 +1,13 @@
 # Đặt vị trí gian hàng — Global Citizens Day 2026
 
+## Tinh chỉnh V10
+
+VH04 trở lại hàng VH01–VH03; VH05 vẫn nằm trên TM01. Khoảng trống hai phía TM21 được tăng lên khoảng 19 đơn vị SVG bằng cách chỉnh các gian tài trợ và dịch hàng TM12–TM17 xuống nhẹ. Camera 360° cùng cao độ với TT03, backdrop nằm phía trên camera và phía dưới hội trường. Chạy migration V10 để đồng bộ dữ liệu mặt bằng.
+
+## Điều chỉnh mặt bằng V9
+
+Hiện có 34 gian: 21 TM, 5 TT, 5 VH và 3 BTC; 26 gian nhận đăng ký. TM21 nằm giữa TT05 và TM12, dùng ID nội bộ 34 để không thay đổi ID hay hồ sơ của các gian cũ. VH05 nằm trên TM01, VH04 cùng trục dọc; mũi tên khu trải nghiệm nằm phía trên VH05. Camera/khu chờ được đưa sang phải TT03, backdrop phía trên camera. Chạy migration `V9__additional_commercial_booth_and_layout.sql` trước khi triển khai. TM21 áp dụng giá, voucher và QR như các gian TM khác.
+
 ## Sơ đồ hiện hành: 33 gian theo loại
 
 Tham khảo mặt bằng `public/images/So-do-GCD-vuong.png`; sơ đồ được vẽ hoàn toàn bằng SVG trong `booth-map.tsx`, không tải ảnh mẫu. Giữ cùng mã và vị trí:

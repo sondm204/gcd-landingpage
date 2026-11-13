@@ -1,6 +1,6 @@
 export const COMMERCIAL_PRICE = 5_000_000;
 export function calculatePayment(position: number, code: string, config = "[]") {
-  if (position > 20) {
+  if (!((position >= 1 && position <= 20) || position === 34)) {
     if (code) throw new Error("Mã giảm giá chỉ áp dụng cho gian thương mại.");
     return null;
   }
@@ -17,5 +17,5 @@ export function calculatePayment(position: number, code: string, config = "[]") 
 }
 
 export function transferMemo(position: number, requestKey: string) {
-  return `GCD TM${String(position).padStart(2, "0")} ${requestKey.replaceAll("-", "").slice(0, 12).toUpperCase()}`;
+  return `GCD TM${String(position === 34 ? 21 : position).padStart(2, "0")} ${requestKey.replaceAll("-", "").slice(0, 12).toUpperCase()}`;
 }

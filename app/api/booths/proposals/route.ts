@@ -1,3 +1,4 @@
+import { isCommercialPosition } from "@/lib/booths/types";
 import { createHash, randomUUID } from "node:crypto";
 import { z } from "zod";
 import { transferMemo } from "@/lib/booths/payment";
@@ -27,7 +28,7 @@ export async function POST(request: Request) {
     const receipt = form.get("payment_receipt");
     if (receipt instanceof File && receipt.size) receiptForm.set("images", receipt);
     const receiptImages = await validateImages(receiptForm);
-    if (receiptImages.length && input.position_id > 20) throw new BoothError(400, "Ảnh chuyển khoản chỉ áp dụng cho gian thương mại.");
+    if (receiptImages.length && !isCommercialPosition(input.position_id)) throw new BoothError(400, "Ảnh chuyển khoản chỉ áp dụng cho gian thương mại.");
     const hash = createHash("sha256").update(JSON.stringify(input));
     validated.forEach((image) => hash.update(`${image.type}:${image.bytes.byteLength}:`).update(image.bytes));
     receiptImages.forEach((image) => hash.update("receipt:").update(image.bytes));
