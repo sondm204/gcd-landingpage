@@ -2,6 +2,7 @@
 
 import Image from "next/image";
 import { useCallback, useEffect, useRef, useState } from "react";
+import { isEmbeddedBrowser } from "@/lib/booths/browser";
 
 type PreparedImage = { src: string; file: File };
 
@@ -45,6 +46,9 @@ async function preparePng(qr: string, filename: string): Promise<PreparedImage> 
 
 // Key this component by QR URL so a changed voucher cannot reuse an old image.
 export default function BoothQrImage({ qr, position }: { qr: string; position: number }) {
+  const [embedded] = useState(() => typeof navigator !== "undefined" && isEmbeddedBrowser(navigator.userAgent));
+  const [showSaveHint, setShowSaveHint] = useState(false);
+  const image = useRef<HTMLImageElement>(null);
   const [prepared, setPrepared] = useState<PreparedImage | null>(null);
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState("");
@@ -92,9 +96,15 @@ export default function BoothQrImage({ qr, position }: { qr: string; position: n
 
   return <>
     <div className="booth-qr-save-preview" role="region" aria-label="Ảnh PNG để lưu">
-      <Image src={prepared ? prepared.src : qr} width={300} height={360} unoptimized alt="QR chuyển khoản phí gian hàng" style={{ display: "block", maxWidth: "100%", height: "auto", background: "#fff", userSelect: "auto", WebkitTouchCallout: "default" }} />
+      <Image ref={image} src={prepared ? prepared.src : qr} width={300} height={360} unoptimized alt="QR chuyển khoản phí gian hàng" style={{ display: "block", maxWidth: "100%", height: "auto", background: "#fff", userSelect: "auto", WebkitTouchCallout: "default" }} />
     </div>
-    <button type="button" className="booth-button secondary" disabled={busy || !prepared} onClick={() => void save()}>{busy ? "Đang lưu ảnh…" : "Lưu ảnh QR về thiết bị"}</button>
+    <button type="button" className="booth-button secondary" disabled={busy || !prepared} onClick={() => {
+      if (embedded) {
+        setShowSaveHint(true);
+        image.current?.scrollIntoView({ block: "center", behavior: "smooth" });
+      } else void save();
+    }}>{busy ? "Đang lưu ảnh…" : embedded ? "Nhấn giữ ảnh QR để lưu" : "Lưu ảnh QR về thiết bị"}</button>
+    {(embedded || showSaveHint) && <p role="status">Nhấn và giữ trực tiếp lên ảnh QR bên trên, sau đó chọn “Lưu ảnh”. Nếu ứng dụng không hỗ trợ, hãy chụp màn hình QR hoặc mở trang bằng Safari / Chrome.</p>}
     {error && <p role="alert" className="booth-payment-error">{error}</p>}
   </>;
 }
