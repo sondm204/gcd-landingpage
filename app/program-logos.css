@@ -1,0 +1,35 @@
+/* Loaded directly by the root layout so this shared strip has an explicit CSS dependency. */
+.program-logos { display: block; overflow: hidden; padding-block: 25px; background: #fff; border-bottom: 1px solid var(--line); }
+.program-logos-track { display: flex; width: max-content; animation: program-logos-drift 48s linear infinite; }
+.program-logo-set { display: flex; align-items: stretch; justify-content: space-evenly; flex-shrink: 0; gap: clamp(32px, 5vw, 80px); }
+.program-logos .program-logo-set { width: max(100vw, 960px); padding-inline: 32px; }
+.program-logos .program-logo-set-flat { display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); align-items: center; gap: 0; padding-inline: 0; }
+.program-logo-set-flat > img { display: block; justify-self: center; width: clamp(110px, 10vw, 150px); height: 85px; object-fit: contain; }
+.program-logo-group { display: flex; flex-direction: column; align-items: center; justify-content: space-between; gap: 14px; }
+.program-logo-label { color: #08275c; font-size: 12px; font-weight: 700; line-height: 1.5; white-space: nowrap; }
+.program-logo-row { display: flex; align-items: center; justify-content: center; gap: 20px; }
+.program-logo-row img { display: block; width: clamp(110px, 10vw, 150px); height: 85px; object-fit: contain; }
+@keyframes program-logos-drift { to { transform: translateX(-50%); } }
+
+.footer-event { flex-wrap: wrap; }
+.footer-logos { display: block; max-width: 100%; background: #fff; padding: 8px 20px; border-radius: 6px; }
+.footer-logos .program-logo-set { width: 100%; flex-wrap: wrap; justify-content: center; gap: 24px 32px; }
+.footer-logos .program-logo-label { font-size: 10px; }
+.footer-logos .program-logo-row { gap: 12px; }
+.footer-logos .program-logo-row img { width: 85px; height: 65px; }
+
+@media (max-width: 600px) {
+  .program-logos { padding-block: 18px; }
+  .program-logos .program-logo-set { width: max(100vw, 800px); }
+  .program-logos .program-logo-row img { width: 110px; height: 75px; }
+  .program-logo-set-flat > img { width: 110px; height: 75px; }
+  .footer-logos { width: 100%; padding: 8px 12px; }
+  .footer-logos .program-logo-set { gap: 24px 18px; }
+  .footer-logos .program-logo-row img { width: 70px; height: 60px; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .program-logos-track { animation: none; width: 100%; }
+  .program-logos .program-logo-set { width: 100%; flex-wrap: wrap; gap: 24px 36px; }
+  .program-logos .program-logo-set-flat { grid-template-columns: repeat(auto-fit, minmax(110px, 1fr)); gap: 24px 0; }
+  .program-logos .program-logo-set[aria-hidden="true"] { display: none; }
+}

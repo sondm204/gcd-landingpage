@@ -2314,21 +2314,6 @@ main {
   }
 }
 
-.program-logos {
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  gap: clamp(25px, 6vw, 90px);
-  padding-block: 25px;
-  background: var(--paper);
-}
-
-.program-logos img {
-  width: clamp(85px, 12vw, 165px);
-  height: 95px;
-  object-fit: contain;
-}
-
 /* Readable typography across desktop and mobile. */
 .main-nav {
   font-size: 14px;
@@ -2397,15 +2382,6 @@ main {
 }
 
 @media (max-width: 600px) {
-  .program-logos {
-    gap: 20px;
-    padding-block: 18px;
-  }
-
-  .program-logos img {
-    width: calc((100vw - 100px) / 3);
-    height: 75px;
-  }
 
   .intro-columns {
     grid-template-columns: 1fr;
@@ -2457,13 +2433,9 @@ main {
     transform: none;
   }
 }
-.footer-event { grid-column: 1 / -1; display: flex; align-items: center; justify-content: space-between; gap: 28px; padding-bottom: 28px; border-bottom: 1px solid var(--line); }
+.footer-event { grid-column: 1 / -1; display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 28px; padding-bottom: 28px; border-bottom: 1px solid var(--line); }
 .footer-event-copy .eyebrow { color: var(--red); font-size: clamp(14px, 1.6vw, 21px); letter-spacing: .08em; }
 .footer-event-copy p { margin-top: 8px; font-size: 13px; color: var(--muted); }
-.footer-logos { display: flex; align-items: center; gap: clamp(18px, 3vw, 45px); }
-.footer-logos img { width: clamp(75px, 9vw, 120px); height: 80px; object-fit: contain; }
 @media (max-width: 600px) {
   .footer-event { flex-direction: column; align-items: flex-start; gap: 22px; }
-  .footer-logos { width: 100%; justify-content: space-between; gap: 18px; }
-  .footer-logos img { width: calc((100% - 36px) / 3); max-width: 110px; height: 75px; }
 }
