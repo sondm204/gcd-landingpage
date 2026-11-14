@@ -1,7 +1,6 @@
 "use client";
 
 import dynamic from "next/dynamic";
-import Image from "next/image";
 import Link from "next/link";
 import { useEffect, useRef, useState } from "react";
 import { Arrow, Lantern, Lotus, Sun } from "./ornaments";
@@ -13,6 +12,7 @@ import EventSchedule from "./event-schedule";
 import SpecialGuests from "./special-guests";
 import { programs } from "./journey-programs";
 import { event } from "@/lib/event";
+import ProgramLogos from "./program-logos";
 
 const HeritageViewer = dynamic(() => import("./heritage-viewer"), {
   ssr: false,
@@ -156,27 +156,13 @@ export default function HeritageJourney() {
       <main>
         <HeroSection reducedMotion={reducedMotion} />
         <div
-          className="program-logos section-pad"
+          className="program-logos"
           aria-label="Các đơn vị chương trình"
         >
-          <Image
-            src="/images/logo_VN.png"
-            alt="Logo Việt Nam"
-            width={180}
-            height={110}
-          />
-          <Image
-            src="/images/logo_danhnhan.png"
-            alt="Logo Danh Nhân"
-            width={180}
-            height={110}
-          />
-          <Image
-            src="/images/logo_ThangLong.png"
-            alt="Logo Thăng Long"
-            width={180}
-            height={110}
-          />
+          <div className="program-logos-track">
+            <ProgramLogos grouped={false} />
+            <ProgramLogos grouped={false} duplicate />
+          </div>
         </div>
         <div className="ticker" aria-hidden="true">
           <div>
@@ -398,9 +384,7 @@ export default function HeritageJourney() {
             <p>{event.slogan}</p>
           </div>
           <div className="footer-logos" aria-label="Các đơn vị chương trình">
-            <Image src="/images/logo_VN.png" alt="Logo Việt Nam" width={180} height={110} />
-            <Image src="/images/logo_danhnhan.png" alt="Logo Danh Nhân" width={180} height={110} />
-            <Image src="/images/logo_ThangLong.png" alt="Logo Thăng Long" width={180} height={110} />
+            <ProgramLogos />
           </div>
         </div>
         <a href="#khoi-hanh" className="footer-brand" data-reveal>

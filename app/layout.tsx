@@ -3,6 +3,7 @@ import SiteHeader from "./components/site-header";
 import { Be_Vietnam_Pro, Playfair_Display } from "next/font/google";
 import "./globals.css";
 import "./keyvisual.css";
+import "./program-logos.css";
 import { siteUrl, siteTitle, siteDescription } from "@/lib/site-metadata";
 
 const vietnam = Be_Vietnam_Pro({
