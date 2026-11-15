@@ -32,8 +32,8 @@ export const stages: {
     id: "rhythm", name: "Bắt nhịp di sản", category: "Âm vang đất Việt", stamp: "Đôi tai",
     description: "Lắng nghe câu hát, chạm theo nhịp phách và nối dài âm vang Việt.",
     story: "Muốn cất tiếng, trước hết phải biết lắng nghe. Theo những làn điệu Quan họ, Ca trù, Chèo, Xẩm để tìm lại dấu ấn Đôi tai.",
-    online: { summary: "30 giây · Chạm theo nhịp", rules: ["Chạm đúng lúc nốt nhạc rơi đến vạch trong đoạn nhạc 30 giây.", "Chạm đúng ít nhất 60% số nốt để vượt chặng.", "Giữ combo để tăng điểm với các mức Tuyệt, Được và Trượt."] },
-    event: { summary: "Giữ nhịp 30 giây", rules: ["Lắng nghe và chạm theo nhịp phách trong 30 giây.", "Xuất trình kết quả hoàn thành tại gian để nhận túi sticker giấy."] },
+    online: { summary: "60 giây · Chạm và giữ nhịp", rules: ["Chạm đúng lúc nốt đến vạch; nốt có đuôi cần giữ đến hết. Nhạc và nốt nhanh dần trong 60 giây.", "Mỗi nốt đúng +10 điểm; hụt, thả sớm hoặc chạm sai −5 điểm. Điểm thấp nhất là 0.", "Đúng ít nhất 60% số nốt để vượt chặng."] },
+    event: { summary: "Giữ nhịp 60 giây", rules: ["Chạm đúng làn, giữ nốt dài đến hết đuôi trong 60 giây với tốc độ tăng dần.", "Nốt đúng +10, nốt hụt −5; điểm thấp nhất 0. Đúng ít nhất 60% số nốt để đạt chặng. Nhạc tổng hợp dùng thử; kết quả chưa dùng nhận sticker hay đổi quà."] },
     challenge: "Gõ phách theo nghệ nhân trong 15 giây.",
   },
   {

@@ -162,18 +162,24 @@ Animation dùng **Motion for React** cho khách đến/rời quầy, món lên/x
 
 ### 4.3. Chặng 3 — BẮT NHỊP DI SẢN (Dấu Đôi tai)
 
+**Bản thử triển khai — `/game/rhythm`:** 4 làn, chuột/cảm ứng hoặc D–F–J–K, 3 giây đếm trước, 60 giây chính thức. Nhịp tăng dần 100 → 200 BPM, khoảng cách nốt và thời gian rơi cùng giảm dần. Đúng ≥60% nốt để đạt. Chấm Tuyệt khi lệch ≤75ms, Được khi ≤160ms; cả hai cùng +10 điểm, không cộng thưởng combo. Mỗi nốt hụt, thả sớm hoặc chạm sai trừ 5 điểm; điểm thấp nhất 0. Mỗi nốt chỉ được tính một lần. Có nốt dài với đuôi sáng: phải nhấn đúng đầu nốt rồi giữ tới hết đuôi (dung sai nhả sớm 80ms), chỉ cộng điểm khi hoàn thành. Giữ sẵn nút trước khi nốt tới không tự bắt nốt. Chặn lặp phím và chạm cùng làn dưới 120ms; hỗ trợ nhiều ngón tay và bắt con trỏ khi kéo ra ngoài nút.
+
+Nhạc nền nguyên bản qua Web Audio gồm giai điệu ngũ cung, hợp âm, bass và nhịp gõ; không thay thế bản thu nghệ nhân. Beatmap, nhạc nền và tiếng nốt dùng cùng `AudioContext.currentTime`, cùng tăng tốc và cùng tạm dừng, không dùng hai timer độc lập. Tự tạm dừng khi tab ẩn hoặc cửa sổ mất focus, cần chạm Tiếp tục để mở lại âm thanh. Nốt dài đang giữ phải nhấn giữ lại trong 750ms sau khi tiếp tục; không tự ghi điểm khi không giữ nút. Có tắt âm và toàn màn hình; rời game/kết thúc đóng AudioContext. Chế độ sự kiện hiện dùng cùng bản thử 60 giây. Kết quả chưa lưu hộ chiếu/chưa dùng đổi quà. Các thông số cửa sổ nhịp và thang điểm thay được ở `app/game/rhythm/engine.ts`.
+
+Các nốt tiếp theo vẫn xuất hiện và rơi bình thường phía sau đuôi nốt dài trên cả bốn làn. Thời điểm tới vạch của nốt kế tiếp cách cuối đuôi ít nhất 280ms (160ms cửa sổ nhịp + 120ms chuyển nút), để người chơi giữ xong rồi mới bấm nốt tiếp theo; không yêu cầu vừa giữ vừa bấm làn khác. Lịch nốt nằm trên lưới nhịp tăng tốc, nhạc đệm phát liên tục. Thả sớm hoặc bỏ lỡ không làm thay đổi lịch rơi.
+
 **Chủ đề:** Quan họ, Ca trù, Chèo, Xẩm. Bài học: muốn cất tiếng trước hết phải biết lắng nghe.
 
 **Gameplay:** Nhạc phát, các nốt rơi xuống theo nhịp phách. Người chơi **chạm đúng lúc nốt chạm vạch** (rhythm game).
 
 **Luật ONLINE [Đã nêu trong đề xuất]:**
 
-- Một đoạn nhạc **30 giây**.
+- Một đoạn nhạc **60 giây**, tăng tốc dần và có nốt dài cần giữ.
 - Chấm ba mức: **Tuyệt / Được / Trượt**.
-- Combo càng dài, điểm càng cao.
+- Nốt đúng +10 điểm; hụt, thả sớm hoặc chạm sai −5 điểm, thấp nhất 0. Combo dùng theo dõi chuỗi đúng.
 - **Chạm đúng ít nhất 60% số nốt** để vượt chặng.
 
-**Bản SỰ KIỆN:** Giữ nhịp **30 giây** trên điện thoại.
+**Bản SỰ KIỆN:** Giữ nhịp **60 giây** trên điện thoại.
 
 **Thử thách thực tế:** Gõ phách theo nghệ nhân trong **15 giây**.
 
@@ -224,7 +230,7 @@ Animation dùng **Motion for React** cho khách đến/rời quầy, món lên/x
 |---|---|---|---|---|
 | 1 | Tiệm Bách nghệ | 5 đơn/60s, đúng 4 đơn | Giao 3 đơn | Sờ đoán chất liệu |
 | 2 | Xếp ván Đông Hồ | Ván 8×8, vượt khi 2 lớp | In 1 lớp | In với ván khắc thật |
-| 3 | Bắt nhịp di sản | Nhạc 30s, đúng ≥60% | Giữ nhịp 30s | Gõ phách 15s |
+| 3 | Bắt nhịp di sản | Nhạc 60s tăng tốc, đúng ≥60%, có nốt giữ | Giữ nhịp 60s | Gõ phách 15s |
 | 4 | Đây là đâu? | 3 ảnh × 20s, 2 ảnh lệch <100 km | Ghim 2 ảnh | Gắn cờ lên bản đồ lớn |
 | 5 | Đại sứ di sản | Postcard tiếng Anh ≤20 từ; có thể quay 15s | Viết postcard | Thuyết trình tiếng Anh 30s |
 
@@ -482,13 +488,13 @@ const modes = {
   online: {
     craftShop: { orders: 5, timeSeconds: 60, minCorrect: 4 },
     dongHo: { minLayers: 2 },
-    rhythm: { durationSeconds: 30, minAccuracy: 0.6 },
+    rhythm: { durationSeconds: 60, minAccuracy: 0.6 },
     heritageMap: { images: 3, secondsPerImage: 20, minWithin100Km: 2 },
   },
   event: {
     craftShop: { orders: 3 },
     dongHo: { minLayers: 1 },
-    rhythm: { durationSeconds: 30 },
+    rhythm: { durationSeconds: 60 },
     heritageMap: { images: 2 },
   },
 };
