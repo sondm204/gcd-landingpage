@@ -2,9 +2,12 @@
 
 import Link from "next/link";
 import { useSearchParams } from "next/navigation";
-import { useEffect, useReducer, useRef, useState } from "react";
+import { useEffect, useReducer, useRef } from "react";
 import { AnimatePresence, MotionConfig, motion, useReducedMotion } from "motion/react";
 import ProductArt from "./product-art";
+import { useBackgroundMusic } from "../hooks/use-background-music";
+import { useGameFullscreen } from "../hooks/use-game-fullscreen";
+import { useShopAudio } from "./use-shop-audio";
 import { initialState, MAX_TRAY, products, reducer, rules, shuffledOrders, type Mode } from "./engine";
 
 export default function CraftShop() {
@@ -29,20 +32,10 @@ function Shop({ mode }: { mode: Mode }) {
   const [state, dispatch] = useReducer(reducer, mode, initialState);
   const titleRef = useRef<HTMLHeadingElement>(null);
   const playRef = useRef<HTMLElement>(null);
-  const [fullscreen, setFullscreen] = useState(false);
-  const [fullscreenSupported, setFullscreenSupported] = useState(false);
-  useEffect(() => {
-    const update = () => { setFullscreen(Boolean(document.fullscreenElement)); setFullscreenSupported(document.fullscreenEnabled); };
-    update();
-    document.addEventListener("fullscreenchange", update);
-    return () => { document.removeEventListener("fullscreenchange", update); };
-  }, []);
-  function enterFullscreen() {
-    if (document.fullscreenEnabled && !document.fullscreenElement) {
-      void document.documentElement.requestFullscreen().catch(() => { /* Browser may deny fullscreen; keep playing normally. */ });
-    }
-  }
+  const screen = useGameFullscreen();
   const active = state.phase === "playing";
+  const music = useBackgroundMusic(active, "/game/audio/craft-shop-background.wav");
+  const effects = useShopAudio(state.notice);
   const correct = state.answers.filter(a => a.correct).length;
   const leftCustomers = state.answers.filter(a => a.points === -10).length;
   const remaining = Math.max(0, Math.ceil((state.end - state.now) / 1000));
@@ -61,7 +54,8 @@ function Shop({ mode }: { mode: Mode }) {
 
   return <main className="craft-app" data-active={active}>
     <div className="craft-wrap">
-      <div className="craft-screen-tools"><Link href="/game">← Về hành trình</Link>{fullscreenSupported && <button onClick={() => { if (fullscreen) void document.exitFullscreen().catch(() => {}); else enterFullscreen(); }}>{fullscreen ? "Thu nhỏ ↙" : "Toàn màn hình ⛶"}</button>}</div>
+      <div className="craft-screen-tools"><Link href="/game">← Về hành trình</Link>{screen.supported && <button onClick={screen.toggle}>{screen.fullscreen ? "Thu nhỏ ↙" : "Toàn màn hình ⛶"}</button>}</div>
+      {active && <div className="craft-audio-tools"><button aria-label="Nhạc nền" aria-pressed={music.enabled} onClick={music.toggle}>{music.enabled ? "Nhạc: bật" : "Nhạc: tắt"}</button><button aria-label="Âm thanh hiệu ứng" aria-pressed={effects.enabled} onClick={() => effects.setEnabled(!effects.enabled)}>{effects.enabled ? "Hiệu ứng: bật" : "Hiệu ứng: tắt"}</button></div>}
       <nav className="craft-nav" aria-label="Điều hướng trò chơi"><Link href="/game">← Hộ chiếu Di sản</Link><span>CHẶNG 01 / 05</span></nav>
       <header className="craft-heading"><p>LÀNG NGHỀ HÀ NỘI · DẤU ĐÔI TAY</p><h1>Tiệm Bách nghệ</h1><span className="craft-badge">Bản chơi thử · {mode === "online" ? "Online" : "Tại sự kiện"}</span></header>
 
@@ -72,7 +66,7 @@ function Shop({ mode }: { mode: Mode }) {
           <div className="craft-rules"><span><b>Liên tục</b>khách ghé tiệm</span><span><b>60 giây</b>mỗi lượt</span><span><b>10 điểm</b>mỗi đơn đúng</span></div>
           <ol><li>Mỗi khách gọi <b>2–3 món</b>. Số trên đơn là thứ tự cần xếp.</li><li>Chạm món trên kệ để thêm vào khay; có thể chọn cùng món nhiều lần. Chạm món trên khay để bỏ.</li><li>Nhấn <b>Giao hàng</b>: khay khớp trọn đơn của khách nào thì khách đó nhận hàng. Mỗi đơn đúng được 10 điểm, hãy giao thật nhiều trong 60 giây!</li></ol>
           <p className="craft-note">Khách chờ khoảng {rules[mode].patience / 1000} giây, mỗi 10 giây khách mới chờ ít hơn 3 giây (tối thiểu 8 giây). Mỗi khách bỏ đi trừ 10 điểm, điểm tối thiểu là 0. Khi còn dưới 30%, khách sẽ tức giận. Giao sai không mất đơn nhưng ngắt chuỗi đúng; hết giờ chờ thì khách rời tiệm. Đồng hồ vẫn chạy khi bạn rời tab.</p>
-          <button className="craft-primary" onClick={() => { enterFullscreen(); dispatch({ type: "start", orders: shuffledOrders(), now: Date.now() }); }}>Mở cửa tiệm →</button>
+          <button className="craft-primary" onClick={() => { music.start(); effects.unlock(); screen.enter(); dispatch({ type: "start", orders: shuffledOrders(), now: Date.now() }); }}>Mở cửa tiệm →</button>
           <Link className="craft-mode-link" href={`/game/craft-shop?mode=${mode === "online" ? "event" : "online"}`}>Chuyển sang {mode === "online" ? "bản sự kiện" : "bản online"}</Link>
         </div>
       </section>}
@@ -103,10 +97,10 @@ function Shop({ mode }: { mode: Mode }) {
           <div className="craft-counter-edge" aria-hidden="true"><span>TIỆM BÁCH NGHỆ</span></div>
         </section>
         <div className="craft-notice-space" role="status" aria-live="polite" aria-atomic="true"><AnimatePresence mode="wait"><motion.p key={state.notice?.id ?? "hint"} className={`craft-notice ${state.notice?.kind ?? "hint"}`} initial={{ opacity: 0, y: 6 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0 }}><b>{state.notice?.kind === "correct" ? "✓ " : state.notice?.kind === "wrong" ? "! " : ""}</b>{state.notice?.text ?? "Xếp món đúng thứ tự trên đơn rồi giao cho khách bất kỳ."}</motion.p></AnimatePresence></div>
-        <section className="craft-shelf" aria-label="Kệ sản phẩm"><div className="craft-shelf-heading"><h2>Chọn món trên kệ</h2><span>CÓ THỂ CHỌN LẶP LẠI</span></div><div className="craft-products">{products.map(p => <motion.button whileTap={{ scale: .92 }} key={p.id} disabled={state.tray.length >= MAX_TRAY} aria-label={`Thêm ${p.name}`} onClick={() => dispatch({ type: "select", id: p.id, now: Date.now() })} className="craft-product" style={{ "--product-color": p.color } as React.CSSProperties}><ProductArt id={p.id} /><span>{p.name}</span><small>{p.village}</small><span className="craft-check" aria-hidden="true">+</span></motion.button>)}</div></section>
+        <section className="craft-shelf" aria-label="Kệ sản phẩm"><div className="craft-shelf-heading"><h2>Chọn món trên kệ</h2><span>CÓ THỂ CHỌN LẶP LẠI</span></div><div className="craft-products">{products.map(p => <motion.button whileTap={{ scale: .92 }} key={p.id} disabled={state.tray.length >= MAX_TRAY} aria-label={`Thêm ${p.name}`} onClick={() => { effects.play("pick"); dispatch({ type: "select", id: p.id, now: Date.now() }); }} className="craft-product" style={{ "--product-color": p.color } as React.CSSProperties}><ProductArt id={p.id} /><span>{p.name}</span><small>{p.village}</small><span className="craft-check" aria-hidden="true">+</span></motion.button>)}</div></section>
         <section className="craft-delivery" aria-label="Khay giao hàng"><div className="craft-tray-heading"><b>Khay của bạn <span>{state.tray.length}/{MAX_TRAY}</span></b><button disabled={!state.tray.length} onClick={() => dispatch({ type: "clear", now: Date.now() })}>Bỏ hết</button></div>
           <motion.div className="craft-tray" key={state.notice?.kind === "wrong" ? state.notice.id : "tray"} animate={state.notice?.kind === "wrong" ? { x: [0, -6, 6, -4, 4, 0] } : { x: 0 }} transition={{ duration: .35 }}>
-            {[0, 1, 2].map(index => <div className="craft-tray-slot" key={index}><span className="craft-order-number">{index + 1}</span><AnimatePresence mode="wait">{state.tray[index] ? <motion.button key={`${index}-${state.tray[index]}`} initial={{ opacity: 0, y: -20, scale: .7 }} animate={{ opacity: 1, y: 0, scale: 1 }} exit={{ opacity: 0, y: -15, scale: .5 }} aria-label={`Bỏ món ${index + 1}: ${products.find(p => p.id === state.tray[index])!.name}`} onClick={() => dispatch({ type: "remove", index, now: Date.now() })}><ProductArt id={state.tray[index]} /><span aria-hidden="true">×</span></motion.button> : <span className="craft-tray-placeholder">+</span>}</AnimatePresence></div>)}
+            {[0, 1, 2].map(index => <div className="craft-tray-slot" key={index}><span className="craft-order-number">{index + 1}</span><AnimatePresence mode="wait">{state.tray[index] ? <motion.button key={`${index}-${state.tray[index]}`} initial={{ opacity: 0, y: -20, scale: .7 }} animate={{ opacity: 1, y: 0, scale: 1 }} exit={{ opacity: 0, y: -15, scale: .5 }} aria-label={`Bỏ món ${index + 1}: ${products.find(p => p.id === state.tray[index])!.name}`} onClick={() => { effects.play("remove"); dispatch({ type: "remove", index, now: Date.now() }); }}><ProductArt id={state.tray[index]} /><span aria-hidden="true">×</span></motion.button> : <span className="craft-tray-placeholder">+</span>}</AnimatePresence></div>)}
           </motion.div><p>Chạm món trên khay để bỏ · Xếp từ trái sang phải</p><motion.button whileTap={{ scale: .98 }} className="craft-primary" disabled={!state.tray.length} onClick={() => dispatch({ type: "deliver", now: Date.now() })}>Giao hàng →</motion.button>
         </section>
       </>}

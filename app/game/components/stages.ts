@@ -24,8 +24,8 @@ export const stages: {
     id: "print", name: "Xếp ván Đông Hồ", category: "Sắc màu dân gian", stamp: "Đôi mắt",
     description: "Xếp từng khối màu, đánh thức bức tranh dân gian sau màn sương.",
     story: "Sương Quên đã xóa nhòa bức tranh Đông Hồ. Mỗi lớp màu bạn in sẽ trả lại một phần ký ức và dấu ấn Đôi mắt.",
-    online: { summary: "Xếp khối · Không giới hạn giờ", rules: ["Kéo các khối màu vào bảng 8 × 8 ô. Lấp đầy một hàng để hoàn thành lớp màu.", "Hoàn thành 2 lớp để vượt chặng, đủ 4 lớp để hiện trọn bức tranh; nét đen là lớp cuối.", "Lượt chơi dừng khi không còn chỗ đặt khối."] },
-    event: { summary: "In 1 lớp màu", rules: ["Kéo và thả khối màu lên bảng để hoàn thành 1 lớp màu.", "Cho chủ gian xem kết quả hoàn thành để nhận túi sticker giấy."] },
+    online: { summary: "20 lớp tranh · 3 phút", rules: ["Kéo các khối vào bảng 8 × 8. Mỗi hàng hoặc cột đầy mở 1 phần tranh và được 10 điểm.", "Đạt 2 lớp để vượt chặng, tiếp tục đến tối đa 20 lớp để mở trọn bức tranh.", "Lượt chơi dừng khi hết 3 phút hoặc không còn chỗ đặt khối."] },
+    event: { summary: "In 1 lớp màu", rules: ["Kéo và thả khối màu lên bảng để hoàn thành 1 lớp màu, rồi chốt kết quả.", "Kết quả bản chơi thử chưa dùng để nhận sticker hay đổi quà."] },
     challenge: "Tự tay in một lớp màu bằng ván khắc thật.",
   },
   {

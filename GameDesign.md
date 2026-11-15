@@ -137,6 +137,12 @@ Animation dùng **Motion for React** cho khách đến/rời quầy, món lên/x
 
 ### 4.2. Chặng 2 — XẾP VÁN ĐÔNG HỒ (Dấu Đôi mắt)
 
+**Giới hạn thời gian mới:** Mỗi lượt tối đa **3 phút** cho cả online và sự kiện. Đồng hồ bắt đầu sau khi mở ván, tính theo thời gian thực kể cả khi rời tab. Hết giờ tự chốt số lớp/điểm đã đạt và dừng nhạc; đặt khối tại hoặc sau hạn không được tính. Bản chơi có thể kết thúc sớm khi đạt 20 lớp, hết chỗ hoặc người chơi chốt sau khi đạt mục tiêu.
+
+**Cập nhật luật mới nhất:** Mở tối đa **20 lớp**, mỗi hàng/cột đầy tương ứng 1 lớp và **10 điểm**, không cộng điểm cho ô đặt. Hàng và cột được kiểm tra đồng thời trước khi xóa, giao điểm không làm mất một lượt tính; giới hạn điểm 200. Dùng ảnh `public/game/tranh_dong_ho.webp`, phủ bằng lưới 5×4 gồm 20 vùng mở dần. Kéo thả giữ đúng ô đang cầm, tính tọa độ từ ô thực tế (loại trừ viền/padding), hình kéo cùng kích thước và vị trí với preview, không bù lệch cố định. Các mô tả 4 lớp và điểm/ô ở lịch sử bên dưới đã được thay thế.
+
+**Bản chơi thử triển khai 15/11/2026 — `/game/dong-ho`:** Ván 8×8, khay 3 khối cố định hướng, dùng hết khay mới cấp 3 khối mới. Kéo thả bằng chuột/cảm ứng hoặc chọn khối rồi chạm/Enter lên ô neo góc trên trái. Không cho vượt mép hoặc đè ô đã có mực. Mỗi hàng ngang đầy bị xóa (ô bên trên không rơi), tương ứng 1 lớp in; nhiều hàng đầy đồng thời in nhiều lớp. Cột dọc không xóa. Tối đa 4 lớp theo vàng → đỏ → xanh → nét đen. Online đạt mục tiêu ở 2 lớp, có thể chốt hoặc tiếp tục đến 4 lớp; sự kiện đạt 1 lớp và có thể chốt. Hết chỗ đặt bất kỳ khối còn lại thì kết thúc. Không giới hạn giờ. Điểm thử nghiệm: 1 điểm/ô đặt + 100 điểm/hàng. Tranh SVG nguyên bản lấy cảm hứng lợn dân gian, không phải bản sao hiện vật Đông Hồ. Kết quả chưa lưu hộ chiếu/chưa dùng đổi quà. Các lựa chọn này là cách triển khai thử cho các câu hỏi còn mở bên dưới.
+
 **Chủ đề:** Tranh dân gian Đông Hồ. Bức tranh bị Sương Quên xóa trắng, cần in nhiều lớp màu để khôi phục.
 
 **Gameplay:** Bảng gồm **8×8 ô**. Người chơi **kéo các khối màu** và thả lên ván. Khi lấp đầy một hàng, một lớp màu được hoàn thành; hoàn thành nhiều lớp sẽ làm hiện tranh.

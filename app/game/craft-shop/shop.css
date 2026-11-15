@@ -5,6 +5,8 @@
 .craft-app { padding-top: max(6px, env(safe-area-inset-top)); padding-bottom: max(6px, env(safe-area-inset-bottom)); }
 .craft-screen-tools { display: flex; justify-content: space-between; align-items: center; gap: 12px; flex-shrink: 0; font-size: 11px; min-height: 28px; }
 .craft-screen-tools button { background: #fffdf7; border: 1px solid #d9c9a9; border-radius: 5px; padding: 4px 8px; color: #17375b; cursor: pointer; }
+.craft-audio-tools { display: flex; justify-content: flex-end; gap: 8px; flex-shrink: 0; }
+.craft-audio-tools button { background: #fffdf7; border: 1px solid #d9c9a9; border-radius: 5px; padding: 4px 8px; color: #17375b; font-size: 10px; cursor: pointer; }
 .craft-app .craft-nav { display: none; }
 .craft-app[data-active=true] .craft-stats { scroll-margin-top: 36px; }
 .craft-app[data-active=true] .craft-nav { display: none; }
