@@ -10,6 +10,7 @@ import HomeLink from "./home-link";
 
 export default function SiteHeader() {
   const pathname = usePathname();
+  if (pathname === "/game" || pathname.startsWith("/game/")) return null;
   return <HeaderContent key={pathname} pathname={pathname} />;
 }
 

@@ -1,7 +1,12 @@
 .craft-app { background: #f6f2e9; color: #17375b; min-height: calc(100dvh - 78px); padding: 24px 18px 48px; }
 .craft-wrap { max-width: 760px; margin: auto; }
 .craft-app[data-active=true] { padding-block: 6px; }
-.craft-app[data-active=true] .craft-wrap { height: calc(100dvh - 102px); display: flex; flex-direction: column; gap: 5px; }
+.craft-app[data-active=true] .craft-wrap { height: calc(100dvh - 12px - env(safe-area-inset-top) - env(safe-area-inset-bottom)); display: flex; flex-direction: column; gap: 5px; }
+.craft-app { padding-top: max(6px, env(safe-area-inset-top)); padding-bottom: max(6px, env(safe-area-inset-bottom)); }
+.craft-screen-tools { display: flex; justify-content: space-between; align-items: center; gap: 12px; flex-shrink: 0; font-size: 11px; min-height: 28px; }
+.craft-screen-tools button { background: #fffdf7; border: 1px solid #d9c9a9; border-radius: 5px; padding: 4px 8px; color: #17375b; cursor: pointer; }
+.craft-app .craft-nav { display: none; }
+.craft-app[data-active=true] .craft-stats { scroll-margin-top: 36px; }
 .craft-app[data-active=true] .craft-nav { display: none; }
 .craft-app[data-active=true] .craft-stats { flex-shrink: 0; margin: 0; padding: 6px 4px; scroll-margin-top: 100px; }
 .craft-app[data-active=true] .craft-stats b { font-size: 19px; }

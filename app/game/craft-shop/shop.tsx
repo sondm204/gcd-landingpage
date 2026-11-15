@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { useSearchParams } from "next/navigation";
-import { useEffect, useReducer, useRef } from "react";
+import { useEffect, useReducer, useRef, useState } from "react";
 import { AnimatePresence, MotionConfig, motion, useReducedMotion } from "motion/react";
 import ProductArt from "./product-art";
 import { initialState, MAX_TRAY, products, reducer, rules, shuffledOrders, type Mode } from "./engine";
@@ -29,6 +29,19 @@ function Shop({ mode }: { mode: Mode }) {
   const [state, dispatch] = useReducer(reducer, mode, initialState);
   const titleRef = useRef<HTMLHeadingElement>(null);
   const playRef = useRef<HTMLElement>(null);
+  const [fullscreen, setFullscreen] = useState(false);
+  const [fullscreenSupported, setFullscreenSupported] = useState(false);
+  useEffect(() => {
+    const update = () => { setFullscreen(Boolean(document.fullscreenElement)); setFullscreenSupported(document.fullscreenEnabled); };
+    update();
+    document.addEventListener("fullscreenchange", update);
+    return () => { document.removeEventListener("fullscreenchange", update); };
+  }, []);
+  function enterFullscreen() {
+    if (document.fullscreenEnabled && !document.fullscreenElement) {
+      void document.documentElement.requestFullscreen().catch(() => { /* Browser may deny fullscreen; keep playing normally. */ });
+    }
+  }
   const active = state.phase === "playing";
   const correct = state.answers.filter(a => a.correct).length;
   const leftCustomers = state.answers.filter(a => a.points === -10).length;
@@ -48,6 +61,7 @@ function Shop({ mode }: { mode: Mode }) {
 
   return <main className="craft-app" data-active={active}>
     <div className="craft-wrap">
+      <div className="craft-screen-tools"><Link href="/game">← Về hành trình</Link>{fullscreenSupported && <button onClick={() => { if (fullscreen) void document.exitFullscreen().catch(() => {}); else enterFullscreen(); }}>{fullscreen ? "Thu nhỏ ↙" : "Toàn màn hình ⛶"}</button>}</div>
       <nav className="craft-nav" aria-label="Điều hướng trò chơi"><Link href="/game">← Hộ chiếu Di sản</Link><span>CHẶNG 01 / 05</span></nav>
       <header className="craft-heading"><p>LÀNG NGHỀ HÀ NỘI · DẤU ĐÔI TAY</p><h1>Tiệm Bách nghệ</h1><span className="craft-badge">Bản chơi thử · {mode === "online" ? "Online" : "Tại sự kiện"}</span></header>
 
@@ -57,8 +71,8 @@ function Shop({ mode }: { mode: Mode }) {
         <div className="craft-intro-copy"><p className="craft-eyebrow">CHÚ TỄU NHẮN BẠN</p><h2 ref={titleRef} tabIndex={-1}>Hôm nay, bạn làm chủ tiệm!</h2><p>Ba vị khách cùng ghé quầy. Nhìn đơn trên đầu mỗi khách, xếp đúng các món từ trái sang phải và giao hàng trước khi khách hết kiên nhẫn.</p>
           <div className="craft-rules"><span><b>Liên tục</b>khách ghé tiệm</span><span><b>60 giây</b>mỗi lượt</span><span><b>10 điểm</b>mỗi đơn đúng</span></div>
           <ol><li>Mỗi khách gọi <b>2–3 món</b>. Số trên đơn là thứ tự cần xếp.</li><li>Chạm món trên kệ để thêm vào khay; có thể chọn cùng món nhiều lần. Chạm món trên khay để bỏ.</li><li>Nhấn <b>Giao hàng</b>: khay khớp trọn đơn của khách nào thì khách đó nhận hàng. Mỗi đơn đúng được 10 điểm, hãy giao thật nhiều trong 60 giây!</li></ol>
-          <p className="craft-note">Khách chờ khoảng {rules[mode].patience / 1000} giây, mỗi 10 giây khách mới chờ ít hơn 3 giây (tối thiểu 8 giây). Mỗi khách bỏ đi trừ 10 điểm, điểm có thể âm. Khi còn dưới 30%, khách sẽ tức giận. Giao sai không mất đơn nhưng ngắt chuỗi đúng; hết giờ chờ thì khách rời tiệm. Đồng hồ vẫn chạy khi bạn rời tab.</p>
-          <button className="craft-primary" onClick={() => dispatch({ type: "start", orders: shuffledOrders(), now: Date.now() })}>Mở cửa tiệm →</button>
+          <p className="craft-note">Khách chờ khoảng {rules[mode].patience / 1000} giây, mỗi 10 giây khách mới chờ ít hơn 3 giây (tối thiểu 8 giây). Mỗi khách bỏ đi trừ 10 điểm, điểm tối thiểu là 0. Khi còn dưới 30%, khách sẽ tức giận. Giao sai không mất đơn nhưng ngắt chuỗi đúng; hết giờ chờ thì khách rời tiệm. Đồng hồ vẫn chạy khi bạn rời tab.</p>
+          <button className="craft-primary" onClick={() => { enterFullscreen(); dispatch({ type: "start", orders: shuffledOrders(), now: Date.now() }); }}>Mở cửa tiệm →</button>
           <Link className="craft-mode-link" href={`/game/craft-shop?mode=${mode === "online" ? "event" : "online"}`}>Chuyển sang {mode === "online" ? "bản sự kiện" : "bản online"}</Link>
         </div>
       </section>}

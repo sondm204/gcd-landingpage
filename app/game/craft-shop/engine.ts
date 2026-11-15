@@ -77,7 +77,7 @@ function advanceTime(s: State, now: number): State {
   }
   if (!expired.length) return current;
   const answers = [...s.answers, ...expired.map(c => ({ id: c.id, items: c.items, correct: false, points: -10 }))];
-  const next = { ...current, customers: s.customers.filter(c => now < c.expiresAt), answers, combo: 0, score: s.score - expired.length * 10,
+  const next = { ...current, customers: s.customers.filter(c => now < c.expiresAt), answers, combo: 0, score: Math.max(0, s.score - expired.length * 10),
     revision: s.revision + 1, notice: { id: s.revision + 1, kind: "expired" as const, text: `${expired.length} khách đã hết kiên nhẫn và rời tiệm. -${expired.length * 10} điểm` } };
   return refill(next);
 }

@@ -39,7 +39,7 @@ test("tray supports repeated items, removal, clear and three-item limit", () => 
 });
 test("expired customers are replaced; independent timers and late clicks respect deadline", () => {
   let s = reducer(pack(start(), ["pot", "silk"]), { type: "deliver", now: 25000 });
-  assert.equal(s.answers[0].id, 1); assert.equal(s.answers[0].correct, false); assert.equal(s.score, -10);
+  assert.equal(s.answers[0].id, 1); assert.equal(s.answers[0].correct, false); assert.equal(s.score, 0);
   assert.equal(s.customers.find(c => c.id === 2).expiresAt, 28000);
   assert(s.customers.some(c => c.id === 4));
   s = reducer(start(), { type: "tick", now: 32000 });
