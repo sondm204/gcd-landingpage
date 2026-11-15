@@ -109,6 +109,14 @@ Mỗi lần vượt một chặng:
 
 ### 4.1. Chặng 1 — TIỆM BÁCH NGHỆ (Dấu Đôi tay)
 
+**Điều chỉnh mới nhất 15/11/2026:** Bản chơi thử dùng lượt **60 giây cho cả hai chế độ**, khách đến liên tục, không giới hạn số đơn và không kết thúc sớm theo số đơn. Mỗi đơn giao đúng trọn bộ/thứ tự được **10 điểm cố định**; chuỗi đúng chỉ là chỉ số, không nhân điểm. Bỏ điều kiện vượt chặng theo số đơn ở giao diện chơi thử, kết thúc hiển thị tổng điểm và số đơn đúng. Kệ có 6 món: bình gốm, khăn lụa, giỏ mây, quạt giấy, nón lá và **chuồn chuồn tre Thạch Xá**. Các quy định về giới hạn đơn/điểm ở mô tả lịch sử bên dưới đã được thay thế trong bản chơi thử.
+
+**Cập nhật bản chơi thử theo yêu cầu 15/11/2026:** Có tối đa 3 khách cùng đứng quầy. Mỗi khách có đơn hiện hình gồm 2–3 món (có thể lặp), phải xếp khớp toàn bộ đơn theo thứ tự trái → phải rồi nhấn Giao hàng. Hệ thống tự tìm khách có đơn khớp; không cần chọn khách. Khay tối đa 3 món, hỗ trợ bỏ từng món hoặc xóa khay. Giao sai giữ nguyên đơn/khay để sửa nhưng ngắt chuỗi đúng. Giao đúng cộng 20 điểm, mỗi đơn đúng liên tiếp thêm 10, tối đa 60 điểm/đơn; khách rời quầy và người mới đến nếu còn đơn.
+
+Mỗi khách có hạn chờ riêng: online 24 giây, sự kiện 32 giây; hai khách mở đầu phía sau có thêm 3/6 giây. Còn 30% thời gian, thanh chờ chuyển đỏ, khách cau mày và lắc người. Hết hạn khách rời đi, đơn thất bại và ngắt chuỗi. Online giữ 5 đơn/60 giây, cần đúng 4; bản sự kiện thử nghiệm 3 đơn/90 giây, cần đúng 3. Đồng hồ theo thời gian thực kể cả khi tab bị ẩn. Đây là cấu hình thử nghiệm mới, chưa thay thế các quy định BTC trong đề xuất gốc bên dưới.
+
+Animation dùng **Motion for React** cho khách đến/rời quầy, món lên/xuống khay, lắc khay khi sai và điểm số. `MotionConfig reducedMotion="user"` tôn trọng cài đặt giảm chuyển động. Logic thuần tại `app/game/craft-shop/engine.ts`, kiểm tra bằng `node --test scripts/craft-shop.test.mjs` và `tests/craft-shop.spec.ts`.
+
 **Chủ đề:** Làng nghề Hà Nội. Người chơi xin học việc ở tiệm thủ công, hiểu rằng di sản sống trong đôi tay người thợ.
 
 **Gameplay:** Khách bước vào và gọi một loại sản phẩm. Người chơi nhìn các vật phẩm đang có, **chạm chọn đúng sản phẩm ứng với làng nghề**, sau đó **giao hàng** trước khi khách hết kiên nhẫn.

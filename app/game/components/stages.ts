@@ -16,8 +16,8 @@ export const stages: {
     id: "craft", name: "Tiệm Bách nghệ", category: "Làng nghề Hà Nội", stamp: "Đôi tay",
     description: "Ghé tiệm thủ công, tìm đúng món đồ và trao gửi tinh hoa làng nghề.",
     story: "Di sản sống trong đôi tay người thợ. Hãy cùng Chú Tễu học việc tại tiệm thủ công và tìm lại dấu ấn Đôi tay.",
-    online: { summary: "60 giây · 5 đơn hàng", rules: ["Chạm chọn sản phẩm đúng với làng nghề rồi giao cho khách.", "Hoàn thành đúng 4 trong 5 đơn hàng trong 60 giây để vượt chặng.", "Giao đúng liên tiếp để tạo combo; giao sai sẽ làm mất chuỗi."] },
-    event: { summary: "Giao 3 đơn hàng", rules: ["Chọn đúng sản phẩm ứng với làng nghề và giao 3 đơn hàng.", "Xuất trình kết quả hoàn thành cho chủ gian để nhận túi sticker giấy."] },
+    online: { summary: "60 giây · Khách đến liên tục", rules: ["Xếp 2–3 món đúng thứ tự đơn của khách rồi giao hàng.", "Phục vụ thật nhiều khách trong 60 giây, không giới hạn số đơn.", "Mỗi đơn đúng được 10 điểm. Giao sai không trừ điểm; hết giờ chờ khách sẽ rời tiệm."] },
+    event: { summary: "60 giây · 10 điểm mỗi đơn", rules: ["Xếp các món từ trái sang phải theo đơn trên đầu mỗi khách.", "Khách đến liên tục trong 60 giây. Mỗi đơn đúng được 10 điểm.", "Kết quả bản chơi thử chưa dùng để nhận sticker hay đổi quà."] },
     challenge: "Sờ và đoán chất liệu bên trong hộp kín.",
   },
   {
