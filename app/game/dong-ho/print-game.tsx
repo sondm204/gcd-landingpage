@@ -52,6 +52,15 @@ function Game({ event }: { event: boolean }) {
     const pitch = cells[1].getBoundingClientRect().left - first.left;
     return { row: Math.floor((y - first.top) / pitch) - (dragRef.current?.anchorY ?? 0), col: Math.floor((x - first.left) / pitch) - (dragRef.current?.anchorX ?? 0), id };
   }
+  function liftedPoint(x: number, y: number) {
+    const d = dragRef.current;
+    const cells = boardRef.current?.querySelectorAll(".print-cell");
+    if (!d || !cells?.length) return { x, y };
+    const pitch = cells[1].getBoundingClientRect().left - cells[0].getBoundingClientRect().left;
+    const height = Math.max(...shapes[d.piece.shape].map(c => c[1])) + 1;
+    // Keep the entire block at least 22px above the finger, regardless of which cell was grabbed.
+    return { x, y: y - ((height - d.anchorY) * pitch + 22) };
+  }
   function moveDrag(x: number, y: number) {
     const d = dragRef.current;
     const cells = boardRef.current?.querySelectorAll(".print-cell");
@@ -60,11 +69,12 @@ function Game({ event }: { event: boolean }) {
     if (!d.moved) return;
     const first = cells[0].getBoundingClientRect();
     const pitch = cells[1].getBoundingClientRect().left - first.left;
-    const pos = spot(x, y, d.piece.id);
+    const point = liftedPoint(x, y);
+    const pos = spot(point.x, point.y, d.piece.id);
     setHover(pos);
     setDrag({ piece: d.piece, pitch, cell: first.width,
       x: pos ? first.left + pos.col * pitch : x - (d.anchorX + .5) * pitch,
-      y: pos ? first.top + pos.row * pitch : y - (d.anchorY + .5) * pitch });
+      y: pos ? first.top + pos.row * pitch : point.y - (d.anchorY + .5) * pitch });
   }
   function cancelDrag() { dragRef.current = null; setDrag(null); setHover(null); }
   function place(row: number, col: number, id: number, now: number) {
@@ -100,7 +110,7 @@ function Game({ event }: { event: boolean }) {
             const anchor = [...cells].sort((a,b) => Math.hypot(a[0]+.5-gx,a[1]+.5-gy)-Math.hypot(b[0]+.5-gx,b[1]+.5-gy))[0];
             dragRef.current = { piece, x: e.clientX, y: e.clientY, moved: false, anchorX: anchor[0], anchorY: anchor[1] }; dispatch({ type: "select", id: piece.id, now: Date.now() }); }}
           onPointerMove={e => moveDrag(e.clientX, e.clientY)}
-          onPointerUp={e => { const d = dragRef.current; if (d?.moved) { suppressClick.current = true; const pos = spot(e.clientX, e.clientY, d.piece.id); if (pos) place(pos.row, pos.col, pos.id, Date.now()); } cancelDrag(); }} onPointerCancel={cancelDrag} onLostPointerCapture={cancelDrag}>
+          onPointerUp={e => { const d = dragRef.current; if (d?.moved) { suppressClick.current = true; const point = liftedPoint(e.clientX, e.clientY); const pos = spot(point.x, point.y, d.piece.id); if (pos) place(pos.row, pos.col, pos.id, Date.now()); } cancelDrag(); }} onPointerCancel={cancelDrag} onLostPointerCapture={cancelDrag}>
           <Block piece={piece} ink={ink} /><small>Khối {index + 1}</small></motion.button> : <div key={`empty-${index}`} className="print-empty-piece" aria-hidden="true" />; })}</div>
         <div className="print-play-actions"><span>+10 điểm/hàng hoặc cột</span><strong className={seconds <= 30 ? "print-timer urgent" : "print-timer"} role="timer" aria-label="Thời gian còn lại">{Math.floor(seconds / 60)}:{String(seconds % 60).padStart(2, "0")}</strong>{reached && <button onClick={() => dispatch({ type: "finish", now: Date.now() })}>Chốt kết quả ✓</button>}</div>
         {drag && <div className="print-drag-ghost" style={{ left: drag.x, top: drag.y, width: 4 * drag.pitch, height: 4 * drag.pitch }} aria-hidden="true">{shapes[drag.piece.shape].map(([x,y]) => <span key={x+":"+y} style={{ position: "absolute", left: x * drag.pitch, top: y * drag.pitch, width: drag.cell, height: drag.cell, background: hover && !valid ? "#d98c78" : ink, borderRadius: 3 }} />)}</div>}

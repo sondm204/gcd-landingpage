@@ -76,7 +76,9 @@ test("drag placement and keyboard selection work without consuming an invalid dr
   const unit = Math.min(start.width / 2, start.height);
   await page.mouse.move(start.x + (start.width - unit * 2) / 2 + unit / 2, start.y + start.height / 2);
   await page.mouse.down();
-  await page.mouse.move(target.x + target.width / 2, target.y + target.height / 2, { steps: 8 });
+  const second = (await page.locator(".print-cell").nth(1).boundingBox())!;
+  const lift = second.x - target.x + 22;
+  await page.mouse.move(target.x + target.width / 2, target.y + target.height / 2 + lift, { steps: 8 });
   const ghost = (await page.locator(".print-drag-ghost > span").first().boundingBox())!;
   expect(Math.abs(ghost.x - target.x)).toBeLessThan(1);
   expect(Math.abs(ghost.y - target.y)).toBeLessThan(1);
