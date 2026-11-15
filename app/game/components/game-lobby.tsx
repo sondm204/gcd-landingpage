@@ -4,9 +4,11 @@ import Link from "next/link";
 import Image from "next/image";
 import { useEffect, useRef, useState } from "react";
 import { PassportArt, StageArt, StageIcon } from "./game-art";
-import { stages, type GameMode } from "./stages";
+import { stages, type GameMode, type StageId } from "./stages";
 
 function Arrow() { return <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" aria-hidden="true"><path d="M4 12h15m-6-6 6 6-6 6" /></svg>; }
+
+const playablePaths: Partial<Record<StageId, string>> = { craft: "/game/craft-shop", print: "/game/dong-ho", rhythm: "/game/rhythm", place: "/game/place" };
 
 export default function GameLobby() {
   const [mode, setMode] = useState<GameMode>("online");
@@ -43,7 +45,7 @@ export default function GameLobby() {
 
       <div className="game-content">
         <section className="game-journey" id="chon-chang" aria-labelledby="stages-title">
-          <div className="game-sectionHeading"><div><p className="game-kicker">HÀNH TRÌNH CỦA BẠN</p><h2 id="stages-title">Năm chặng chơi. <em>Một cội nguồn.</em></h2></div><span className="game-previewBadge">Chặng 1 · Chơi thử</span></div>
+          <div className="game-sectionHeading"><div><p className="game-kicker">HÀNH TRÌNH CỦA BẠN</p><h2 id="stages-title">Năm chặng chơi. <em>Một cội nguồn.</em></h2></div><span className="game-previewBadge">4 chặng · Chơi thử</span></div>
           <p className="game-sectionIntro">Mỗi trò chơi mở ra một góc nhìn về di sản Việt. Bạn muốn khám phá điều gì trước?</p>
 
           <div className="game-modeSwitcher" role="group" aria-label="Chế độ trải nghiệm">
@@ -55,7 +57,7 @@ export default function GameLobby() {
           <div className="game-stageGrid">
             {stages.map((stage, index) => <button type="button" key={stage.id} className="game-stageCard" data-stage={stage.id} onClick={() => showStage(stage)} aria-label={`Khám phá chặng ${index + 1}: ${stage.name}`} aria-haspopup="dialog">
               <div className="game-cardArt"><span className="game-stageNumber">CHẶNG <b>0{index + 1}</b></span><StageArt id={stage.id} /><span className="game-artCaption">{stage.category}</span></div>
-              <div className="game-cardContent"><div className="game-cardTopline"><span className="game-stampLabel"><StageIcon id={stage.id} />Dấu {stage.stamp}</span><span className="game-comingSoon">{["craft", "print", "rhythm"].includes(stage.id) ? "Có thể chơi thử" : "Sắp ra mắt"}</span></div><h3>{stage.name}</h3><p>{stage.description}</p><span className="game-gameSummary">{stage[mode].summary}</span><span className="game-cardAction">Khám phá chặng <Arrow /></span></div>
+              <div className="game-cardContent"><div className="game-cardTopline"><span className="game-stampLabel"><StageIcon id={stage.id} />Dấu {stage.stamp}</span><span className="game-comingSoon">{playablePaths[stage.id] ? "Có thể chơi thử" : "Sắp ra mắt"}</span></div><h3>{stage.name}</h3><p>{stage.description}</p><span className="game-gameSummary">{stage[mode].summary}</span><span className="game-cardAction">Khám phá chặng <Arrow /></span></div>
             </button>)}
             <aside className="game-storyCard">
               <span className="game-storyMark" aria-hidden="true">✦</span><p className="game-kicker">MỘT HÀNH TRÌNH, NĂM DẤU ẤN</p><h3>Muốn đi xa,<br />phải biết mình<br /><em>từ đâu đến.</em></h3><p>Thu thập đủ 5 con dấu, tìm lại bản sắc và trở thành Đại sứ di sản.</p><div className="game-storyStamps" aria-label="Năm dấu ấn: Đôi tay, Đôi mắt, Đôi tai, Đôi chân, Tiếng nói">{stages.map(stage => <span key={stage.id} title={stage.stamp}><StageIcon id={stage.id} /></span>)}</div>
@@ -69,7 +71,7 @@ export default function GameLobby() {
     <footer className="game-footer"><div><b>HỘ CHIẾU DI SẢN</b><span>Một trải nghiệm của Global Citizens Day 2026</span></div><Link href="/">Về trang sự kiện <Arrow /></Link></footer>
 
     <dialog className="game-dialog" ref={dialogRef} aria-labelledby="stage-dialog-title" onClick={event => { if (event.target === event.currentTarget) dialogRef.current?.close(); }}>
-      {selected && <><div className="game-dialogArt" data-stage={selected.id}><StageArt id={selected.id} /><button type="button" className="game-closeDialog" aria-label="Đóng giới thiệu chặng" onClick={() => dialogRef.current?.close()}>×</button></div><div className="game-dialogBody"><p className="game-kicker">CHẶNG 0{stages.indexOf(selected) + 1} · {mode === "online" ? "ONLINE" : "TẠI SỰ KIỆN"}</p><h2 id="stage-dialog-title">{selected.name}</h2><p className="game-dialogStory">{selected.story}</p><h3>Cách chơi</h3><ul>{selected[mode].rules.map(rule => <li key={rule}>{rule}</li>)}</ul>{mode === "event" && <div className="game-challenge"><b>Thử thách thực tế · Tùy chọn</b><p>{selected.challenge}</p></div>}<div className="game-dialogStamp"><StageIcon id={selected.id} /><span>Dấu ấn của chặng: <b>{selected.stamp}</b></span></div>{["craft", "print", "rhythm"].includes(selected.id) ? <><Link className="game-craftPlay" href={`/game/${selected.id === "craft" ? "craft-shop" : selected.id === "print" ? "dong-ho" : "rhythm"}?mode=${mode}`} onClick={() => dialogRef.current?.close()}>Chơi thử {selected.name} →</Link><p className="game-dialogNote">Khám phá bản chơi thử. Kết quả chưa lưu vào hộ chiếu.</p></> : <><button type="button" className="game-playButton" disabled>Trò chơi sắp ra mắt</button><p className="game-dialogNote">Bạn có thể xem trước các chặng. Hành trình chơi sẽ được mở sau.</p></>}</div></>}
+      {selected && <><div className="game-dialogArt" data-stage={selected.id}><StageArt id={selected.id} /><button type="button" className="game-closeDialog" aria-label="Đóng giới thiệu chặng" onClick={() => dialogRef.current?.close()}>×</button></div><div className="game-dialogBody"><p className="game-kicker">CHẶNG 0{stages.indexOf(selected) + 1} · {mode === "online" ? "ONLINE" : "TẠI SỰ KIỆN"}</p><h2 id="stage-dialog-title">{selected.name}</h2><p className="game-dialogStory">{selected.story}</p><h3>Cách chơi</h3><ul>{selected[mode].rules.map(rule => <li key={rule}>{rule}</li>)}</ul>{mode === "event" && <div className="game-challenge"><b>Thử thách thực tế · Tùy chọn</b><p>{selected.challenge}</p></div>}<div className="game-dialogStamp"><StageIcon id={selected.id} /><span>Dấu ấn của chặng: <b>{selected.stamp}</b></span></div>{playablePaths[selected.id] ? <><Link className="game-craftPlay" href={`${playablePaths[selected.id]}?mode=${mode}`} onClick={() => dialogRef.current?.close()}>Chơi thử {selected.name} →</Link><p className="game-dialogNote">Khám phá bản chơi thử. Kết quả chưa lưu vào hộ chiếu.</p></> : <><button type="button" className="game-playButton" disabled>Trò chơi sắp ra mắt</button><p className="game-dialogNote">Bạn có thể xem trước các chặng. Hành trình chơi sẽ được mở sau.</p></>}</div></>}
     </dialog>
   </div>;
 }

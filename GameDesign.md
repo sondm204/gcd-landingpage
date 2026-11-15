@@ -189,16 +189,22 @@ Các nốt tiếp theo vẫn xuất hiện và rơi bình thường phía sau đ
 
 ### 4.4. Chặng 4 — ĐÂY LÀ ĐÂU? (Dấu Đôi chân)
 
+**Cập nhật bộ câu hỏi:** online chơi đủ 10 ảnh, không lặp, gồm 3 miền Bắc (Hạ Long, Khuê Văn Các, Tràng An), 4 miền Trung (Hội An, Ngọ Môn, Mỹ Sơn, Phong Nha), 3 miền Nam (Dinh Độc Lập, Bến Thành, Cái Răng). Mỗi câu tối đa **30 điểm**, công thức `round(30 × exp(-km / 250))`; tổng online tối đa 300 điểm, đạt khi ghim gần ít nhất 7/10 câu. Bản sự kiện giữ 2 câu, tối đa 60 điểm và cần ít nhất 1 câu ghim gần. Các thông số trong đoạn này thay thế số lượng/thang điểm cũ bên dưới. Nhãn khung hình hiển thị từ 01 đến 10.
+
+**Bản thử triển khai — `/game/place`:** online 10 ảnh/lượt, sự kiện 2 ảnh/lượt, xáo thứ tự không lặp. Mỗi ảnh có 20 giây, chỉ đếm sau khi ảnh tải xong; lỗi tải có nút thử lại. Được chỉnh ghim trước khi chốt; hết giờ tự chốt ghim cuối cùng, chưa có ghim nhận 0 điểm. Khoảng cách dùng Haversine, điểm mỗi ảnh `round(30 × exp(-km / 250))`, tối đa 30; “ghim gần” là sai lệch **<100 km**. Online cần ít nhất 7/10 ảnh ghim gần; bản sự kiện rút gọn cần ít nhất 1/2. Có tạm dừng thủ công/tự động khi tab bị ẩn, nhạc nền riêng, toàn màn hình và điều khiển bản đồ bằng cảm ứng, chuột hoặc phím mũi tên. Site header ẩn riêng trong game. Kết quả chưa lưu vào hộ chiếu hay dùng đổi quà.
+
+Ảnh thật Hạ Long, Chùa Cầu, Ngọ Môn và bản đồ vector tải cục bộ. Bản đồ có nhãn Hoàng Sa/Trường Sa (Việt Nam), phóng to tối đa 4×, kéo để di chuyển; phép đổi tọa độ dùng SVG CTM để ghim đúng khi zoom hoặc có khoảng trống quanh bản đồ. Sau mỗi câu hiện tên di sản, vị trí đúng, ghim đã chọn và vùng 100 km. Chi tiết nguồn, giấy phép ảnh và mức khái quát bản đồ: `public/game/place/README.md`. Dữ liệu địa điểm/ảnh thay ở `app/game/place/engine.ts`.
+
 **Chủ đề:** Di sản thế giới tại Việt Nam. Người chơi nhìn ảnh di sản rồi xác định địa điểm trên bản đồ.
 
 **Gameplay:** Hiển thị ảnh **không kèm tên di sản**. Người chơi chọn **một điểm trên bản đồ** để đặt ghim. Điểm càng gần vị trí thật càng cao.
 
 **Luật ONLINE [Đã nêu trong đề xuất]:**
 
-- **3 ảnh/lượt**, mỗi ảnh **20 giây**.
+- **10 ảnh/lượt**, mỗi ảnh **20 giây**.
 - **Vượt khi có ít nhất 2 ảnh** được ghim sai lệch **dưới 100 km**.
 
-**Bản SỰ KIỆN:** Ghim vị trí cho **2 ảnh** trên điện thoại.
+**Bản SỰ KIỆN:** Ghim vị trí cho **7 ảnh** trên điện thoại.
 
 **Thử thách thực tế:** Gắn cờ di sản quê mình lên bản đồ lớn tại gian.
 
