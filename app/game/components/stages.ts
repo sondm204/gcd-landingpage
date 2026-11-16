@@ -48,8 +48,8 @@ export const stages: {
     id: "postcard", name: "Đại sứ di sản", category: "Kể chuyện Việt ra thế giới", stamp: "Tiếng nói",
     description: "Gửi một tấm postcard, kể câu chuyện di sản bằng tiếng nói của riêng bạn.",
     story: "Hành trình đưa bạn trở về với gốc rễ, để tự tin bước ra thế giới. Hãy gửi lời giới thiệu di sản Việt Nam đến bạn bè quốc tế.",
-    online: { summary: "Sáng tạo postcard · Tối đa 20 từ", rules: ["Chọn khung postcard và viết một câu tiếng Anh giới thiệu di sản, tối đa 20 từ.", "Bạn có thể quay thêm clip 15 giây đọc câu giới thiệu.", "Postcard được ban tổ chức duyệt trước khi xuất hiện trên tường postcard."] },
-    event: { summary: "Viết postcard tại gian", rules: ["Chọn khung và viết postcard giới thiệu di sản Việt Nam trên điện thoại.", "Nội dung postcard cần được ban tổ chức duyệt trước khi hiển thị công khai."] },
+    online: { summary: "Sáng tạo postcard · Tối đa 20 từ", rules: ["Chọn ảnh, khung postcard và viết một câu tiếng Anh giới thiệu di sản, tối đa 20 từ.", "Tải ảnh PNG hoặc quay thêm clip 15 giây đọc câu giới thiệu.", "Bản thử lưu trên thiết bị; chưa gửi ban tổ chức hay đăng lên tường postcard công khai."] },
+    event: { summary: "Viết postcard tại gian", rules: ["Chọn ảnh, khung và viết postcard giới thiệu di sản Việt Nam trên điện thoại.", "Tải postcard để gửi bạn bè. Bản thử chưa gửi duyệt, đăng công khai hay dùng nhận sticker."] },
     challenge: "Nói tiếng Anh trong 30 giây để giới thiệu một di sản.",
   },
 ];

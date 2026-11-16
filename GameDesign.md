@@ -197,6 +197,10 @@ Nhạc nền ngũ cung nguyên bản qua Web Audio cùng đồng hồ với nố
 
 ### 4.5. Chặng 5 — ĐẠI SỨ DI SẢN (Dấu Tiếng nói)
 
+**Bản thử `/game/postcard`:** chọn một trong 10 ảnh có sẵn, 3 khung Cội nguồn / Sắc Việt / Vươn xa; viết lời nhắn tiếng Anh 1–20 từ, tối đa 240 ký tự, tên người gửi tối đa 40 ký tự. Không tự chấm chất lượng ngôn ngữ, không tính điểm hay điều kiện vượt chặng. Preview và PNG 1200×1500 dùng chung canvas renderer, có tên điểm đến, lời nhắn và nguồn/giấy phép ảnh. Chỉ cho tải khi bản xem trước khớp nội dung hiện tại và số từ hợp lệ. Bản nháp lưu cục bộ, tự phục hồi khi bắt đầu lại trên cùng trình duyệt. Có chia sẻ file bằng Web Share nếu thiết bị hỗ trợ, nút tải ảnh luôn sẵn sàng.
+
+Quay clip tối đa 15 giây là tuỳ chọn, chỉ xin camera/micro khi người dùng bấm quay. Có xem lại, tải clip, quay lại; tự dừng khi ẩn tab và giải phóng camera khi rời trang. Clip/ảnh chưa tải lên máy chủ. Bản thử chưa có API gửi/duyệt/tường công khai/bình chọn, chưa cấp điểm hoặc con dấu; các yêu cầu công khai bên dưới dành cho giai đoạn tích hợp backend. Bản sự kiện dùng cùng công cụ sáng tạo. Game mở từ lobby, ẩn site header và hỗ trợ fullscreen theo thiết bị.
+
 **Chủ đề:** Di sản tự chọn. Người chơi giới thiệu di sản Việt Nam với bạn bè quốc tế.
 
 **Gameplay:** Chọn khung **postcard**, viết một câu tiếng Anh giới thiệu di sản. Người chơi **có thể** quay clip **15 giây** đọc câu đó.

@@ -8,7 +8,7 @@ import { stages, type GameMode, type StageId } from "./stages";
 
 function Arrow() { return <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" aria-hidden="true"><path d="M4 12h15m-6-6 6 6-6 6" /></svg>; }
 
-const playablePaths: Partial<Record<StageId, string>> = { craft: "/game/craft-shop", print: "/game/dong-ho", rhythm: "/game/rhythm", place: "/game/place" };
+const playablePaths: Partial<Record<StageId, string>> = { craft: "/game/craft-shop", print: "/game/dong-ho", rhythm: "/game/rhythm", place: "/game/place", postcard: "/game/postcard" };
 
 export default function GameLobby() {
   const [mode, setMode] = useState<GameMode>("online");
@@ -45,7 +45,7 @@ export default function GameLobby() {
 
       <div className="game-content">
         <section className="game-journey" id="chon-chang" aria-labelledby="stages-title">
-          <div className="game-sectionHeading"><div><p className="game-kicker">HÀNH TRÌNH CỦA BẠN</p><h2 id="stages-title">Năm chặng chơi. <em>Một cội nguồn.</em></h2></div><span className="game-previewBadge">4 chặng · Chơi thử</span></div>
+          <div className="game-sectionHeading"><div><p className="game-kicker">HÀNH TRÌNH CỦA BẠN</p><h2 id="stages-title">Năm chặng chơi. <em>Một cội nguồn.</em></h2></div><span className="game-previewBadge">5 chặng · Chơi thử</span></div>
           <p className="game-sectionIntro">Mỗi trò chơi mở ra một góc nhìn về di sản Việt. Bạn muốn khám phá điều gì trước?</p>
 
           <div className="game-modeSwitcher" role="group" aria-label="Chế độ trải nghiệm">
