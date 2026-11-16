@@ -2,6 +2,7 @@
 
 import dynamic from "next/dynamic";
 import Link from "next/link";
+import Image from "next/image";
 import { useEffect, useRef, useState } from "react";
 import { Arrow, Lantern, Lotus, Sun } from "./ornaments";
 import HeroSection from "./hero-section";
@@ -384,7 +385,7 @@ export default function HeritageJourney() {
             <p>{event.slogan}</p>
           </div>
           <div className="footer-logos" aria-label="Các đơn vị chương trình">
-            <ProgramLogos />
+            <Image src="/images/pos GCD.png" alt="Các đơn vị bảo trợ, tổ chức, thực hiện và đồng hành Global Citizens Day 2026" width={1280} height={126} sizes="100vw" style={{ width: "100%", height: "auto", display: "block" }} />
           </div>
         </div>
         <a href="#khoi-hanh" className="footer-brand" data-reveal>

@@ -4,13 +4,21 @@ import Image from "next/image";
 const groups = [
   { label: "ĐƠN VỊ BẢO TRỢ", logos: [
     { src: "/images/logo_danhnhan.png", alt: "Hội Doanh nhân trẻ Việt Nam" },
+    { src: "/images/logo_VN.png", alt: "JCI Việt Nam" },
   ] },
   { label: "ĐƠN VỊ TỔ CHỨC", logos: [
-    { src: "/images/logo_VN.png", alt: "JCI Việt Nam" },
+    { src: "/images/JCI_VN.png", alt: "Hội đồng Phát triển JCI Việt Nam" },
+    { src: "/images/jci-junior-division.png", alt: "JCI Junior Division" },
     { src: "/images/GCD_logo.png", alt: "Global Citizens Day" },
   ] },
   { label: "ĐƠN VỊ THỰC HIỆN", logos: [
     { src: "/images/logo_ThangLong.png", alt: "JCI Thăng Long" },
+  ] },
+  { label: "ĐƠN VỊ ĐỒNG HÀNH", logos: [
+    { src: "/images/Logo_JCIHN.png", alt: "JCI Hà Nội" },
+    { src: "/images/Logo_JCIHP.png", alt: "JCI Hải Phòng" },
+    { src: "/images/Logo_JCIGrace.png", alt: "JCI Grace" },
+    { src: "/images/Logo_JCICT.png", alt: "JCI Cần Thơ" },
     { src: "/images/junior_logo.png", alt: "JCI Junior Club" },
   ] },
 ];
