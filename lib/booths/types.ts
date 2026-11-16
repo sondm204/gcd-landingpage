@@ -93,6 +93,7 @@ export type BoothPosition = {
   pending_count: number;
   confirmed_brand: string | null;
   confirmed_booth: string | null;
+  confirmed_logo_url?: string | null;
   is_booked: boolean;
   is_bookable: boolean;
 };
