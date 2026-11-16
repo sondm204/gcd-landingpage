@@ -1,4 +1,6 @@
 "use client";
+import { useCopy, useLocalizedData } from "@/i18n/copy";
+
 
 import Image from "next/image";
 import { useEffect, useRef, useState } from "react";
@@ -21,7 +23,7 @@ type SponsorSlide = {
 };
 
 // Các vị trí sau PNJ là dữ liệu minh họa, sẵn sàng thay bằng nhà tài trợ tiếp theo.
-const sponsors: Sponsor[] = [
+const sponsorsSource: Sponsor[] = [
   { name: "PNJ", website: "https://www.pnj.com.vn/", logo: "/images/sponsors/pnj-logo.jpg", mark: "PNJ", kind: "Nhà tài trợ" },
   { name: "Thương hiệu 02", website: "https://example.com", mark: "02", kind: "Vị trí minh họa", demo: true },
   { name: "Thương hiệu 03", website: "https://example.com", mark: "03", kind: "Vị trí minh họa", demo: true },
@@ -29,7 +31,7 @@ const sponsors: Sponsor[] = [
 ];
 
 // Có thể thêm { type: "video", src: "/sponsors/ten-video.mp4" } vào media.
-const slides: SponsorSlide[] = [
+const slidesSource: SponsorSlide[] = [
   {
     title: "Dấu ấn PNJ trên hành trình.",
     description: "Một khung hình từ PNJ — nơi vẻ đẹp của từng chi tiết được trân trọng.",
@@ -45,6 +47,9 @@ const slides: SponsorSlide[] = [
 ];
 
 export default function SponsorsSection() {
+  const t = useCopy();
+  const sponsors = useLocalizedData(sponsorsSource);
+  const slides = useLocalizedData(slidesSource);
   const [current, setCurrent] = useState(0);
   const [paused, setPaused] = useState(false);
   const [visible, setVisible] = useState(false);
@@ -73,7 +78,7 @@ export default function SponsorsSection() {
     if (paused || !visible || !pageVisible || reducedMotion || slides.length < 2) return;
     const timer = window.setInterval(() => setCurrent((index) => (index + 1) % slides.length), 5000);
     return () => window.clearInterval(timer);
-  }, [current, paused, visible, pageVisible, reducedMotion]);
+  }, [current, paused, visible, pageVisible, reducedMotion, slides.length]);
 
   const show = (index: number) => setCurrent((index + slides.length) % slides.length);
   const slide = slides[current];
@@ -82,15 +87,15 @@ export default function SponsorsSection() {
     <section ref={sectionRef} id="nha-tai-tro" className="sponsors-section section-pad" aria-labelledby="sponsors-title">
       <div className="sponsors-heading">
         <div data-reveal>
-          <span className="eyebrow">NHỮNG NGƯỜI BẠN ĐỒNG HÀNH</span>
-          <h2 id="sponsors-title">Di sản được nối dài<br />bởi <em>những bàn tay chung sức.</em></h2>
+          <span className="eyebrow">{t("NHỮNG NGƯỜI BẠN ĐỒNG HÀNH")}</span>
+          <h2 id="sponsors-title">{t("Di sản được nối dài")}<br />{t("bởi")} <em>{t("những bàn tay chung sức.")}</em></h2>
         </div>
-        <p data-reveal data-reveal-delay="110">Mỗi sự đồng hành mở thêm một lối để câu chuyện văn hóa Việt chạm đến nhiều người hơn.</p>
+        <p data-reveal data-reveal-delay="110">{t("Mỗi sự đồng hành mở thêm một lối để câu chuyện văn hóa Việt chạm đến nhiều người hơn.")}</p>
       </div>
 
-      <div className="sponsors-rule" aria-hidden="true"><span>✳</span><span>ĐỒNG HÀNH CÙNG HÀNH TRÌNH</span><span>✳</span></div>
+      <div className="sponsors-rule" aria-hidden="true"><span>✳</span><span>{t("ĐỒNG HÀNH CÙNG HÀNH TRÌNH")}</span><span>✳</span></div>
 
-      <div className="sponsor-grid" aria-label="Danh sách nhà tài trợ và vị trí minh họa">
+      <div className="sponsor-grid" aria-label={t("Danh sách nhà tài trợ và vị trí minh họa")}>
         {sponsors.map((sponsor, index) => (
           <a
             className="sponsor-card"
@@ -98,7 +103,7 @@ export default function SponsorsSection() {
             href={sponsor.website}
             target="_blank"
             rel="noopener noreferrer"
-            aria-label={`${sponsor.name} — mở website trong tab mới${sponsor.demo ? " (dữ liệu minh họa)" : ""}`}
+            aria-label={t("{v0} — mở website trong tab mới{v1}", { v0: sponsor.name, v1: sponsor.demo ? " (dữ liệu minh họa)" : "" })}
             data-reveal
             data-reveal-delay={String(index * 65)}
           >
@@ -122,20 +127,20 @@ export default function SponsorsSection() {
           <span className="sponsor-media-label">{slide.label}</span>
         </div>
         <div className="sponsor-feature-copy">
-          <div><span className="eyebrow">CÂU CHUYỆN ĐỒNG HÀNH</span><Lotus /><h3>{slide.title}</h3><p>{slide.description}</p></div>
+          <div><span className="eyebrow">{t("CÂU CHUYỆN ĐỒNG HÀNH")}</span><Lotus /><h3>{slide.title}</h3><p>{slide.description}</p></div>
           <div className="sponsor-slider-controls">
             <span className="sponsor-slide-count">0{current + 1} <span>/</span> 0{slides.length}</span>
             <div className="sponsor-slider-buttons">
-              <button type="button" onClick={() => show(current - 1)} aria-label="Slide trước">←</button>
-              <button type="button" onClick={() => show(current + 1)} aria-label="Slide tiếp theo">→</button>
+              <button type="button" onClick={() => show(current - 1)} aria-label={t("Slide trước")}>←</button>
+              <button type="button" onClick={() => show(current + 1)} aria-label={t("Slide tiếp theo")}>→</button>
             </div>
           </div>
         </div>
-        <div className="sponsor-slider-dots" aria-label="Chọn slide">
-          {slides.map((item, index) => <button key={item.title} type="button" className={index === current ? "active" : ""} onClick={() => show(index)} aria-label={`Đến slide ${index + 1}`} aria-current={index === current ? "true" : undefined} />)}
+        <div className="sponsor-slider-dots" aria-label={t("Chọn slide")}>
+          {slides.map((item, index) => <button key={item.title} type="button" className={index === current ? "active" : ""} onClick={() => show(index)} aria-label={t("Đến slide {v0}", { v0: index + 1 })} aria-current={index === current ? "true" : undefined} />)}
         </div>
       </div>
-      <div className="sponsors-tail" aria-hidden="true"><span>DI SẢN ĐƯỢC TIẾP NỐI</span><span>✳</span><span>BỞI CHÚNG TA</span></div>
+      <div className="sponsors-tail" aria-hidden="true"><span>{t("DI SẢN ĐƯỢC TIẾP NỐI")}</span><span>✳</span><span>{t("BỞI CHÚNG TA")}</span></div>
     </section>
   );
 }

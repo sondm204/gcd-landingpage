@@ -1,10 +1,13 @@
 "use client";
+import { useCopy } from "@/i18n/copy";
 
-import Link from "next/link";
-import { usePathname, useRouter } from "next/navigation";
+
+import { Link } from "@/i18n/navigation";
+import { usePathname, useRouter } from "@/i18n/navigation";
 import { useEffect, useRef, useState } from "react";
 
 export default function BoothAccount() {
+  const t = useCopy();
   const pathname = usePathname();
   const router = useRouter();
   const [admin, setAdmin] = useState<{ email: string } | null>(null);
@@ -50,17 +53,17 @@ export default function BoothAccount() {
     setBusy(true); setError("");
     try {
       const response = await fetch("/api/booths/admin/logout", { method: "POST" });
-      if (!response.ok) throw new Error("Chưa thể đăng xuất. Vui lòng thử lại.");
+      if (!response.ok) throw new Error(t("Chưa thể đăng xuất. Vui lòng thử lại."));
       setAdmin(null); setBusy(false);
       window.dispatchEvent(new Event("booth-auth-changed"));
       router.replace("/booths"); router.refresh();
-    } catch (err) { setError(err instanceof Error ? err.message : "Mất kết nối. Vui lòng thử lại."); setBusy(false); }
+    } catch (err) { setError(err instanceof Error ? err.message : t("Mất kết nối. Vui lòng thử lại.")); setBusy(false); }
   }
 
-  if (!ready) return <span className="booth-account-loading" aria-label="Đang kiểm tra tài khoản" />;
-  if (!admin) return <Link href="/booths/admin/login">Đăng nhập quản trị</Link>;
+  if (!ready) return <span className="booth-account-loading" aria-label={t("Đang kiểm tra tài khoản")} />;
+  if (!admin) return <Link href="/booths/admin/login">{t("Đăng nhập quản trị")}</Link>;
   return <details className="booth-account" ref={popup}>
-    <summary aria-label="Tài khoản quản trị" title="Tài khoản quản trị"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.6" aria-hidden="true"><circle cx="12" cy="8" r="3.5" /><path d="M5 21v-2a7 7 0 0 1 14 0v2" /></svg></summary>
-    <div className="booth-account-popup"><span className="booth-kicker">TÀI KHOẢN QUẢN TRỊ</span><p>{admin.email}</p>{error && <p role="alert">{error}</p>}<button className="booth-button secondary compact" type="button" disabled={busy} onClick={logout}>{busy ? "Đang đăng xuất…" : "Đăng xuất"}</button></div>
+    <summary aria-label={t("Tài khoản quản trị")} title={t("Tài khoản quản trị")}><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.6" aria-hidden="true"><circle cx="12" cy="8" r="3.5" /><path d="M5 21v-2a7 7 0 0 1 14 0v2" /></svg></summary>
+    <div className="booth-account-popup"><span className="booth-kicker">{t("TÀI KHOẢN QUẢN TRỊ")}</span><p>{admin.email}</p>{error && <p role="alert">{t(error)}</p>}<button className="booth-button secondary compact" type="button" disabled={busy} onClick={logout}>{busy ? t("Đang đăng xuất…") : t("Đăng xuất")}</button></div>
   </details>;
 }
