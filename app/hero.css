@@ -143,6 +143,14 @@
   .hero-actions .button > span { font-size: 18px; }
 }
 @media (prefers-reduced-motion: reduce) { .cloud-intro { display: none; }.hero-enter, .hero-immersive .hero-art, .hero-atmosphere *, .scroll-pill { animation: none !important; } }
+/* The supplied transparent key visual includes the title, wordmark and slogan.
+   Its upper 210px are empty canvas; bottom alignment removes only that blank space. */
+.hero-immersive h1.hero-artwork { position: relative; width: min(900px, 100%, 90dvh); aspect-ratio: 2616 / 1165; margin: 0; overflow: hidden; }
+.hero-artwork .hero-artwork-text { position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip-path: inset(50%); white-space: nowrap; }
+@media (max-height: 500px) and (min-aspect-ratio: 4/3) {
+  .hero-immersive .hero-copy { grid-template-areas: "title title" "message message" "details actions"; }
+  .hero-immersive h1.hero-artwork { justify-self: center; width: min(600px, 58%, 96dvh); }
+}
 .cloud-intro {
   position: fixed;
   inset: 0;

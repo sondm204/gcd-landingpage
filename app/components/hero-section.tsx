@@ -3,7 +3,6 @@
 import Image from "next/image";
 import { useEffect, useRef, useState } from "react";
 import { Arrow } from "./ornaments";
-import HeritageLockup from "./heritage-lockup";
 import { event } from "@/lib/event";
 
 function CloudIntro() {
@@ -56,10 +55,10 @@ export default function HeroSection({ reducedMotion }: { reducedMotion: boolean 
       <div className="hero-vignette" aria-hidden="true" />
       <div className="hero-atmosphere" aria-hidden="true"><span className="odyssey-glow glow-one" /><span className="odyssey-glow glow-two" /><span className="odyssey-spark spark-one">✦</span><span className="odyssey-spark spark-two">✦</span><span className="odyssey-spark spark-three">✧</span></div>
       <div className="hero-copy">
-        <div className="eyebrow hero-enter hero-event-name"><span /> HÀNH TRÌNH CÔNG DÂN TOÀN CẦU <span /></div>
-        <h1 id="hero-title" className="hero-enter"><span>GLOBAL</span><span>CITIZENS DAY <em>2026</em></span></h1>
-        <HeritageLockup className="hero-enter" />
-        <p className="hero-slogan hero-enter"><span>VIETNAM ROOTS</span><i aria-hidden="true">✦</i><span>GLOBAL MINDS</span></p>
+        <h1 id="hero-title" className="hero-artwork hero-enter">
+          <span className="hero-artwork-text">Global Citizens Day 2026. The Heritage Odyssey. Vietnam Roots – Global Minds.</span>
+          <Image src="/keyvisual/Hero_text.png" alt="" fill sizes="(max-width: 800px) 90vw, (max-width: 1100px) 77vw, 900px" preload style={{ objectFit: "cover", objectPosition: "center bottom" }} />
+        </h1>
         <p className="hero-message hero-enter">Hiểu cội nguồn. Vững bản lĩnh.<br />Khai mở tư duy toàn cầu. Chủ động kiến tạo tương lai.</p>
         <div className="hero-event-details hero-enter">
           <div><svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><rect x="3" y="5" width="18" height="16" rx="2" /><path d="M7 2v6M17 2v6M3 11h18M7 15h3M14 15h3" /></svg><span><small>HẸN BẠN VÀO</small><strong>{event.date}</strong></span></div>
