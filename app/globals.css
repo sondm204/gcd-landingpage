@@ -2433,9 +2433,11 @@ main {
     transform: none;
   }
 }
-.footer-event { grid-column: 1 / -1; display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 28px; padding-bottom: 28px; border-bottom: 1px solid var(--line); }
+.footer-event { grid-column: 1 / -1; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 28px; padding-bottom: 28px; border-bottom: 1px solid var(--line); text-align: center; }
+.footer-event-copy { display: flex; flex-direction: column; align-items: center; width: 100%; }
+.footer-event > .footer-logos { width: 100%; max-width: 1280px; min-width: 0; }
 .footer-event-copy .eyebrow { color: var(--red); font-size: clamp(14px, 1.6vw, 21px); letter-spacing: .08em; }
 .footer-event-copy p { margin-top: 8px; font-size: 13px; color: var(--muted); }
 @media (max-width: 600px) {
-  .footer-event { flex-direction: column; align-items: flex-start; gap: 22px; }
+  .footer-event { align-items: center; gap: 22px; }
 }

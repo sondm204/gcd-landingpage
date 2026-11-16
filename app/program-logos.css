@@ -3,7 +3,7 @@
 .program-logos-track { display: flex; width: max-content; animation: program-logos-drift 48s linear infinite; }
 .program-logo-set { display: flex; align-items: stretch; justify-content: space-evenly; flex-shrink: 0; gap: clamp(32px, 5vw, 80px); }
 .program-logos .program-logo-set { width: max(100vw, 960px); padding-inline: 32px; }
-.program-logos .program-logo-set-flat { display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); align-items: center; gap: 0; padding-inline: 0; }
+.program-logos .program-logo-set-flat { display: grid; grid-template-columns: repeat(11, minmax(0, 1fr)); align-items: center; gap: 0; padding-inline: 0; min-width: 1760px; }
 .program-logo-set-flat > img { display: block; justify-self: center; width: clamp(110px, 10vw, 150px); height: 85px; object-fit: contain; }
 .program-logo-group { display: flex; flex-direction: column; align-items: center; justify-content: space-between; gap: 14px; }
 .program-logo-label { color: #08275c; font-size: 12px; font-weight: 700; line-height: 1.5; white-space: nowrap; }
@@ -30,6 +30,6 @@
 @media (prefers-reduced-motion: reduce) {
   .program-logos-track { animation: none; width: 100%; }
   .program-logos .program-logo-set { width: 100%; flex-wrap: wrap; gap: 24px 36px; }
-  .program-logos .program-logo-set-flat { grid-template-columns: repeat(auto-fit, minmax(110px, 1fr)); gap: 24px 0; }
+  .program-logos .program-logo-set-flat { min-width: 0; grid-template-columns: repeat(auto-fit, minmax(110px, 1fr)); gap: 24px 0; }
   .program-logos .program-logo-set[aria-hidden="true"] { display: none; }
 }
