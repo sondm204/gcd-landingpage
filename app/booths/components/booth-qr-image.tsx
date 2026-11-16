@@ -1,4 +1,6 @@
 "use client";
+import { useCopy } from "@/i18n/copy";
+
 
 import Image from "next/image";
 import { useCallback, useEffect, useRef, useState } from "react";
@@ -14,7 +16,7 @@ async function preparePng(qr: string, filename: string): Promise<PreparedImage> 
     blob = await response.blob();
   } catch {
     const response = await fetch("/api/booths/payment/download", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ qr }) });
-    if (!response.ok) { const data = await response.json(); throw new Error(data.error || "Chưa tải được ảnh QR. Vui lòng thử lại."); }
+    if (!response.ok) { const data = await response.json(); throw new Error(data.error_code || data.error || "Chưa tải được ảnh QR. Vui lòng thử lại."); }
     blob = await response.blob();
   }
   if (blob.type !== "image/png") {
@@ -46,6 +48,7 @@ async function preparePng(qr: string, filename: string): Promise<PreparedImage> 
 
 // Key this component by QR URL so a changed voucher cannot reuse an old image.
 export default function BoothQrImage({ qr, position }: { qr: string; position: number }) {
+  const t = useCopy();
   const [embedded] = useState(() => typeof navigator !== "undefined" && isEmbeddedBrowser(navigator.userAgent));
   const [showSaveHint, setShowSaveHint] = useState(false);
   const image = useRef<HTMLImageElement>(null);
@@ -70,10 +73,10 @@ export default function BoothQrImage({ qr, position }: { qr: string; position: n
   useEffect(() => {
     let active = true;
     void prepare().then(result => { if (active) setPrepared(result); }).catch(err => {
-      if (active) setError(err instanceof Error ? err.message : "Chưa mở được ảnh PNG. Bạn vẫn có thể chụp màn hình QR.");
+      if (active) setError(err instanceof Error ? err.message : t("Chưa mở được ảnh PNG. Bạn vẫn có thể chụp màn hình QR."));
     });
     return () => { active = false; };
-  }, [prepare]);
+  }, [prepare, t]);
 
   async function save() {
     setError("");
@@ -90,21 +93,21 @@ export default function BoothQrImage({ qr, position }: { qr: string; position: n
       link.click();
       link.remove();
       setTimeout(() => URL.revokeObjectURL(url), 1000);
-    } catch (err) { setError(err instanceof Error ? err.message : "Chưa lưu được ảnh QR."); }
+    } catch (err) { setError(err instanceof Error ? err.message : t("Chưa lưu được ảnh QR.")); }
     finally { setBusy(false); }
   }
 
   return <>
-    <div className="booth-qr-save-preview" role="region" aria-label="Ảnh PNG để lưu">
-      <Image ref={image} src={prepared ? prepared.src : qr} width={300} height={360} unoptimized alt="QR chuyển khoản phí gian hàng" style={{ display: "block", maxWidth: "100%", height: "auto", background: "#fff", userSelect: "auto", WebkitTouchCallout: "default" }} />
+    <div className="booth-qr-save-preview" role="region" aria-label={t("Ảnh PNG để lưu")}>
+      <Image ref={image} src={prepared ? prepared.src : qr} width={300} height={360} unoptimized alt={t("QR chuyển khoản phí gian hàng")} style={{ display: "block", maxWidth: "100%", height: "auto", background: "#fff", userSelect: "auto", WebkitTouchCallout: "default" }} />
     </div>
     <button type="button" className="booth-button secondary" disabled={busy || !prepared} onClick={() => {
       if (embedded) {
         setShowSaveHint(true);
         image.current?.scrollIntoView({ block: "center", behavior: "smooth" });
       } else void save();
-    }}>{busy ? "Đang lưu ảnh…" : embedded ? "Nhấn giữ ảnh QR để lưu" : "Lưu ảnh QR về thiết bị"}</button>
-    {(embedded || showSaveHint) && <p role="status">Nhấn và giữ trực tiếp lên ảnh QR bên trên, sau đó chọn “Lưu ảnh”. Nếu ứng dụng không hỗ trợ, hãy chụp màn hình QR hoặc mở trang bằng Safari / Chrome.</p>}
-    {error && <p role="alert" className="booth-payment-error">{error}</p>}
+    }}>{busy ? t("Đang lưu ảnh…") : embedded ? t("Nhấn giữ ảnh QR để lưu") : t("Lưu ảnh QR về thiết bị")}</button>
+    {(embedded || showSaveHint) && <p role="status">{t("Nhấn và giữ trực tiếp lên ảnh QR bên trên, sau đó chọn “Lưu ảnh”. Nếu ứng dụng không hỗ trợ, hãy chụp màn hình QR hoặc mở trang bằng Safari / Chrome.")}</p>}
+    {error && <p role="alert" className="booth-payment-error">{t(error)}</p>}
   </>;
 }

@@ -1,9 +1,11 @@
 "use client";
+import { useCopy, useLocalizedData } from "@/i18n/copy";
+
 
 import Image from "next/image";
 import { useEffect, useRef, useState } from "react";
 import { Arrow } from "./ornaments";
-import { event } from "@/lib/event";
+import { event as eventSource } from "@/lib/event";
 
 function CloudIntro() {
   const [finished, setFinished] = useState(false);
@@ -16,6 +18,8 @@ function CloudIntro() {
 }
 
 export default function HeroSection({ reducedMotion }: { reducedMotion: boolean }) {
+  const event = useLocalizedData(eventSource);
+  const t = useCopy();
   const [introRun, setIntroRun] = useState(0);
   const rootRef = useRef<HTMLElement>(null);
   const videoRef = useRef<HTMLVideoElement>(null);
@@ -59,14 +63,14 @@ export default function HeroSection({ reducedMotion }: { reducedMotion: boolean 
           <span className="hero-artwork-text">Global Citizens Day 2026. The Heritage Odyssey. Vietnam Roots – Global Minds.</span>
           <Image src="/keyvisual/Hero_text.png" alt="" fill sizes="(max-width: 800px) 90vw, (max-width: 1100px) 77vw, 900px" preload style={{ objectFit: "cover", objectPosition: "center bottom" }} />
         </h1>
-        <p className="hero-message hero-enter">Hiểu cội nguồn. Vững bản lĩnh.<br />Khai mở tư duy toàn cầu. Chủ động kiến tạo tương lai.</p>
+        <p className="hero-message hero-enter">{t("Hiểu cội nguồn. Vững bản lĩnh.")}<br />{t("Khai mở tư duy toàn cầu. Chủ động kiến tạo tương lai.")}</p>
         <div className="hero-event-details hero-enter">
-          <div><svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><rect x="3" y="5" width="18" height="16" rx="2" /><path d="M7 2v6M17 2v6M3 11h18M7 15h3M14 15h3" /></svg><span><small>HẸN BẠN VÀO</small><strong>{event.date}</strong></span></div>
+          <div><svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><rect x="3" y="5" width="18" height="16" rx="2" /><path d="M7 2v6M17 2v6M3 11h18M7 15h3M14 15h3" /></svg><span><small>{t("HẸN BẠN VÀO")}</small><strong>{event.date}</strong></span></div>
           <div><svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M20 10c0 6-8 12-8 12S4 16 4 10a8 8 0 1 1 16 0Z" /><circle cx="12" cy="10" r="2.5" /></svg><span><strong>{event.venue}</strong><small>{event.address}</small></span></div>
         </div>
-        <div className="hero-actions hero-enter"><a href="#hanh-trinh" className="button button-red">Bước vào hành trình <Arrow /></a><a href="#lich-trinh" className="hero-schedule-link">Lịch trình sự kiện <span aria-hidden="true">↗</span></a></div>
+        <div className="hero-actions hero-enter"><a href="#hanh-trinh" className="button button-red">{t("Bước vào hành trình")} <Arrow /></a><a href="#lich-trinh" className="hero-schedule-link">{t("Lịch trình sự kiện")} <span aria-hidden="true">↗</span></a></div>
       </div>
-      <div className="hero-bottom"><a href="#hanh-trinh"><span className="scroll-pill">↓</span> KHỞI HÀNH TỪ BẢN SẮC · KẾT NỐI VỚI THẾ GIỚI</a></div>
+      <div className="hero-bottom"><a href="#hanh-trinh"><span className="scroll-pill">↓</span> {t("KHỞI HÀNH TỪ BẢN SẮC · KẾT NỐI VỚI THẾ GIỚI")}</a></div>
     </section>
   </>;
 }

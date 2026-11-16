@@ -1,4 +1,6 @@
-const pillars = [
+"use client";
+import { useCopy, useLocalizedData } from "@/i18n/copy";
+const pillarsSource = [
   {
     name: "Hiểu về cội nguồn",
     en: "ROOTS",
@@ -26,6 +28,8 @@ const pillars = [
 ];
 
 export default function GlobalMindSection() {
+  const t = useCopy();
+  const pillars = useLocalizedData(pillarsSource);
   return (
     <section
       className="global-mind section-pad"
@@ -34,17 +38,11 @@ export default function GlobalMindSection() {
     >
       <div className="global-mind-intro">
         <div data-reveal>
-          <span className="eyebrow">TINH THẦN GLOBAL CITIZENS DAY 2026</span>
-          <h2 id="global-mind-title">
-            Từ hiểu mình,
-            <br />
-            <em>đến hiểu thế giới.</em>
+          <span className="eyebrow">{t("TINH THẦN GLOBAL CITIZENS DAY 2026")}</span>
+          <h2 id="global-mind-title">{t("Từ hiểu mình,")}<br />
+            <em>{t("đến hiểu thế giới.")}</em>
           </h2>
-          <p>
-            Công dân toàn cầu bắt đầu từ cách ta nghĩ, cách ta lắng nghe và
-            trách nhiệm với những điều mình làm. Cội nguồn là điểm tựa cho hành
-            trình ấy.
-          </p>
+          <p>{t("Công dân toàn cầu bắt đầu từ cách ta nghĩ, cách ta lắng nghe và trách nhiệm với những điều mình làm. Cội nguồn là điểm tựa cho hành trình ấy.")}</p>
         </div>
         <div className="global-orbit" data-reveal data-reveal-delay="100">
           <svg viewBox="0 0 420 340" fill="none" aria-hidden="true">
@@ -74,9 +72,7 @@ export default function GlobalMindSection() {
             <br />
             <strong>GLOBAL MINDS</strong>
           </span>
-          <span className="global-orbit-note">
-            BẢN SẮC LÀ ĐIỂM TỰA. KẾT NỐI LÀ KHỞI ĐẦU.
-          </span>
+          <span className="global-orbit-note">{t("BẢN SẮC LÀ ĐIỂM TỰA. KẾT NỐI LÀ KHỞI ĐẦU.")}</span>
         </div>
       </div>
       <ol className="global-pillars">

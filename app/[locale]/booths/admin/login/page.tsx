@@ -1,2 +1,2 @@
-import BoothLogin from "../../components/booth-login";
+import BoothLogin from "../../../../booths/components/booth-login";
 export default function BoothLoginPage() { return <BoothLogin />; }

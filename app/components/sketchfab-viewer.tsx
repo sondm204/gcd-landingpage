@@ -1,4 +1,6 @@
 "use client";
+import { useCopy } from "@/i18n/copy";
+
 
 import Script from "next/script";
 import { useEffect, useRef, useState } from "react";
@@ -23,6 +25,7 @@ type SketchfabConstructor = new (frame: HTMLIFrameElement) => {
 };
 
 export default function SketchfabViewer({ model, reducedMotion, visible }: { model: SketchfabModel; reducedMotion: boolean; visible: boolean }) {
+  const t = useCopy();
   const embedUrl = `https://sketchfab.com/models/${model.id}/embed?autostart=1&autospin=0&camera=0&animation_autoplay=0&transparent=1&navigation=orbit&scrollwheel=1&ui_theme=dark&dnt=1`;
   const [sdkReady, setSdkReady] = useState(false);
   const [ready, setReady] = useState(false);
@@ -131,17 +134,17 @@ export default function SketchfabViewer({ model, reducedMotion, visible }: { mod
     <div className="sketchfab-stage">
       <iframe ref={frameRef} src={embedUrl} width="100%" height="100%" title={model.title} allow="autoplay; fullscreen; xr-spatial-tracking; web-share" allowFullScreen onLoad={() => apiRef.current?.start()} />
     </div>
-    <div className="sketchfab-toolbar" role="group" aria-label={`Điều khiển mô hình ${model.title}`}>
-      <span>Kéo để xoay · Cuộn hoặc chụm để zoom</span>
+    <div className="sketchfab-toolbar" role="group" aria-label={t("Điều khiển mô hình {v0}", { v0: model.title })}>
+      <span>{t("Kéo để xoay · Cuộn hoặc chụm để zoom")}</span>
       <div className="sketchfab-buttons">
-        <button type="button" disabled={!ready} aria-label="Phóng to mô hình" onClick={() => moveCamera(0.8)}>+</button>
-        <button type="button" disabled={!ready} aria-label="Thu nhỏ mô hình" onClick={() => moveCamera(1.25)}>−</button>
-        <button type="button" disabled={!ready} aria-label="Xoay trái" onClick={() => moveCamera(1, Math.PI / 6)}>↶</button>
-        <button type="button" disabled={!ready} aria-label="Đặt lại góc nhìn" onClick={resetCamera}>⟲</button>
-        <button type="button" disabled={!ready} aria-label="Xoay phải" onClick={() => moveCamera(1, -Math.PI / 6)}>↷</button>
-        <button type="button" aria-label="Toàn màn hình mô hình" onClick={toggleFullscreen}>⛶</button>
+        <button type="button" disabled={!ready} aria-label={t("Phóng to mô hình")} onClick={() => moveCamera(0.8)}>+</button>
+        <button type="button" disabled={!ready} aria-label={t("Thu nhỏ mô hình")} onClick={() => moveCamera(1.25)}>−</button>
+        <button type="button" disabled={!ready} aria-label={t("Xoay trái")} onClick={() => moveCamera(1, Math.PI / 6)}>↶</button>
+        <button type="button" disabled={!ready} aria-label={t("Đặt lại góc nhìn")} onClick={resetCamera}>⟲</button>
+        <button type="button" disabled={!ready} aria-label={t("Xoay phải")} onClick={() => moveCamera(1, -Math.PI / 6)}>↷</button>
+        <button type="button" aria-label={t("Toàn màn hình mô hình")} onClick={toggleFullscreen}>⛶</button>
       </div>
     </div>
-    {failed && <p className="sketchfab-status" role="status">Mô hình chưa tải được. Bạn có thể <a href={model.url} target="_blank" rel="noopener noreferrer">mở trực tiếp trên Sketchfab ↗</a>.</p>}
+    {failed && <p className="sketchfab-status" role="status">{t("Mô hình chưa tải được. Bạn có thể")} <a href={model.url} target="_blank" rel="noopener noreferrer">{t("mở trực tiếp trên Sketchfab ↗")}</a>.</p>}
   </div>;
 }

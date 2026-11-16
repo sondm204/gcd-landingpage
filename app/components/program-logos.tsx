@@ -1,7 +1,9 @@
+"use client";
+import { useLocalizedData } from "@/i18n/copy";
 import Image from "next/image";
 
 // Keep the proposal order; the footer also displays the organization groups.
-const groups = [
+const groupsSource = [
   { label: "ĐƠN VỊ BẢO TRỢ", logos: [
     { src: "/images/logo_danhnhan.png", alt: "Hội Doanh nhân trẻ Việt Nam" },
     { src: "/images/logo_VN.png", alt: "JCI Việt Nam" },
@@ -24,6 +26,7 @@ const groups = [
 ];
 
 export default function ProgramLogos({ duplicate = false, grouped = true }: { duplicate?: boolean; grouped?: boolean }) {
+  const groups = useLocalizedData(groupsSource);
   if (!grouped) return <div className="program-logo-set program-logo-set-flat" aria-hidden={duplicate || undefined}>
     {groups.flatMap((group) => group.logos).map((logo) => <Image key={logo.src} src={logo.src} alt={duplicate ? "" : logo.alt} width={180} height={110} sizes="(max-width: 600px) 110px, 150px" />)}
   </div>;

@@ -6,7 +6,7 @@ export async function POST(request: Request) {
     const url = new URL(body.qr || "");
     const bank = process.env.BOOTH_BANK_ID, account = process.env.BOOTH_BANK_ACCOUNT;
     const path = `/image/${encodeURIComponent(bank || "")}-${encodeURIComponent(account || "")}-compact2.png`;
-    if (!bank || !account || url.origin !== "https://img.vietqr.io" || url.pathname !== path || url.username || url.password) return Response.json({error:"Ảnh QR không hợp lệ."},{status:400});
+    if (!bank || !account || url.origin !== "https://img.vietqr.io" || url.pathname !== path || url.username || url.password) return Response.json({error:"Ảnh QR không hợp lệ.",error_code:"m0663"},{status:400});
     // Save the displayed QR, without requiring a voucher or applying it again.
     let target = url;
     let response: Response | undefined;
@@ -28,5 +28,5 @@ export async function POST(request: Request) {
     if (bytes.byteLength > 5 * 1024 * 1024) throw new Error("QR too large");
     const extension = type === "image/svg+xml" ? "svg" : type === "image/jpeg" ? "jpg" : type === "image/webp" ? "webp" : "png";
     return new Response(bytes, { headers: { "Content-Type": type, "Content-Disposition": `attachment; filename="GCD-QR.${extension}"`, "Cache-Control": "no-store", "X-Content-Type-Options": "nosniff" } });
-  } catch { return Response.json({ error: "Không tải được ảnh từ VietQR. Vui lòng thử lại sau." }, { status: 503 }); }
+  } catch { return Response.json({ error: "Không tải được ảnh từ VietQR. Vui lòng thử lại sau.", error_code: "m0664" }, { status: 503 }); }
 }

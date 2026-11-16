@@ -3,6 +3,7 @@ import { createClient } from "@supabase/supabase-js";
 import { createServerClient } from "@supabase/ssr";
 import { cookies } from "next/headers";
 import { createHmac } from "node:crypto";
+import sourceKeys from "@/messages/source-keys.json";
 
 export class BoothError extends Error {
   constructor(public status: number, message: string) { super(message); }
@@ -46,9 +47,9 @@ export async function rateLimit(request: Request, scope: string, limit: number, 
   if (!data) throw new BoothError(429, "Bạn đã gửi nhiều yêu cầu. Vui lòng thử lại sau.");
 }
 export function responseError(error: unknown) {
-  if (error instanceof BoothError) return Response.json({ error: error.message }, { status: error.status, headers: { "Cache-Control": "no-store" } });
+  if (error instanceof BoothError) return Response.json({ error: error.message, error_code: (sourceKeys as Record<string, string>)[error.message.replace(/\s+/g, " ").trim()] || "m0595" }, { status: error.status, headers: { "Cache-Control": "no-store" } });
   console.error("Booth operation failed", error instanceof Error ? error.message : "Unexpected database/storage error");
-  return Response.json({ error: "Không thể hoàn tất yêu cầu. Vui lòng thử lại sau." }, { status: 500, headers: { "Cache-Control": "no-store" } });
+  return Response.json({ error: "Không thể hoàn tất yêu cầu. Vui lòng thử lại sau.", error_code: "m0595" }, { status: 500, headers: { "Cache-Control": "no-store" } });
 }
 export function json(data: unknown, status = 200) { return Response.json(data, { status, headers: { "Cache-Control": "no-store, private" } }); }
 

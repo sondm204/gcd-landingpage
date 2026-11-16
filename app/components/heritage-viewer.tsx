@@ -1,9 +1,11 @@
 "use client";
+import { useCopy, useLocalizedData } from "@/i18n/copy";
+
 
 import { useEffect, useRef, useState } from "react";
 import SketchfabViewer from "./sketchfab-viewer";
 
-const landmarks = [
+const landmarksSource = [
   { name: "Chùa Một Cột", place: "HÀ NỘI", description: "Một đoá sen vươn lên từ mặt nước — cảm hứng từ kiến trúc chùa Một Cột.", tag: "01 / MÁI CHÙA TRONG KÝ ỨC", sketchfab: {
     id: "9b2562f8884141c0b1777e1a1c05887c", title: "One Pillar Pagoda - Chùa Một Cột",
     url: "https://sketchfab.com/3d-models/one-pillar-pagoda-chua-mot-cot-9b2562f8884141c0b1777e1a1c05887c", author: "inucaboo", authorUrl: "https://sketchfab.com/inulab",
@@ -43,6 +45,8 @@ const landmarks = [
 ];
 
 export default function HeritageViewer({ reducedMotion }: { reducedMotion: boolean }) {
+  const t = useCopy();
+  const landmarks = useLocalizedData(landmarksSource);
   const [model, setModel] = useState(0);
   const [visible, setVisible] = useState(true);
   const rootRef = useRef<HTMLDivElement>(null);
@@ -58,7 +62,7 @@ export default function HeritageViewer({ reducedMotion }: { reducedMotion: boole
   return <div className="viewer" ref={rootRef}>
     <div className="viewer-topline"><span>{landmarks[model].tag}</span><span>↔ 360°</span></div>
     <SketchfabViewer key={landmarks[model].sketchfab.id} model={landmarks[model].sketchfab} reducedMotion={reducedMotion} visible={visible} />
-    <div className="landmark-caption" aria-live="polite"><div><h3>{landmarks[model].name}</h3><span>{landmarks[model].place} · VIỆT NAM</span></div><p>{landmarks[model].description}</p></div>
-    <div className="landmark-tabs" role="group" aria-label="Chọn di sản">{landmarks.map((landmark, i) => <button key={landmark.name} type="button" aria-pressed={model === i} className={model === i ? "selected" : ""} onClick={() => { setModel(i); }}><span>{String(i + 1).padStart(2, "0")}</span>{landmark.name}</button>)}</div>
+    <div className="landmark-caption" aria-live="polite"><div><h3>{landmarks[model].name}</h3><span>{landmarks[model].place} {t("· VIỆT NAM")}</span></div><p>{landmarks[model].description}</p></div>
+    <div className="landmark-tabs" role="group" aria-label={t("Chọn di sản")}>{landmarks.map((landmark, i) => <button key={landmark.name} type="button" aria-pressed={model === i} className={model === i ? "selected" : ""} onClick={() => { setModel(i); }}><span>{String(i + 1).padStart(2, "0")}</span>{landmark.name}</button>)}</div>
   </div>;
 }
