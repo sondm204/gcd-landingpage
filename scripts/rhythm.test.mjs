@@ -1,10 +1,24 @@
 import { test } from "node:test";
 import assert from "node:assert/strict";
-import { DURATION, GOOD, HOLD_RELEASE, beatInterval, beats, travelTime, initialState, notes, reducer } from "../app/game/rhythm/engine.ts";
+import { DURATION, MAX_SCORE, unitsForNote, unitsForStreak, scoreFromUnits, GOOD, HOLD_RELEASE, beatInterval, beats, travelTime, initialState, notes, reducer } from "../app/game/rhythm/engine.ts";
 const start = () => reducer(initialState(), { type: "start" });
-const isolated = (note, score = 40) => ({ ...start(), score, judgments: notes.map(n => n.id === note.id ? null : "miss") });
+const isolated = (note, scoreUnits = 4000) => ({ ...start(), scoreUnits, score: scoreFromUnits(scoreUnits), judgments: notes.map(n => n.id === note.id ? null : "miss") });
 const hold = notes.find(n => n.duration > 0);
 const tap = notes[0];
+test("successive notes earn more and mistakes reset the streak bonus", () => {
+  const seed = () => ({ ...start(), judgments: notes.map(n => n.id < 4 ? null : "miss") });
+  const hit = (s, n) => reducer(reducer(s, { type: "hit", lane: n.lane, elapsed: n.at }), { type: "release", lane: n.lane, elapsed: n.at + 1 });
+  let s = hit(seed(), notes[0]); const first = s.scoreUnits;
+  s = hit(s, notes[1]); assert(s.scoreUnits - first > first); assert.equal(s.combo, 2);
+  const uninterrupted = hit(s, notes[2]);
+  let broken = reducer(s, { type: "hit", lane: 3, elapsed: notes[1].at + 200 });
+  assert.equal(broken.combo, 0); assert.equal(broken.maxCombo, 2);
+  const previous = broken.scoreUnits; broken = hit(broken, notes[2]);
+  assert.equal(broken.scoreUnits - previous, unitsForNote(1)); assert.equal(broken.combo, 1);
+  assert(uninterrupted.scoreUnits > broken.scoreUnits);
+  let missed = reducer(s, { type: "tick", elapsed: notes[2].at + GOOD + 1 });
+  assert.equal(missed.combo, 0); missed = hit(missed, notes[3]); assert.equal(missed.combo, 1);
+});
 const perfectActions = notes.flatMap(n => [
   { type: "hit", lane: n.lane, elapsed: n.at },
   { type: "release", lane: n.lane, elapsed: n.at + (n.duration || 1) }
@@ -41,16 +55,16 @@ test("following notes remain visible behind the long tail, with time to switch b
     assert(beats.includes(next.at));
     let s = reducer(isolated(n), { type: "hit", lane: n.lane, elapsed: n.at });
     s = reducer(s, { type: "tick", elapsed: end });
-    assert.equal(s.score, 50);
+    assert.equal(s.score, scoreFromUnits(4100));
   }
 });
 
-test("perfect run scores exactly 10 per note, including holds, with no combo bonus", () => {
+test("perfect run scores exactly 300 points, including holds and increasing streak bonuses", () => {
   let s = start();
   for (const a of perfectActions) s = reducer(s, a);
   assert.equal(s.combo, notes.length);
   assert.equal(s.maxCombo, notes.length);
-  assert.equal(s.score, notes.length * 10);
+  assert.equal(s.score, MAX_SCORE);
   assert.equal(s.phase, "playing");
   s = reducer(s, { type: "tick", elapsed: DURATION });
   assert.equal(s.phase, "result");
@@ -58,34 +72,50 @@ test("perfect run scores exactly 10 per note, including holds, with no combo bon
   assert.deepEqual(reducer(s, { type: "hit", lane: 0, elapsed: DURATION + 10 }), s);
 });
 
-test("perfect and good both score 10, with inclusive grading windows", () => {
+test("perfect and good share the same normalized value, with inclusive grading windows", () => {
   for (const [offset, expected] of [[-160,"good"],[-75,"perfect"],[75,"perfect"],[160,"good"]]) {
     const s = reducer(isolated(tap), { type: "hit", lane: tap.lane, elapsed: tap.at + offset });
     assert.equal(s.judgments[tap.id], expected);
-    assert.equal(s.score, 50);
+    assert.equal(s.score, scoreFromUnits(4100));
   }
 });
 
-test("each missed note costs 5 exactly once, score never drops below zero", () => {
+test("each missed note costs half a note exactly once, score never drops below zero", () => {
   let s = reducer(isolated(tap), { type: "tick", elapsed: tap.at + GOOD + 1 });
-  assert.equal(s.score, 35); assert.equal(s.combo, 0);
-  s = reducer(s, { type: "tick", elapsed: DURATION }); assert.equal(s.score, 35);
+  assert.equal(s.score, scoreFromUnits(3950)); assert.equal(s.combo, 0);
+  s = reducer(s, { type: "tick", elapsed: DURATION }); assert.equal(s.score, scoreFromUnits(3950));
   s = reducer(start(), { type: "tick", elapsed: DURATION });
   assert.equal(s.score, 0); assert(s.judgments.every(j => j === "miss"));
 });
 
+test("normalized score stays in 0–300, accumulates without per-note rounding, and penalizes partial runs", () => {
+  assert.equal(scoreFromUnits(-5), 0);
+  assert.equal(scoreFromUnits(unitsForStreak(notes.length) * 2), 300);
+  let s = start();
+  for (const a of perfectActions) {
+    s = reducer(s, a);
+    assert(s.score >= 0 && s.score <= 300);
+  }
+  assert.equal(s.scoreUnits, unitsForStreak(notes.length));
+  assert.equal(s.score, 300);
+  let partial = start();
+  for (const a of perfectActions.filter(a => a.elapsed >= notes[1].at)) partial = reducer(partial, a);
+  assert(partial.score < 300);
+  assert(partial.judgments.includes("miss"));
+});
+
 test("hold head gives no points until completion; repeated down/tick cannot rescore", () => {
   let s = reducer(isolated(hold), { type: "hit", lane: hold.lane, elapsed: hold.at });
-  assert.equal(s.score, 40); assert.equal(s.judgments[hold.id], null);
+  assert.equal(s.score, scoreFromUnits(4000)); assert.equal(s.judgments[hold.id], null);
   s = reducer(s, { type: "hit", lane: hold.lane, elapsed: hold.at + 50 });
   s = reducer(s, { type: "tick", elapsed: hold.at + hold.duration });
-  assert.equal(s.score, 50); assert.equal(s.judgments[hold.id], "perfect");
+  assert.equal(s.score, scoreFromUnits(4100)); assert.equal(s.judgments[hold.id], "perfect");
   s = reducer(s, { type: "release", lane: hold.lane, elapsed: hold.at + hold.duration + 1 });
-  s = reducer(s, { type: "tick", elapsed: DURATION }); assert.equal(s.score, 50);
+  s = reducer(s, { type: "tick", elapsed: DURATION }); assert.equal(s.score, scoreFromUnits(4100));
 });
 
 test("releasing early fails a long note once; release tolerance has an explicit boundary", () => {
-  for (const [offset, grade, score] of [[HOLD_RELEASE, "perfect", 50], [HOLD_RELEASE + 1, "miss", 35], [hold.duration - 1, "miss", 35]]) {
+  for (const [offset, grade, score] of [[HOLD_RELEASE, "perfect", scoreFromUnits(4100)], [HOLD_RELEASE + 1, "miss", scoreFromUnits(3950)], [hold.duration - 1, "miss", scoreFromUnits(3950)]]) {
     let s = reducer(isolated(hold), { type: "hit", lane: hold.lane, elapsed: hold.at });
     s = reducer(s, { type: "release", lane: hold.lane, elapsed: hold.at + hold.duration - offset });
     assert.equal(s.judgments[hold.id], grade); assert.equal(s.score, score);
@@ -97,7 +127,7 @@ test("holding a lane before a note arrives cannot catch it automatically", () =>
   let s = reducer(isolated(hold), { type: "hit", lane: hold.lane, elapsed: hold.at - 500 });
   s = reducer(s, { type: "hit", lane: hold.lane, elapsed: hold.at });
   s = reducer(s, { type: "tick", elapsed: hold.at + hold.duration });
-  assert.equal(s.judgments[hold.id], "miss"); assert.equal(s.score, 30);
+  assert.equal(s.judgments[hold.id], "miss"); assert.equal(s.score, scoreFromUnits(3900));
 });
 
 test("pause freezes game; active holds must be pressed again after resume", () => {
@@ -105,14 +135,14 @@ test("pause freezes game; active holds must be pressed again after resume", () =
   s = reducer(s, { type: "tick", elapsed: hold.at + 100 });
   s = reducer(s, { type: "pause" });
   assert.deepEqual(reducer(s, { type: "tick", elapsed: DURATION }), s);
-  assert.deepEqual(reducer(s, { type: "hit", lane: hold.lane, elapsed: hold.at + 200 }), s);
+  assert.deepEqual(reducer(s, { type: "hit", lane: hold.lane, elapsed: hold.at + 300 }), s);
   assert.equal(s.pressed[hold.lane], false);
   const resumed = reducer(s, { type: "resume" });
   s = reducer(resumed, { type: "hit", lane: hold.lane, elapsed: resumed.elapsed + 100 });
   s = reducer(s, { type: "tick", elapsed: hold.at + hold.duration });
-  assert.equal(s.judgments[hold.id], "perfect"); assert.equal(s.score, 50);
+  assert.equal(s.judgments[hold.id], "perfect"); assert.equal(s.score, scoreFromUnits(4100));
   s = reducer(resumed, { type: "tick", elapsed: hold.at + hold.duration + 1000 });
-  assert.equal(s.judgments[hold.id], "miss"); assert.equal(s.score, 35);
+  assert.equal(s.judgments[hold.id], "miss"); assert.equal(s.score, scoreFromUnits(3950));
 });
 
 test("countdown ignores input, reset clears all holds, expiry grades every note", () => {

@@ -1,5 +1,5 @@
 import { test, expect } from "@playwright/test";
-import { DURATION, GOOD, notes } from "../app/game/rhythm/engine";
+import { DURATION, MAX_SCORE, unitsForStreak, scoreFromUnits, GOOD, notes } from "../app/game/rhythm/engine";
 
 async function setup(page: import("@playwright/test").Page) {
   await page.addInitScript(() => {
@@ -16,7 +16,7 @@ async function time(page: import("@playwright/test").Page, milliseconds: number)
   await page.evaluate(ms => { (window as typeof window & { rhythmTime: number }).rhythmTime = (ms + 3000) / 1000; }, milliseconds);
   await expect(page.locator(".rhythm-stage")).toHaveAttribute("data-elapsed", String(milliseconds));
 }
-test("tap and hold with pointer and keyboard, score 10 each, complete 60 seconds and replay", async ({ page }) => {
+test("tap and hold with pointer and keyboard, score at most 300, complete 60 seconds and replay", async ({ page }) => {
   test.setTimeout(90000);
   await page.setViewportSize({ width: 390, height: 844 });
   await setup(page);
@@ -42,11 +42,12 @@ test("tap and hold with pointer and keyboard, score 10 each, complete 60 seconds
     }
     if ((down && !n.duration) || (!down && n.duration)) completed++;
     await expect(page.locator(".rhythm-stats > span").nth(2)).toContainText(`${completed}/${notes.length}`);
-    await expect(page.locator(".rhythm-stats > span").first().locator("b")).toHaveText(String(completed * 10));
+    await expect(page.locator(".rhythm-stats > span").first().locator("b")).toHaveText(String(scoreFromUnits(unitsForStreak(completed))));
   }
   await page.evaluate(ms => { (window as typeof window & { rhythmTime: number }).rhythmTime = (ms + 3000) / 1000; }, DURATION);
-  await expect(page.getByRole("heading", { name: "Bạn đã bắt được nhịp!" })).toBeVisible();
+  await expect(page.getByRole("heading", { name: "Giai điệu của bạn" })).toBeVisible();
   await expect(page.locator(".rhythm-result")).toContainText(`${notes.length}/${notes.length}`);
+  await expect(page.locator(".rhythm-result-score")).toHaveText(`${MAX_SCORE}/ ${MAX_SCORE} điểm`);
   await page.getByRole("button", { name: "Chơi lại", exact: true }).click();
   await expect(page.getByRole("button", { name: "Lên sân khấu →" })).toBeVisible();
 });
@@ -65,7 +66,7 @@ test("pause and tab hiding freeze play; untouched round ends with zero hits; mob
   expect(await page.evaluate(() => document.documentElement.scrollHeight)).toBe(568);
   expect(await page.evaluate(() => document.documentElement.scrollWidth)).toBe(320);
   await page.evaluate(ms => { (window as typeof window & { rhythmTime: number }).rhythmTime = (ms + 3000) / 1000; }, DURATION);
-  await expect(page.getByRole("heading", { name: "Giai điệu vẫn chờ bạn" })).toBeVisible();
+  await expect(page.getByRole("heading", { name: "Giai điệu của bạn" })).toBeVisible();
   await expect(page.locator(".rhythm-result")).toContainText(`0/${notes.length}`);
 });
 
@@ -74,9 +75,9 @@ test("miss penalty and touch hold cancellation apply once, even outside the pad"
   await setup(page);
   await time(page, notes[0].at);
   await page.locator(".rhythm-pads button").nth(notes[0].lane).click();
-  await expect(page.locator(".rhythm-stats > span").first().locator("b")).toHaveText("10");
+  await expect(page.locator(".rhythm-stats > span").first().locator("b")).toHaveText(String(scoreFromUnits(100)));
   await time(page, notes[1].at + GOOD + 1);
-  await expect(page.locator(".rhythm-stats > span").first().locator("b")).toHaveText("5");
+  await expect(page.locator(".rhythm-stats > span").first().locator("b")).toHaveText(String(scoreFromUnits(50)));
   const n = notes.find(note => note.duration)!;
   await time(page, n.at);
   const pad = page.locator(".rhythm-pads button").nth(n.lane);
@@ -112,7 +113,7 @@ test("keyboard long note survives pause only after pressing again, then scores o
   await expect(pad).toHaveAttribute("data-holding", "true");
   await time(page, n.at + n.duration);
   await page.keyboard.up(key);
-  await expect(page.locator(".rhythm-stats > span").first().locator("b")).toHaveText("10");
+  await expect(page.locator(".rhythm-stats > span").first().locator("b")).toHaveText(String(scoreFromUnits(100)));
   await expect(pad).toHaveAttribute("aria-pressed", "false");
 });
 
@@ -141,5 +142,5 @@ test("following notes scroll visibly behind the hold tail and reach the line aft
   await expect(following).toBeVisible();
   await time(page, next.at);
   await page.keyboard.press(["d", "f", "j", "k"][next.lane]);
-  await expect(page.locator(".rhythm-stats > span").first().locator("b")).toHaveText("20");
+  await expect(page.locator(".rhythm-stats > span").first().locator("b")).toHaveText(String(scoreFromUnits(unitsForStreak(2))));
 });

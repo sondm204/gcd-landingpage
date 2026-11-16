@@ -162,30 +162,13 @@ Animation dùng **Motion for React** cho khách đến/rời quầy, món lên/x
 
 ### 4.3. Chặng 3 — BẮT NHỊP DI SẢN (Dấu Đôi tai)
 
-**Bản thử triển khai — `/game/rhythm`:** 4 làn, chuột/cảm ứng hoặc D–F–J–K, 3 giây đếm trước, 60 giây chính thức. Nhịp tăng dần 100 → 200 BPM, khoảng cách nốt và thời gian rơi cùng giảm dần. Đúng ≥60% nốt để đạt. Chấm Tuyệt khi lệch ≤75ms, Được khi ≤160ms; cả hai cùng +10 điểm, không cộng thưởng combo. Mỗi nốt hụt, thả sớm hoặc chạm sai trừ 5 điểm; điểm thấp nhất 0. Mỗi nốt chỉ được tính một lần. Có nốt dài với đuôi sáng: phải nhấn đúng đầu nốt rồi giữ tới hết đuôi (dung sai nhả sớm 80ms), chỉ cộng điểm khi hoàn thành. Giữ sẵn nút trước khi nốt tới không tự bắt nốt. Chặn lặp phím và chạm cùng làn dưới 120ms; hỗ trợ nhiều ngón tay và bắt con trỏ khi kéo ra ngoài nút.
+Bản thử `/game/rhythm`: 60 giây, 4 làn D–F–J–K, có đếm ngược 3 giây. Nhạc và nốt tăng tốc 100 → 200 BPM. Không có điều kiện đạt/trượt chặng; cuối lượt hiển thị điểm, số nốt đúng, độ chính xác và chuỗi dài nhất.
 
-Nhạc nền nguyên bản qua Web Audio gồm giai điệu ngũ cung, hợp âm, bass và nhịp gõ; không thay thế bản thu nghệ nhân. Beatmap, nhạc nền và tiếng nốt dùng cùng `AudioContext.currentTime`, cùng tăng tốc và cùng tạm dừng, không dùng hai timer độc lập. Tự tạm dừng khi tab ẩn hoặc cửa sổ mất focus, cần chạm Tiếp tục để mở lại âm thanh. Nốt dài đang giữ phải nhấn giữ lại trong 750ms sau khi tiếp tục; không tự ghi điểm khi không giữ nút. Có tắt âm và toàn màn hình; rời game/kết thúc đóng AudioContext. Chế độ sự kiện hiện dùng cùng bản thử 60 giây. Kết quả chưa lưu hộ chiếu/chưa dùng đổi quà. Các thông số cửa sổ nhịp và thang điểm thay được ở `app/game/rhythm/engine.ts`.
+**Điểm tối đa 300:** mỗi nốt đúng thứ k trong chuỗi nhận `100 + k − 1` đơn vị. Chuỗi càng dài, mỗi nốt càng có giá trị. Hụt nốt, thả sớm hoặc bấm sai trừ 50 đơn vị và đặt chuỗi về 0. Tổng đơn vị tối đa là `N × (N + 199) / 2`; điểm hiển thị `round(300 × đơn vị tích lũy / đơn vị tối đa)`, giới hạn 0–300. Chỉ làm tròn tổng điểm để tránh sai số tích lũy. Đúng toàn bộ, giữ chuỗi trọn lượt đạt đúng 300 điểm. Cả Tuyệt (≤75ms) và Được (≤160ms) đều nối dài chuỗi.
 
-Các nốt tiếp theo vẫn xuất hiện và rơi bình thường phía sau đuôi nốt dài trên cả bốn làn. Thời điểm tới vạch của nốt kế tiếp cách cuối đuôi ít nhất 280ms (160ms cửa sổ nhịp + 120ms chuyển nút), để người chơi giữ xong rồi mới bấm nốt tiếp theo; không yêu cầu vừa giữ vừa bấm làn khác. Lịch nốt nằm trên lưới nhịp tăng tốc, nhạc đệm phát liên tục. Thả sớm hoặc bỏ lỡ không làm thay đổi lịch rơi.
+Nốt dài chỉ nối chuỗi và nhận điểm một lần khi giữ đủ. Nốt sau vẫn rơi phía sau đuôi nốt dài, không yêu cầu bấm làn khác khi đang giữ. Có chuỗi hiện tại, chuỗi dài nhất và điểm nốt tiếp theo hiển thị trực tiếp.
 
-**Chủ đề:** Quan họ, Ca trù, Chèo, Xẩm. Bài học: muốn cất tiếng trước hết phải biết lắng nghe.
-
-**Gameplay:** Nhạc phát, các nốt rơi xuống theo nhịp phách. Người chơi **chạm đúng lúc nốt chạm vạch** (rhythm game).
-
-**Luật ONLINE [Đã nêu trong đề xuất]:**
-
-- Một đoạn nhạc **60 giây**, tăng tốc dần và có nốt dài cần giữ.
-- Chấm ba mức: **Tuyệt / Được / Trượt**.
-- Nốt đúng +10 điểm; hụt, thả sớm hoặc chạm sai −5 điểm, thấp nhất 0. Combo dùng theo dõi chuỗi đúng.
-- **Chạm đúng ít nhất 60% số nốt** để vượt chặng.
-
-**Bản SỰ KIỆN:** Giữ nhịp **60 giây** trên điện thoại.
-
-**Thử thách thực tế:** Gõ phách theo nghệ nhân trong **15 giây**.
-
-**Lưu ý [Đã nêu trong đề xuất]:** Cần bản thu có **quyền sử dụng**; gợi ý thu riêng cùng nghệ nhân.
-
-**[Cần xác nhận]:** Track nhạc, số lane và nốt, độ lệch nhịp được tính từng mức, cách vận hành trên nhiều loại điện thoại, xử lý nhạc không tự phát do chính sách trình duyệt.
+Nhạc nền ngũ cung nguyên bản qua Web Audio cùng đồng hồ với nốt; có tắt âm, toàn màn hình, tạm dừng khi tab ẩn hoặc cửa sổ mất focus. Sau khi tiếp tục, nốt dài đang dở phải được nhấn giữ lại trong 750ms. Kết quả bản thử chưa lưu vào hộ chiếu/chưa dùng đổi quà. Hai chế độ dùng cùng luật tính điểm.
 
 ### 4.4. Chặng 4 — ĐÂY LÀ ĐÂU? (Dấu Đôi chân)
 

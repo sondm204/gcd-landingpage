@@ -26,19 +26,27 @@ for (const at of beats) {
   }
 }
 export const notes: Note[] = chart;
+export const MAX_SCORE = 300;
+export const unitsForNote = (streak: number) => 100 + Math.max(0, streak - 1);
+export const unitsForStreak = (length: number) => length * (length + 199) / 2;
+const MAX_UNITS = unitsForStreak(notes.length);
+// Keep integer rhythm units; normalize only the displayed score to avoid rounding drift.
+export const scoreFromUnits = (units: number) => Math.round(Math.min(MAX_SCORE, Math.max(0, units) / MAX_UNITS * MAX_SCORE));
+export const pointsForNextNote = (streak: number) => unitsForNote(streak + 1) / MAX_UNITS * MAX_SCORE;
+function scoring(units: number) { const scoreUnits = Math.max(0, Math.min(MAX_UNITS, units)); return { scoreUnits, score: scoreFromUnits(scoreUnits) }; }
 export type Grade = "perfect" | "good" | "miss";
 type Hold = { noteId: number; grade: Exclude<Grade, "miss">; resumeUntil: number | null };
 export type State = {
   phase: "ready" | "playing" | "paused" | "result";
   elapsed: number; judgments: (Grade | null)[]; holds: (Hold | null)[]; pressed: boolean[];
-  score: number; combo: number; maxCombo: number; feedback: string;
+  score: number; scoreUnits: number; combo: number; maxCombo: number; feedback: string;
   lastLane: number; feedbackId: number; wrong: number; lastInput: number[];
 };
 export type Action = { type: "start" } | { type: "reset" } | { type: "pause" } | { type: "resume" }
   | { type: "tick"; elapsed: number } | { type: "hit"; lane: number; elapsed: number }
   | { type: "release"; lane: number; elapsed: number };
 export function initialState(): State {
-  return { phase: "ready", elapsed: -LEAD_IN, judgments: notes.map(() => null), holds: [null, null, null, null], pressed: [false, false, false, false], score: 0, combo: 0, maxCombo: 0, feedback: "Sẵn sàng bắt nhịp", lastLane: -1, feedbackId: 0, wrong: 0, lastInput: [-9999, -9999, -9999, -9999] };
+  return { phase: "ready", elapsed: -LEAD_IN, judgments: notes.map(() => null), holds: [null, null, null, null], pressed: [false, false, false, false], score: 0, scoreUnits: 0, combo: 0, maxCombo: 0, feedback: "Sẵn sàng bắt nhịp", lastLane: -1, feedbackId: 0, wrong: 0, lastInput: [-9999, -9999, -9999, -9999] };
 }
 function judge(s: State, id: number, grade: Grade): State {
   if (s.judgments[id] !== null) return s;
@@ -46,7 +54,7 @@ function judge(s: State, id: number, grade: Grade): State {
   const holds = [...s.holds];
   if (holds[notes[id].lane]?.noteId === id) holds[notes[id].lane] = null;
   const combo = grade === "miss" ? 0 : s.combo + 1;
-  return { ...s, judgments, holds, combo, maxCombo: Math.max(combo, s.maxCombo), score: Math.max(0, s.score + (grade === "miss" ? -5 : 10)), feedback: grade === "miss" ? "Trượt · −5" : grade === "perfect" ? "Tuyệt! +10" : "Được! +10", feedbackId: s.feedbackId + 1, lastLane: grade === "miss" ? -1 : notes[id].lane };
+  return { ...s, judgments, holds, combo, maxCombo: Math.max(combo, s.maxCombo), ...scoring(s.scoreUnits + (grade === "miss" ? -50 : unitsForNote(combo))), feedback: grade === "miss" ? "Trượt · Ngắt chuỗi" : grade === "perfect" ? "Tuyệt!" : "Được!", feedbackId: s.feedbackId + 1, lastLane: grade === "miss" ? -1 : notes[id].lane };
 }
 function advance(s: State, elapsed: number): State {
   let next = { ...s, elapsed: Math.min(DURATION, elapsed) };
@@ -88,7 +96,7 @@ export function reducer(s: State, a: Action): State {
   const lastInput = [...next.lastInput]; lastInput[a.lane] = next.elapsed;
   const note = notes.filter(n => n.lane === a.lane && next.judgments[n.id] === null && Math.abs(n.at - next.elapsed) <= GOOD)
     .sort((a1, b) => Math.abs(a1.at - next.elapsed) - Math.abs(b.at - next.elapsed))[0];
-  if (!note) return { ...next, pressed, lastInput, wrong: next.wrong + 1, score: Math.max(0, next.score - 5), combo: 0, feedback: "Lệch nhịp · −5", feedbackId: next.feedbackId + 1, lastLane: -1 };
+  if (!note) return { ...next, pressed, lastInput, wrong: next.wrong + 1, ...scoring(next.scoreUnits - 50), combo: 0, feedback: "Lệch nhịp", feedbackId: next.feedbackId + 1, lastLane: -1 };
   const grade = Math.abs(note.at - next.elapsed) <= PERFECT ? "perfect" : "good";
   if (note.duration) {
     const holds = [...next.holds]; holds[a.lane] = { noteId: note.id, grade, resumeUntil: null };

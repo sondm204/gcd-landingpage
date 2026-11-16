@@ -2,7 +2,7 @@
 import Link from "next/link";
 import { useSearchParams } from "next/navigation";
 import { useCallback, useEffect, useReducer, useRef, useState } from "react";
-import { DURATION, GOOD, beatInterval, initialState, notes, reducer, travelTime } from "./engine";
+import { DURATION, GOOD, MAX_SCORE, pointsForNextNote, beatInterval, initialState, notes, reducer, travelTime } from "./engine";
 import { useRhythmAudio } from "./use-rhythm-audio";
 import { useGameFullscreen } from "../hooks/use-game-fullscreen";
 
@@ -23,7 +23,6 @@ function Game({ event }: { event: boolean }) {
   const hits = state.judgments.filter(v => v === "perfect" || v === "good").length;
   const perfect = state.judgments.filter(v => v === "perfect").length;
   const good = state.judgments.filter(v => v === "good").length;
-  const passed = hits / notes.length >= .6;
   const playing = state.phase === "playing";
   const countdown = Math.ceil(-state.elapsed / 1000);
   const travel = travelTime(state.elapsed);
@@ -91,11 +90,11 @@ function Game({ event }: { event: boolean }) {
       <div className="rhythm-disc" aria-hidden="true"><span>♪</span></div>
       <h2>Lắng nghe. Chạm đúng. Giữ nhịp.</h2>
       <p>Những âm thanh đang tìm đường trở về. Để đôi tai dẫn lối, theo nhịp phách và thắp sáng từng làn âm sắc.</p>
-      <div className="rhythm-rules"><span><b>60 giây</b>nhanh dần về cuối</span><span><b>4 làn</b>D · F · J · K</span><span><b>60%</b>nốt đúng để đạt</span></div>
+      <div className="rhythm-rules"><span><b>60 giây</b>nhanh dần về cuối</span><span><b>4 làn</b>D · F · J · K</span><span><b>{MAX_SCORE}</b>điểm tối đa</span></div>
       <ol>
         <li>Chờ đếm ngược 3 nhịp. Chạm nút cùng làn khi tâm nốt chạm vạch vàng; dùng hai tay hoặc phím D–F–J–K.</li>
         <li>Nốt có đuôi: nhấn và giữ nút đến khi toàn bộ đuôi đi qua vạch. Thả sớm sẽ tính là hụt. Các nốt tiếp theo rơi phía sau đuôi nốt dài và chỉ tới vạch khi đã giữ xong.</li>
-        <li>Mỗi nốt đúng +10 điểm. Bỏ lỡ, thả sớm hoặc chạm lệch nhịp −5 điểm, ngắt combo. Điểm thấp nhất là 0.</li>
+        <li>Tối đa {MAX_SCORE} điểm. Mỗi nốt đúng nối dài chuỗi và tăng điểm cho nốt tiếp theo. Hụt, thả sớm hoặc bấm sai sẽ ngắt chuỗi, trừ nửa giá trị nốt cơ bản. Điểm thấp nhất là 0.</li>
       </ol>
       <p className="rhythm-note">Nhạc nền ngũ cung nguyên bản với giai điệu, hợp âm và nhịp gõ tăng tốc cùng màn chơi; chưa phải bản thu Quan họ, Ca trù, Chèo hay Xẩm. Game tự tạm dừng khi rời tab.</p>
       <button className="rhythm-primary" disabled={starting} onClick={() => void start()}>{starting ? "Đang mở âm thanh…" : "Lên sân khấu →"}</button>
@@ -104,8 +103,8 @@ function Game({ event }: { event: boolean }) {
     </section>}
     {(playing || state.phase === "paused") && <>
       <header className="rhythm-heading"><h1>Bắt nhịp di sản</h1><button onClick={() => void pause()} disabled={!playing}>Tạm dừng</button></header>
-      <div className="rhythm-stats"><span><small>ĐIỂM</small><b>{state.score}</b></span><span><small>COMBO</small><b>×{state.combo}</b></span><span><small>NỐT ĐÚNG</small><b>{hits}/{notes.length}</b></span><span><small>CÒN LẠI</small><b role="timer">{Math.ceil((DURATION - Math.max(0, state.elapsed)) / 1000)}s</b></span></div>
-      <div className="rhythm-feedback" aria-live="off"><b key={state.feedbackId} className={state.feedback.startsWith("Tuyệt") ? "perfect" : state.feedback.startsWith("Được") ? "good" : ""}>{state.elapsed < 0 ? "Theo nhịp đếm rồi bắt đầu nhé" : state.feedback}</b><small>Đúng +10 · Hụt −5 · {Math.round(60000 / beatInterval(state.elapsed))} BPM · Mục tiêu {Math.ceil(notes.length * .6)} nốt</small></div>
+      <div className="rhythm-stats"><span><small>ĐIỂM</small><b>{state.score}</b></span><span><small>CHUỖI ĐÚNG</small><b>×{state.combo}</b></span><span><small>NỐT ĐÚNG</small><b>{hits}/{notes.length}</b></span><span><small>CÒN LẠI</small><b role="timer">{Math.ceil((DURATION - Math.max(0, state.elapsed)) / 1000)}s</b></span></div>
+      <div className="rhythm-feedback" aria-live="off"><b key={state.feedbackId} className={state.feedback.startsWith("Tuyệt") ? "perfect" : state.feedback.startsWith("Được") ? "good" : ""}>{state.elapsed < 0 ? "Theo nhịp đếm rồi bắt đầu nhé" : state.feedback}</b><small>Tối đa {MAX_SCORE} điểm · {Math.round(60000 / beatInterval(state.elapsed))} BPM · Nốt tiếp +{pointsForNextNote(state.combo).toFixed(2)}đ</small></div>
       <section className="rhythm-stage" aria-label="Sân khấu bốn làn" data-elapsed={Math.round(state.elapsed)}>
         <div className="rhythm-lanes" aria-hidden="true">{keys.map((key, lane) => <div key={key} className="rhythm-lane" data-lane={lane}>
           {notes.filter(n => n.lane === lane && state.judgments[n.id] === null && n.at - state.elapsed <= travel && (state.holds[lane]?.noteId === n.id || n.at - state.elapsed >= -GOOD)).map(n => {
@@ -131,6 +130,6 @@ function Game({ event }: { event: boolean }) {
       <p className="rhythm-bottom-note">Nốt ngắn: chạm · Nốt có đuôi: giữ đến hết đuôi</p>
       {state.phase === "paused" && <div className="rhythm-pause" role="dialog" aria-modal="true" aria-label="Game đã tạm dừng"><div><h2>Giữ lại nhịp này</h2><p>Nhạc và nốt đã tạm dừng. Sẵn sàng rồi tiếp tục nhé!</p>{state.holds.some(Boolean) && <p>Nốt dài đang dở: nhấn giữ lại làn đó ngay sau khi tiếp tục (trong 0,75 giây).</p>}<button className="rhythm-primary" autoFocus onClick={() => void resume()}>Tiếp tục →</button><p role="alert">{error}</p><Link href="/game">Về hành trình</Link></div></div>}
     </>}
-    {state.phase === "result" && <section className="rhythm-result"><p className="rhythm-kicker">{passed ? "DẤU ĐÔI TAI · ĐÃ KHÁM PHÁ" : "THỬ LẠI ĐỂ TÌM NHỊP CỦA BẠN"}</p><h1 ref={title} tabIndex={-1}>{passed ? "Bạn đã bắt được nhịp!" : "Giai điệu vẫn chờ bạn"}</h1><div className="rhythm-result-score">{state.score}<small>điểm</small></div><p>{hits}/{notes.length} nốt đúng · {Math.round(hits / notes.length * 100)}% · Mục tiêu 60%</p><div className="rhythm-results-grid"><span><b>{perfect}</b>Tuyệt</span><span><b>{good}</b>Được</span><span><b>{notes.length - hits}</b>Trượt</span><span><b>{state.maxCombo}</b>Combo cao nhất</span></div><p>Chạm lệch nhịp: {state.wrong} lần. {passed ? "Đôi tai đã tìm lại một mảnh ghép của hành trình." : "Nhìn tâm nốt, lắng nghe nhịp gõ và thử lại nhé!"}</p><button className="rhythm-primary" onClick={() => dispatch({ type: "reset" })}>Chơi lại</button><Link className="rhythm-mode" href="/game">Về hành trình 5 chặng →</Link><small className="rhythm-note">Kết quả bản chơi thử chưa lưu vào hộ chiếu, chưa dùng nhận sticker hay đổi quà.</small></section>}
+    {state.phase === "result" && <section className="rhythm-result"><p className="rhythm-kicker">KẾT THÚC LƯỢT CHƠI</p><h1 ref={title} tabIndex={-1}>Giai điệu của bạn</h1><div className="rhythm-result-score">{state.score}<small>/ {MAX_SCORE} điểm</small></div><p>{hits}/{notes.length} nốt đúng · {Math.round(hits / notes.length * 100)}%</p><div className="rhythm-results-grid"><span><b>{perfect}</b>Tuyệt</span><span><b>{good}</b>Được</span><span><b>{notes.length - hits}</b>Trượt</span><span><b>{state.maxCombo}</b>Chuỗi dài nhất</span></div><p>Chạm lệch nhịp: {state.wrong} lần. Tiếp tục luyện tập để nối dài chuỗi đúng nhé!</p><button className="rhythm-primary" onClick={() => dispatch({ type: "reset" })}>Chơi lại</button><Link className="rhythm-mode" href="/game">Về hành trình 5 chặng →</Link><small className="rhythm-note">Kết quả bản chơi thử chưa lưu vào hộ chiếu, chưa dùng nhận sticker hay đổi quà.</small></section>}
   </div></main>;
 }
