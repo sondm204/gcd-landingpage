@@ -54,6 +54,9 @@
 .booth-map-canvas svg { display: block; width: 100%; }
 .booth-map-building { fill: #fff6e3; font-size: 16px; font-weight: 600; }
 .booth-map-spot { cursor: pointer; outline: none; }
+.booth-confirmed-logo { position: relative; display: grid; place-items: center; width: min(120px, 100%); aspect-ratio: 1; flex-shrink: 0; margin: 0 0 18px; border: 1px solid #d7e1ef; border-radius: 10px; background: #fff; overflow: hidden; }
+.booth-confirmed-logo img { box-sizing: border-box; width: 100%; height: 100%; object-fit: contain; padding: 8px; }
+.booth-confirmed-logo > span { font-size: 28px; font-weight: 700; color: #315b96; }
 .booth-map-spot-shadow { fill: #3c3d3020; }
 .booth-map-spot-fill { fill: #ffffff; stroke: #9db8dd; stroke-width: 1.5; }
 .booth-map-spot text { fill: #4a5b43; font-size: 15px; font-weight: 600; pointer-events: none; }

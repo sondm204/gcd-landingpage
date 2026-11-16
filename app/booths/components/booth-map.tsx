@@ -5,6 +5,7 @@ import { BOOTH_ZONES, zonePositionCount, type BoothPosition } from "@/lib/booths
 
 export default function BoothMap({ positions, selected, onSelect }: { positions: BoothPosition[]; selected: number; onSelect: (id: number) => void }) {
   const [zoom, setZoom] = useState(1);
+  const [failedLogos, setFailedLogos] = useState<Set<string>>(() => new Set());
   const markerId = useId().replace(/:/g, "");
   return <div className="booth-map-card">
     <div className="booth-map-top"><div><span className="booth-kicker">MẶT BẰNG DỰ KIẾN · 34 GIAN</span><h2>Chọn gian thương mại hoặc tài trợ.</h2></div><div className="booth-map-tools"><button type="button" aria-label="Thu nhỏ sơ đồ" disabled={zoom <= 1} onClick={() => setZoom(Math.max(1, zoom - .5))}>−</button><button type="button" aria-label="Đặt lại sơ đồ" onClick={() => setZoom(1)}>⟲</button><button type="button" aria-label="Phóng to sơ đồ" disabled={zoom >= 3} onClick={() => setZoom(Math.min(3, zoom + .5))}>+</button></div></div>
@@ -54,10 +55,14 @@ export default function BoothMap({ positions, selected, onSelect }: { positions:
             }
             const status=booth.is_booked ? "Đã xác nhận" : booth.pending_count ? `${booth.pending_count} đề xuất, vẫn nhận thêm` : "Đang nhận đề xuất";
             const color=BOOTH_ZONES.find(z=>z.name===booth.zone)?.color;
+            const logo = booth.is_booked && booth.confirmed_logo_url && !failedLogos.has(booth.confirmed_logo_url) ? booth.confirmed_logo_url : null;
             return <g key={booth.id} className={`booth-map-spot ${booth.is_booked ? "is-booked" : booth.pending_count ? "is-pending" : "is-open"} ${selected===booth.id ? "is-selected" : ""}`} role="button" tabIndex={0} aria-label={`${booth.code} · ${booth.zone} — ${status}`} aria-pressed={selected===booth.id} onClick={()=>onSelect(booth.id)} onKeyDown={e=>{if(e.key==='Enter'||e.key===' '){e.preventDefault();onSelect(booth.id);}}}>
               <title>{booth.code}: {status}{booth.confirmed_brand ? ` · ${booth.confirmed_brand}` : ""}</title>
               <rect className="booth-map-spot-fill" x={x} y={y} width={w} height={h} rx="10" style={{ stroke: color, ...(selected===booth.id || booth.is_booked ? { fill: color } : {}) }} />
-              <text x={x+w/2} y={y+h/2+7} textAnchor="middle" style={{ fontSize: 23, fill: selected===booth.id || booth.is_booked ? "#fff" : color }}>{booth.code}</text>
+              {logo ? <g pointerEvents="none">
+                <defs><clipPath id={`${markerId}-logo-${booth.id}`}><rect x={x+1} y={y+1} width={w-2} height={h-2} rx="9" /></clipPath></defs>
+                <g clipPath={`url(#${markerId}-logo-${booth.id})`}><rect x={x+1} y={y+1} width={w-2} height={h-2} fill="#fff" /><image href={logo} x={x+1} y={y+1} width={w-2} height={h-2} preserveAspectRatio="xMidYMid meet" onError={() => setFailedLogos(previous => new Set(previous).add(logo))} /></g>
+              </g> : <text x={x+w/2} y={y+h/2+7} textAnchor="middle" style={{ fontSize: 23, fill: selected===booth.id || booth.is_booked ? "#fff" : color }}>{booth.code}</text>}
               {selected===booth.id && <rect className="booth-map-spot-outline" x={x-4} y={y-4} width={w+8} height={h+8} rx="13" style={{ stroke: color }} />}
             </g>;
           })}
