@@ -4,6 +4,8 @@ import geometry from "./map-data.json";
 import { MAP_HEIGHT, MAP_WIDTH, bounds, project, unproject, type Coordinate } from "./engine";
 
 type View = { x: number; y: number; width: number; height: number };
+type Pointer = { x: number; y: number };
+type Gesture = { view: View; matrix: DOMMatrix; anchor: DOMPoint; origin: Pointer; distance: number; moved: boolean };
 const overview: View = { x: 0, y: 0, width: MAP_WIDTH, height: MAP_HEIGHT };
 const paths = geometry.map(country => ({ id: country.id, d: country.polygons.map(poly => poly.map(ring => ring.map(([lon, lat], i) => { const p = project({ lon, lat }); return `${i ? "L" : "M"}${p.x.toFixed(2)},${p.y.toFixed(2)}`; }).join("") + "Z").join("")).join("") }));
 function clampView(v: View): View { return { ...v, x: Math.max(0, Math.min(MAP_WIDTH - v.width, v.x)), y: Math.max(0, Math.min(MAP_HEIGHT - v.height, v.y)) }; }
@@ -19,7 +21,10 @@ export default function VietnamMap({ pin, answer, onPick, disabled = false }: { 
   const [view, setView] = useState<View>(overview);
   const svg = useRef<SVGSVGElement>(null);
   const [size, setSize] = useState({ width: MAP_WIDTH, height: MAP_HEIGHT });
-  const drag = useRef<{ id: number; clientX: number; clientY: number; x: number; y: number; moved: boolean; view: View; matrix: DOMMatrix } | null>(null);
+  const currentView = useRef<View>(overview);
+  const pointers = useRef(new Map<number, Pointer>());
+  const gesture = useRef<Gesture | null>(null);
+  const suppressTap = useRef(false);
   const zoomFraction = view.width / MAP_WIDTH;
   // SVG units per CSS pixel: preserve readable labels/pins even in a short mobile map.
   const scale = Math.max(view.width / Math.max(1, size.width), view.height / Math.max(1, size.height));
@@ -29,38 +34,72 @@ export default function VietnamMap({ pin, answer, onPick, disabled = false }: { 
     observer.observe(element); return () => observer.disconnect();
   }, []);
   function zoom(factor: number) {
-    setView(v => { const width = Math.max(MAP_WIDTH / 4, Math.min(MAP_WIDTH, v.width * factor)); const height = width / MAP_WIDTH * MAP_HEIGHT;
-      return clampView({ x: v.x + (v.width - width) / 2, y: v.y + (v.height - height) / 2, width, height }); });
+    const v = currentView.current;
+    const width = Math.max(MAP_WIDTH / 4, Math.min(MAP_WIDTH, v.width * factor));
+    const height = width / MAP_WIDTH * MAP_HEIGHT;
+    updateView({ x: v.x + (v.width - width) / 2, y: v.y + (v.height - height) / 2, width, height });
+  }
+  function updateView(next: View) {
+    currentView.current = clampView(next);
+    setView(currentView.current);
+  }
+  function startGesture() {
+    const points = [...pointers.current.values()];
+    const matrix = svg.current?.getScreenCTM()?.inverse();
+    if (!points.length || !matrix) { gesture.current = null; return; }
+    const [a, b] = points;
+    const origin = b ? { x: (a.x + b.x) / 2, y: (a.y + b.y) / 2 } : a;
+    gesture.current = { view: currentView.current, matrix, origin,
+      anchor: new DOMPoint(origin.x, origin.y).matrixTransform(matrix),
+      distance: b ? Math.max(1, Math.hypot(b.x - a.x, b.y - a.y)) : 0, moved: suppressTap.current };
+  }
+  function finishPointer(id: number, cancelled = false) {
+    const point = pointers.current.get(id);
+    if (!point) return;
+    const g = gesture.current;
+    if (!cancelled && pointers.current.size === 1 && g && !g.moved && !suppressTap.current && !disabled) {
+      const matrix = svg.current?.getScreenCTM()?.inverse();
+      if (matrix) {
+        const p = new DOMPoint(point.x, point.y).matrixTransform(matrix);
+        if (p.x >= 0 && p.y >= 0 && p.x <= MAP_WIDTH && p.y <= MAP_HEIGHT) onPick(unproject(p.x, p.y));
+      }
+    }
+    pointers.current.delete(id);
+    // Rebase after lifting either finger; the remaining finger may keep panning.
+    if (!pointers.current.size) { gesture.current = null; suppressTap.current = false; }
+    else { suppressTap.current = true; startGesture(); }
   }
   function label(text: string, point: Coordinate, className = "") { const p = project(point); return <text key={text} x={p.x} y={p.y} textAnchor="middle" fontSize={11 * scale} className={className}>{text}</text>; }
   const target = answer ? project(answer) : null;
   const guess = pin ? project(pin) : null;
   return <div className="place-map-shell">
-    <div className="place-map-tools" role="group" aria-label="Điều khiển bản đồ"><button type="button" aria-label="Phóng to bản đồ" disabled={zoomFraction <= .25} onClick={() => zoom(.65)}>+</button><button type="button" aria-label="Thu nhỏ bản đồ" disabled={zoomFraction >= 1} onClick={() => zoom(1 / .65)}>−</button><button type="button" aria-label="Xem toàn bộ bản đồ" onClick={() => setView(overview)}>⌂</button></div>
-    <svg ref={svg} className="place-map" viewBox={`${view.x} ${view.y} ${view.width} ${view.height}`} role="group" tabIndex={0} aria-label="Bản đồ Việt Nam. Chạm để ghim; kéo để di chuyển. Có thể dùng các phím mũi tên để chỉnh ghim." data-zoom={Math.round(1 / zoomFraction * 100)} data-guess-lat={pin?.lat} data-guess-lon={pin?.lon}
+    <div className="place-map-tools" role="group" aria-label="Điều khiển bản đồ"><button type="button" aria-label="Phóng to bản đồ" disabled={zoomFraction <= .25} onClick={() => zoom(.65)}>+</button><button type="button" aria-label="Thu nhỏ bản đồ" disabled={zoomFraction >= 1} onClick={() => zoom(1 / .65)}>−</button><button type="button" aria-label="Xem toàn bộ bản đồ" onClick={() => updateView(overview)}>⌂</button></div>
+    <svg ref={svg} className="place-map" viewBox={`${view.x} ${view.y} ${view.width} ${view.height}`} role="group" tabIndex={0} aria-label="Bản đồ Việt Nam. Chạm để ghim; kéo một ngón để di chuyển; chụm hoặc tách hai ngón để thu phóng. Có thể dùng các phím mũi tên để chỉnh ghim." data-zoom={Math.round(1 / zoomFraction * 100)} data-guess-lat={pin?.lat} data-guess-lon={pin?.lon}
       onPointerDown={e => {
-        if (e.button !== 0 || (e.pointerType === "touch" && !e.isPrimary)) return;
-        const matrix = svg.current?.getScreenCTM()?.inverse(); if (!matrix) return;
-        const p = new DOMPoint(e.clientX, e.clientY).matrixTransform(matrix);
-        drag.current = { id: e.pointerId, clientX: e.clientX, clientY: e.clientY, x: p.x, y: p.y, moved: false, view, matrix };
+        if (e.pointerType !== "touch" && e.button !== 0) return;
+        pointers.current.set(e.pointerId, { x: e.clientX, y: e.clientY });
+        if (pointers.current.size > 1) suppressTap.current = true;
+        startGesture();
         e.currentTarget.setPointerCapture(e.pointerId);
       }}
       onPointerMove={e => {
-        const d = drag.current; if (!d || d.id !== e.pointerId) return;
-        if (Math.hypot(e.clientX - d.clientX, e.clientY - d.clientY) > 6) d.moved = true;
-        if (!d.moved) return;
-        const p = new DOMPoint(e.clientX, e.clientY).matrixTransform(d.matrix);
-        setView(clampView({ ...d.view, x: d.view.x - (p.x - d.x), y: d.view.y - (p.y - d.y) }));
+        if (!pointers.current.has(e.pointerId)) return;
+        pointers.current.set(e.pointerId, { x: e.clientX, y: e.clientY });
+        const g = gesture.current; if (!g) return;
+        const [a, b] = [...pointers.current.values()];
+        const center = b ? { x: (a.x + b.x) / 2, y: (a.y + b.y) / 2 } : a;
+        if (b || Math.hypot(center.x - g.origin.x, center.y - g.origin.y) > 6) { g.moved = true; suppressTap.current = true; }
+        if (!g.moved) return;
+        const p = new DOMPoint(center.x, center.y).matrixTransform(g.matrix);
+        const width = b && g.distance ? Math.max(MAP_WIDTH / 4, Math.min(MAP_WIDTH, g.view.width * g.distance / Math.max(1, Math.hypot(b.x - a.x, b.y - a.y)))) : g.view.width;
+        const ratio = width / g.view.width;
+        updateView({ x: g.anchor.x - (p.x - g.view.x) * ratio, y: g.anchor.y - (p.y - g.view.y) * ratio, width, height: g.view.height * ratio });
       }}
       onPointerUp={e => {
-        const d = drag.current; if (!d || d.id !== e.pointerId) return;
-        drag.current = null;
-        if (d.moved || disabled) return;
-        const matrix = svg.current?.getScreenCTM()?.inverse(); if (!matrix) return;
-        const p = new DOMPoint(e.clientX, e.clientY).matrixTransform(matrix);
-        if (p.x >= 0 && p.y >= 0 && p.x <= MAP_WIDTH && p.y <= MAP_HEIGHT) onPick(unproject(p.x, p.y));
+        if (pointers.current.has(e.pointerId)) pointers.current.set(e.pointerId, { x: e.clientX, y: e.clientY });
+        finishPointer(e.pointerId);
       }}
-      onPointerCancel={() => { drag.current = null; }} onLostPointerCapture={() => { drag.current = null; }}
+      onPointerCancel={e => finishPointer(e.pointerId, true)} onLostPointerCapture={e => finishPointer(e.pointerId, true)}
       onKeyDown={e => {
         if (e.key === "+" || e.key === "-") { e.preventDefault(); zoom(e.key === "+" ? .65 : 1 / .65); return; }
         if (disabled || !["ArrowUp", "ArrowDown", "ArrowLeft", "ArrowRight"].includes(e.key)) return;
@@ -69,7 +108,8 @@ export default function VietnamMap({ pin, answer, onPick, disabled = false }: { 
         const step = .25 * zoomFraction;
         const next = { lat: Math.max(bounds.south, Math.min(bounds.north, p.lat + (e.key === "ArrowUp" ? step : e.key === "ArrowDown" ? -step : 0))), lon: Math.max(bounds.west, Math.min(bounds.east, p.lon + (e.key === "ArrowRight" ? step : e.key === "ArrowLeft" ? -step : 0))) };
         const pos = project(next);
-        setView(v => clampView({ ...v, x: pos.x - v.width / 2, y: pos.y - v.height / 2 })); onPick(next);
+        const v = currentView.current;
+        updateView({ ...v, x: pos.x - v.width / 2, y: pos.y - v.height / 2 }); onPick(next);
       }}>
       <rect width={MAP_WIDTH} height={MAP_HEIGHT} fill="#e3eef0" />
       <g className="place-grid">{[104, 108, 112, 116].map(lon => <line key={lon} x1={project({ lat: 24, lon }).x} x2={project({ lat: 24, lon }).x} y1="0" y2={MAP_HEIGHT} />)}{[8, 12, 16, 20, 24].map(lat => <line key={lat} y1={project({ lat, lon: 101 }).y} y2={project({ lat, lon: 101 }).y} x1="0" x2={MAP_WIDTH} />)}</g>

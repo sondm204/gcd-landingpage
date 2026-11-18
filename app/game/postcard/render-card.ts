@@ -1,16 +1,21 @@
 import { frames, type Draft } from "./model";
 import { places } from "../place/engine";
+import { postcardArtworkUrl } from "./postcard-art";
 
 /** Local photograph + canvas text only; no remote assets or user uploads. */
 export async function renderCard(draft: Draft) {
   const place = places[draft.place];
   const frame = frames.find(f => f.id === draft.frame) || frames[0];
   const image = new window.Image(); image.src = place.image;
-  await Promise.all([image.decode(), document.fonts.ready]);
+  const paper = new window.Image(); paper.src = postcardArtworkUrl(frame);
+  await Promise.all([image.decode(), paper.decode(), document.fonts.ready]);
   const canvas = document.createElement("canvas"); canvas.width = 1200; canvas.height = 1500;
   const ctx = canvas.getContext("2d"); if (!ctx) throw new Error("Thiết bị chưa hỗ trợ xuất postcard.");
-  ctx.fillStyle = frame.paper; ctx.fillRect(0, 0, 1200, 1500);
-  ctx.strokeStyle = frame.accent; ctx.lineWidth = 2; ctx.strokeRect(24, 24, 1152, 1452);
+  ctx.drawImage(paper, 0, 0, 1200, 1500);
+  ctx.save();
+  ctx.shadowColor = "#2c261d33"; ctx.shadowBlur = 18; ctx.shadowOffsetY = 6;
+  ctx.fillStyle = "#fffdf8"; ctx.fillRect(52, 100, 1096, 706);
+  ctx.restore();
   ctx.fillStyle = frame.ink; ctx.textAlign = "left"; ctx.font = "600 17px Arial";
   ctx.fillText("FROM VIETNAM, WITH HERITAGE", 60, 76);
   ctx.textAlign = "right"; ctx.fillText("GCD 2026", 1140, 76);

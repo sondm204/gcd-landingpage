@@ -8,6 +8,7 @@ import { useGameFullscreen } from "../hooks/use-game-fullscreen";
 import { frames, initialDraft, MAX_WORDS, restoreDraft, validMessage, wordCount, type Draft } from "./model";
 import { renderCard } from "./render-card";
 import PostcardRecorder from "./postcard-recorder";
+import { postcardArtworkUrl } from "./postcard-art";
 
 const storageKey = "gcd-postcard-draft-v1";
 export default function PostcardGame() {
@@ -21,6 +22,7 @@ export default function PostcardGame() {
   const ready = rendered.key === key && Boolean(rendered.url);
   const place = places[draft.place];
   const frame = frames.find(f => f.id === draft.frame) || frames[0];
+  const artwork = useMemo(() => postcardArtworkUrl(frame), [frame]);
   async function download() {
     if (!valid) return;
     try {
@@ -54,7 +56,7 @@ export default function PostcardGame() {
     {phase === "intro" ? <section className="post-intro"><p className="post-kicker">CHẶNG 05 · DẤU TIẾNG NÓI · {event ? "SỰ KIỆN" : "ONLINE"}</p><div className="post-envelope" aria-hidden="true">✉<span>FROM VIETNAM</span></div><h1>Đại sứ <em>di sản</em></h1><p>Một tấm thiệp nhỏ.<br />Mang câu chuyện Việt đi xa.</p><ol><li>Chọn một điểm đến và khung postcard bạn yêu thích.</li><li>Viết lời giới thiệu tiếng Anh, tối đa 20 từ, bằng góc nhìn của riêng bạn.</li><li>Tải postcard để gửi bạn bè. Bạn có thể quay thêm clip 15 giây đọc lời nhắn.</li></ol><button className="post-primary" onClick={start}>Viết câu chuyện của tôi →</button><small>Bản chơi thử · Tạo và tải trên thiết bị. Chưa gửi ban tổ chức, chưa đăng lên tường postcard hay lưu vào hộ chiếu.</small></section> : <>
       <header className="post-heading"><div><p className="post-kicker">CHẶNG 05 · KỂ CHUYỆN VIỆT RA THẾ GIỚI</p><h1>{phase === "done" ? "Câu chuyện đã sẵn sàng" : "Postcard của bạn"}</h1></div><span className="post-step">{phase === "done" ? "✦ SẴN SÀNG GỬI ĐI" : "ẢNH · KHUNG · LỜI NHẮN"}</span></header>
       <div className="post-layout">
-        <section className="post-preview" aria-label="Xem trước postcard"><div className="post-preview-paper post-live" style={{ background: frame.paper, color: frame.ink, borderColor: frame.accent }}><div className="post-live-top">FROM VIETNAM, WITH HERITAGE <span>GCD 2026</span></div><Image src={place.image} alt={place.name} width={1080} height={690} /><p className="post-live-slogan" style={{ color: frame.accent }}>VIETNAM ROOTS - GLOBAL MINDS</p><h2>{place.name}</h2><p className="post-live-message">{draft.message || "Your story starts here..."}</p><p className="post-live-sender">{draft.sender ? "From " + draft.sender : "A friend from Vietnam"}</p><small>Photo: {place.author} - {place.license}</small></div><p>FROM VIETNAM, WITH HERITAGE</p></section>
+        <section className="post-preview" aria-label="Xem trước postcard"><div className="post-preview-paper post-live" data-frame={frame.id} style={{ backgroundColor: frame.paper, backgroundImage: `url("${artwork}")`, color: frame.ink, borderColor: frame.accent }}><div className="post-live-top">FROM VIETNAM, WITH HERITAGE <span>GCD 2026</span></div><div className="post-live-photo"><Image src={place.image} alt={place.name} width={1080} height={690} /></div><p className="post-live-slogan" style={{ color: frame.accent }}>VIETNAM ROOTS - GLOBAL MINDS</p><h2>{place.name}</h2><p className="post-live-message">{draft.message || "Your story starts here..."}</p><p className="post-live-sender">{draft.sender ? "From " + draft.sender : "A friend from Vietnam"}</p><small>Photo: {place.author} - {place.license}</small></div><p>FROM VIETNAM, WITH HERITAGE</p></section>
         {phase === "edit" ? <section className="post-editor" aria-label="Thiết kế postcard">
           <label className="post-field"><span><b>01</b> Một miền di sản<select value={draft.place} onChange={e => setDraft(d => ({ ...d, place: Number(e.target.value) }))}>{places.map((p, i) => <option key={p.id} value={i}>{p.name}</option>)}</select></span></label>
           <fieldset className="post-frames"><legend><b>02</b> Một sắc màu của bạn</legend>{frames.map(f => <button key={f.id} type="button" aria-pressed={draft.frame === f.id} onClick={() => setDraft(d => ({ ...d, frame: f.id }))}><i style={{ background: f.paper, borderColor: f.ink, color: f.accent }}>✦</i>{f.name}</button>)}</fieldset>

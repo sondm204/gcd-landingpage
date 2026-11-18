@@ -109,6 +109,8 @@ Mỗi lần vượt một chặng:
 
 ### 4.1. Chặng 1 — TIỆM BÁCH NGHỆ (Dấu Đôi tay)
 
+**Hình sản phẩm:** sáu ảnh minh hoạ chất liệu thật (men gốm, lụa, nan mây, giấy, lá và tre), nền trong suốt, WebP cục bộ tại `public/game/craft-shop/`. Kệ hàng, đơn của khách và khay giao hàng dùng chung asset để dễ nhận biết. Nguồn tạo và bộ prompt lưu trong README cùng thư mục.
+
 **Điều chỉnh mới nhất 15/11/2026:** Bản chơi thử dùng lượt **60 giây cho cả hai chế độ**, khách đến liên tục, không giới hạn số đơn và không kết thúc sớm theo số đơn. Mỗi đơn giao đúng trọn bộ/thứ tự được **10 điểm cố định**; chuỗi đúng chỉ là chỉ số, không nhân điểm. Bỏ điều kiện vượt chặng theo số đơn ở giao diện chơi thử, kết thúc hiển thị tổng điểm và số đơn đúng. Kệ có 6 món: bình gốm, khăn lụa, giỏ mây, quạt giấy, nón lá và **chuồn chuồn tre Thạch Xá**. Các quy định về giới hạn đơn/điểm ở mô tả lịch sử bên dưới đã được thay thế trong bản chơi thử.
 
 **Cập nhật bản chơi thử theo yêu cầu 15/11/2026:** Có tối đa 3 khách cùng đứng quầy. Mỗi khách có đơn hiện hình gồm 2–3 món (có thể lặp), phải xếp khớp toàn bộ đơn theo thứ tự trái → phải rồi nhấn Giao hàng. Hệ thống tự tìm khách có đơn khớp; không cần chọn khách. Khay tối đa 3 món, hỗ trợ bỏ từng món hoặc xóa khay. Giao sai giữ nguyên đơn/khay để sửa nhưng ngắt chuỗi đúng. Giao đúng cộng 20 điểm, mỗi đơn đúng liên tiếp thêm 10, tối đa 60 điểm/đơn; khách rời quầy và người mới đến nếu còn đơn.
@@ -178,6 +180,8 @@ Nhạc nền ngũ cung nguyên bản qua Web Audio cùng đồng hồ với nố
 
 Ảnh thật Hạ Long, Chùa Cầu, Ngọ Môn và bản đồ vector tải cục bộ. Bản đồ có nhãn Hoàng Sa/Trường Sa (Việt Nam), phóng to tối đa 4×, kéo để di chuyển; phép đổi tọa độ dùng SVG CTM để ghim đúng khi zoom hoặc có khoảng trống quanh bản đồ. Sau mỗi câu hiện tên di sản, vị trí đúng, ghim đã chọn và vùng 100 km. Chi tiết nguồn, giấy phép ảnh và mức khái quát bản đồ: `public/game/place/README.md`. Dữ liệu địa điểm/ảnh thay ở `app/game/place/engine.ts`.
 
+**Cảm ứng:** kéo một ngón để di chuyển; chụm/tách hai ngón để thu phóng 1–4× quanh trung điểm hai ngón. Có thể kéo tiếp khi nhấc một ngón. Kéo, pinch và thao tác bị huỷ không đặt ghim; chạm đơn sau đó vẫn dùng phép đổi tọa độ hiện tại. Các nút +/−, đặt lại và phím mũi tên vẫn hoạt động.
+
 **Chủ đề:** Di sản thế giới tại Việt Nam. Người chơi nhìn ảnh di sản rồi xác định địa điểm trên bản đồ.
 
 **Gameplay:** Hiển thị ảnh **không kèm tên di sản**. Người chơi chọn **một điểm trên bản đồ** để đặt ghim. Điểm càng gần vị trí thật càng cao.
@@ -197,7 +201,7 @@ Nhạc nền ngũ cung nguyên bản qua Web Audio cùng đồng hồ với nố
 
 ### 4.5. Chặng 5 — ĐẠI SỨ DI SẢN (Dấu Tiếng nói)
 
-**Bản thử `/game/postcard`:** chọn một trong 10 ảnh có sẵn, 3 khung Cội nguồn / Sắc Việt / Vươn xa; viết lời nhắn tiếng Anh 1–20 từ, tối đa 240 ký tự, tên người gửi tối đa 40 ký tự. Không tự chấm chất lượng ngôn ngữ, không tính điểm hay điều kiện vượt chặng. Preview và PNG 1200×1500 dùng chung canvas renderer, có tên điểm đến, lời nhắn và nguồn/giấy phép ảnh. Chỉ cho tải khi bản xem trước khớp nội dung hiện tại và số từ hợp lệ. Bản nháp lưu cục bộ, tự phục hồi khi bắt đầu lại trên cùng trình duyệt. Có chia sẻ file bằng Web Share nếu thiết bị hỗ trợ, nút tải ảnh luôn sẵn sàng.
+**Bản thử `/game/postcard`:** chọn một trong 10 ảnh có sẵn, 3 khung Cội nguồn / Sắc Việt / Vươn xa; viết lời nhắn tiếng Anh 1–20 từ, tối đa 240 ký tự, tên người gửi tối đa 40 ký tự. Không tự chấm chất lượng ngôn ngữ, không tính điểm hay điều kiện vượt chặng. Preview cập nhật chữ trực tiếp bằng DOM, không tạo lại ảnh khi gõ. PNG 1200×1500 chỉ được tạo khi tải; có tên điểm đến, lời nhắn và nguồn/giấy phép ảnh. Preview và PNG dùng chung lớp trang trí từ `postcard-art.ts`: vân/sợi giấy, viền kim sắc, hoa sen / mặt trời trống đồng / sóng nước theo mẫu, cùng khung ảnh có độ nổi. Bản nháp lưu cục bộ, tự phục hồi khi bắt đầu lại trên cùng trình duyệt. Có chia sẻ file bằng Web Share nếu thiết bị hỗ trợ.
 
 Quay clip tối đa 15 giây là tuỳ chọn, chỉ xin camera/micro khi người dùng bấm quay. Có xem lại, tải clip, quay lại; tự dừng khi ẩn tab và giải phóng camera khi rời trang. Clip/ảnh chưa tải lên máy chủ. Bản thử chưa có API gửi/duyệt/tường công khai/bình chọn, chưa cấp điểm hoặc con dấu; các yêu cầu công khai bên dưới dành cho giai đoạn tích hợp backend. Bản sự kiện dùng cùng công cụ sáng tạo. Game mở từ lobby, ẩn site header và hỗ trợ fullscreen theo thiết bị.
 

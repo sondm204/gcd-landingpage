@@ -86,7 +86,7 @@ function Game({ event }: { event: boolean }) {
           </article> : <p className="place-photo-hint">{state.phase === "loading" ? "Đang mở khung hình… Đồng hồ bắt đầu khi ảnh tải xong." : "Nhìn những chi tiết quen thuộc. Đây là miền di sản nào?"}</p>}
         </div>
         <div className="place-map-column"><VietnamMap key={state.round} pin={state.pin} answer={review ? current.point : undefined} disabled={!playing} onPick={point => dispatch({ type: "pin", point, now: performance.now() })} />
-          <p className="place-map-help">{review ? "Ghim xanh: vị trí đúng · Ghim đỏ: bạn chọn · Vòng xanh: 100 km" : "Chạm để ghim · Kéo để dịch chuyển · + / − để phóng to"}</p>
+          <p className="place-map-help">{review ? "Ghim xanh: vị trí đúng · Ghim đỏ: bạn chọn · Vòng xanh: 100 km" : "Chạm để ghim · Kéo một ngón để di chuyển · Chụm/tách hai ngón để zoom"}</p>
         </div>
       </div>
       <div className="place-bottom"><p aria-live="polite">{review ? result?.guess ? "Khoảng cách tính theo đường chim bay." : "Bạn chưa đặt ghim ở khung hình này." : state.pin ? `${state.pin.lat.toFixed(2)}°B · ${state.pin.lon.toFixed(2)}°Đ · Có thể chọn lại` : "Chọn một điểm trên bản đồ để bắt đầu"}</p>
