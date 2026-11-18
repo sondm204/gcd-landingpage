@@ -1,7 +1,7 @@
-.craft-app { background: #f6f2e9; color: #17375b; min-height: calc(100dvh - 78px); padding: 24px 18px 48px; }
+.craft-app { background: #f6f2e9; color: #17375b; min-height: calc(var(--game-viewport-height, 100dvh) - 78px); padding: 24px 18px 48px; }
 .craft-wrap { max-width: 760px; margin: auto; }
 .craft-app[data-active=true] { padding-block: 6px; }
-.craft-app[data-active=true] .craft-wrap { height: calc(100dvh - 12px - env(safe-area-inset-top) - env(safe-area-inset-bottom)); display: flex; flex-direction: column; gap: 5px; }
+.craft-app[data-active=true] .craft-wrap { height: calc(var(--game-viewport-height, 100dvh) - 12px - env(safe-area-inset-top) - env(safe-area-inset-bottom)); display: flex; flex-direction: column; gap: 5px; }
 .craft-app { padding-top: max(6px, env(safe-area-inset-top)); padding-bottom: max(6px, env(safe-area-inset-bottom)); }
 .craft-screen-tools { display: flex; justify-content: space-between; align-items: center; gap: 12px; flex-shrink: 0; font-size: 11px; min-height: 28px; }
 .craft-screen-tools button { background: #fffdf7; border: 1px solid #d9c9a9; border-radius: 5px; padding: 4px 8px; color: #17375b; cursor: pointer; }
@@ -83,3 +83,24 @@
   .craft-notice-space { min-height: 50px; }.craft-notice { font-size: 11px; }.craft-shelf-heading h2 { font-size: 19px; }.craft-shelf-heading > span { font-size: 7px; }.craft-products { grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 6px; }.craft-product { padding-bottom: 6px; }.craft-product svg { height: 57px; margin-bottom: 4px; }.craft-product > span:first-of-type { font-size: 10px; }.craft-product small { font-size: 8px; }.craft-delivery { padding: 10px; margin-top: 12px; }.craft-tray-slot { height: 57px; }.craft-tray-slot svg { height: 50px; }
 }
 @media (prefers-reduced-motion: reduce) { .craft-customer-progress::-webkit-progress-value { transition: none; }.is-angry .craft-person-wrap { animation: none; } }
+
+@media (max-height: 650px) {
+  .craft-app[data-active=true] .craft-wrap { gap: 3px; }
+  .craft-app[data-active=true] .craft-stats > div { gap: 3px; }
+  .craft-app[data-active=true] .craft-stats b, .craft-app[data-active=true] .craft-stats span { line-height: 1.3; }
+  .craft-app[data-active=true] .craft-order-bubble { padding: 5px 4px; margin-bottom: 6px; }
+  .craft-app[data-active=true] .craft-order-meta { font-size: 8px; margin-bottom: 4px; }
+  .craft-app[data-active=true] .craft-order-items { margin-bottom: 4px; }
+  .craft-app[data-active=true] .craft-order-items svg { height: 23px; }
+  .craft-app[data-active=true] .craft-person-wrap { width: 30px; }
+  .craft-app[data-active=true] .craft-mood, .craft-app[data-active=true] .craft-counter-edge { display: none; }
+  .craft-app[data-active=true] .craft-empty-slot { height: 107px; }
+  .craft-app[data-active=true] .craft-notice { font-size: 9px; line-height: 1.3; padding: 2px; }
+  .craft-app[data-active=true] .craft-delivery { padding: 4px 6px; }
+  .craft-app[data-active=true] .craft-tray-heading { font-size: 10px; }
+  .craft-app[data-active=true] .craft-tray-heading > button { padding: 2px; }
+  .craft-app[data-active=true] .craft-tray-slot { height: 30px; }
+  .craft-app[data-active=true] .craft-delivery > p { display: none; }
+  .craft-app[data-active=true] .craft-shelf-heading h2 { font-size: 13px; }
+  .craft-app[data-active=true] .craft-product > span:first-of-type { font-size: 9px; }
+}

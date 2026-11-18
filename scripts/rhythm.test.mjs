@@ -1,6 +1,6 @@
 import { test } from "node:test";
 import assert from "node:assert/strict";
-import { DURATION, MAX_SCORE, unitsForNote, unitsForStreak, scoreFromUnits, GOOD, HOLD_RELEASE, beatInterval, beats, travelTime, initialState, notes, reducer } from "../app/game/rhythm/engine.ts";
+import { DURATION, MAX_SCORE, unitsForNote, unitsForStreak, scoreFromUnits, GOOD, HOLD_RELEASE, beatInterval, beats, travelTime, noteIsVisible, initialState, notes, reducer } from "../app/game/rhythm/engine.ts";
 const start = () => reducer(initialState(), { type: "start" });
 const isolated = (note, scoreUnits = 4000) => ({ ...start(), scoreUnits, score: scoreFromUnits(scoreUnits), judgments: notes.map(n => n.id === note.id ? null : "miss") });
 const hold = notes.find(n => n.duration > 0);
@@ -72,10 +72,10 @@ test("perfect run scores exactly 300 points, including holds and increasing stre
   assert.deepEqual(reducer(s, { type: "hit", lane: 0, elapsed: DURATION + 10 }), s);
 });
 
-test("perfect and good share the same normalized value, with inclusive grading windows", () => {
-  for (const [offset, expected] of [[-160,"good"],[-75,"perfect"],[75,"perfect"],[160,"good"]]) {
+test("visible notes can be pressed early without aiming for a hit line", () => {
+  for (const offset of [-1200, -500, -160, -75, 75, 160]) {
     const s = reducer(isolated(tap), { type: "hit", lane: tap.lane, elapsed: tap.at + offset });
-    assert.equal(s.judgments[tap.id], expected);
+    assert.equal(s.judgments[tap.id], "perfect");
     assert.equal(s.score, scoreFromUnits(4100));
   }
 });
@@ -86,6 +86,27 @@ test("each missed note costs half a note exactly once, score never drops below z
   s = reducer(s, { type: "tick", elapsed: DURATION }); assert.equal(s.score, scoreFromUnits(3950));
   s = reducer(start(), { type: "tick", elapsed: DURATION });
   assert.equal(s.score, 0); assert(s.judgments.every(j => j === "miss"));
+});
+
+test("only the earliest unfinished visible note can be pressed, including during holds", () => {
+  const elapsed = 500;
+  assert(noteIsVisible(notes[0], elapsed) && noteIsVisible(notes[1], elapsed));
+  let s = reducer(start(), { type: "hit", lane: notes[1].lane, elapsed });
+  assert.equal(s.wrong, 1);
+  assert.equal(s.judgments[1], null);
+  s = reducer(s, { type: "release", lane: notes[1].lane, elapsed });
+  s = reducer(s, { type: "hit", lane: notes[0].lane, elapsed });
+  s = reducer(s, { type: "release", lane: notes[0].lane, elapsed });
+  s = reducer(s, { type: "hit", lane: notes[1].lane, elapsed: elapsed + 121 });
+  assert.equal(s.combo, 2);
+  assert.equal(s.judgments[1], "perfect");
+
+  s = reducer(isolated(hold), { type: "hit", lane: hold.lane, elapsed: hold.at - 500 });
+  assert.equal(s.holds[hold.lane]?.noteId, hold.id);
+  s = { ...s, judgments: s.judgments.map((j, id) => id === hold.id + 1 ? null : j) };
+  s = reducer(s, { type: "hit", lane: notes[hold.id + 1].lane, elapsed: hold.at + hold.duration - 100 });
+  assert.equal(s.wrong, 1);
+  assert.equal(s.judgments[hold.id + 1], null);
 });
 
 test("normalized score stays in 0–300, accumulates without per-note rounding, and penalizes partial runs", () => {
@@ -124,7 +145,7 @@ test("releasing early fails a long note once; release tolerance has an explicit 
 });
 
 test("holding a lane before a note arrives cannot catch it automatically", () => {
-  let s = reducer(isolated(hold), { type: "hit", lane: hold.lane, elapsed: hold.at - 500 });
+  let s = reducer(isolated(hold), { type: "hit", lane: hold.lane, elapsed: hold.at - 2000 });
   s = reducer(s, { type: "hit", lane: hold.lane, elapsed: hold.at });
   s = reducer(s, { type: "tick", elapsed: hold.at + hold.duration });
   assert.equal(s.judgments[hold.id], "miss"); assert.equal(s.score, scoreFromUnits(3900));

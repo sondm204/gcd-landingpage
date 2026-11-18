@@ -1,6 +1,7 @@
 export const SIZE = 8;
 export const MAX_LAYERS = 20;
-export const DURATION = 180_000;
+// Both online and event rounds have the same three-minute limit.
+export const DURATION = 3 * 60 * 1000;
 export const inks = ["#d8a53c", "#b74b35", "#4e785c", "#272c32"];
 export function inkForLayers(layers: number) { return inks[Math.min(3, Math.floor(layers / 5))]; }
 export const shapes = [

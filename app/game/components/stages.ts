@@ -32,8 +32,8 @@ export const stages: {
     id: "rhythm", name: "Bắt nhịp di sản", category: "Âm vang đất Việt", stamp: "Đôi tai",
     description: "Lắng nghe câu hát, chạm theo nhịp phách và nối dài âm vang Việt.",
     story: "Muốn cất tiếng, trước hết phải biết lắng nghe. Theo những làn điệu Quan họ, Ca trù, Chèo, Xẩm để tìm lại dấu ấn Đôi tai.",
-    online: {"summary":"60 giây · Chuỗi đúng · Tối đa 300 điểm","rules":["Chạm đúng lúc nốt đến vạch; nốt có đuôi cần giữ đến hết. Nhạc và nốt nhanh dần trong 60 giây.","Mỗi nốt đúng nối dài chuỗi và tăng điểm nốt tiếp theo. Hụt, thả sớm hoặc chạm sai ngắt chuỗi và trừ điểm.","Chơi trọn lượt để ghi điểm, tối đa 300 điểm; không có điều kiện đạt chặng."]},
-    event: {"summary":"Giữ nhịp 60 giây · Tối đa 300 điểm","rules":["Chạm đúng làn, giữ nốt dài đến hết đuôi trong 60 giây với tốc độ tăng dần.","Nối dài chuỗi đúng để tăng điểm mỗi nốt, tối đa 300 điểm. Không có điều kiện đạt chặng. Kết quả bản thử chưa dùng nhận sticker hay đổi quà."]},
+    online: {"summary":"60 giây · Chuỗi đúng · Tối đa 300 điểm","rules":["Bấm nốt ngay khi xuất hiện, theo đúng thứ tự; nốt có đuôi cần giữ đến hết. Nhạc và nốt nhanh dần trong 60 giây.","Mỗi nốt đúng nối dài chuỗi và tăng điểm nốt tiếp theo. Hụt, thả sớm hoặc chạm sai ngắt chuỗi và trừ điểm.","Chơi trọn lượt để ghi điểm, tối đa 300 điểm; không có điều kiện đạt chặng."]},
+    event: {"summary":"Giữ nhịp 60 giây · Tối đa 300 điểm","rules":["Bấm nốt đang hiển thị theo thứ tự đúng làn, giữ nốt dài đến hết đuôi trong 60 giây với tốc độ tăng dần.","Nối dài chuỗi đúng để tăng điểm mỗi nốt, tối đa 300 điểm. Không có điều kiện đạt chặng. Kết quả bản thử chưa dùng nhận sticker hay đổi quà."]},
     challenge: "Gõ phách theo nghệ nhân trong 15 giây.",
   },
   {

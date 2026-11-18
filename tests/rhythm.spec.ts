@@ -16,6 +16,23 @@ async function time(page: import("@playwright/test").Page, milliseconds: number)
   await page.evaluate(ms => { (window as typeof window & { rhythmTime: number }).rhythmTime = (ms + 3000) / 1000; }, milliseconds);
   await expect(page.locator(".rhythm-stage")).toHaveAttribute("data-elapsed", String(milliseconds));
 }
+
+test("visible notes accept early input in sequence without a timing line", async ({ page }) => {
+  await setup(page);
+  await time(page, 500);
+  await expect(page.locator('.rhythm-falling-note[data-note-id="0"]')).toBeVisible();
+  await expect(page.locator('.rhythm-falling-note[data-note-id="1"]')).toBeVisible();
+  await expect(page.locator(".rhythm-hit-line")).toHaveCount(0);
+  await page.keyboard.press(["d", "f", "j", "k"][notes[1].lane]);
+  await expect(page.locator('.rhythm-falling-note[data-note-id="1"]')).toBeVisible();
+  await expect(page.locator(".rhythm-feedback")).toContainText("Bấm theo thứ tự nốt");
+  await page.keyboard.press(["d", "f", "j", "k"][notes[0].lane]);
+  await expect(page.locator('.rhythm-falling-note[data-note-id="0"]')).toHaveCount(0);
+  await time(page, 621);
+  await page.keyboard.press(["d", "f", "j", "k"][notes[1].lane]);
+  await expect(page.locator('.rhythm-falling-note[data-note-id="1"]')).toHaveCount(0);
+  await expect(page.locator(".rhythm-stats > span").nth(1)).toContainText("2");
+});
 test("tap and hold with pointer and keyboard, score at most 300, complete 60 seconds and replay", async ({ page }) => {
   test.setTimeout(90000);
   await page.setViewportSize({ width: 390, height: 844 });

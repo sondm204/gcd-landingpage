@@ -4,10 +4,11 @@ export const PERFECT = 75;
 export const GOOD = 160;
 export const HOLD_RELEASE = 80;
 const RESUME_GRACE = 750;
-// Both the soundtrack and chart follow this gradual 100 → 200 BPM ramp.
-export const beatInterval = (elapsed: number) => 600 - 300 * Math.min(1, Math.max(0, elapsed / DURATION));
-export const travelTime = (elapsed: number) => 2200 - 800 * Math.min(1, Math.max(0, elapsed / DURATION));
+// Music and notes accelerate together: about 133 → 250 BPM.
+export const beatInterval = (elapsed: number) => 450 - 210 * Math.min(1, Math.max(0, elapsed / DURATION));
+export const travelTime = (elapsed: number) => 1600 - 700 * Math.min(1, Math.max(0, elapsed / DURATION));
 export type Note = { id: number; lane: number; at: number; duration: number };
+export const noteIsVisible = (note: Note, elapsed: number) => elapsed >= 0 && note.at - elapsed <= travelTime(elapsed) && elapsed <= note.at + GOOD;
 const pattern = [0, 1, 2, 1, 3, 2, 0, 3, 1, 0, 2, 3, 2, 1, 3, 0];
 export const beats: number[] = [];
 for (let at = 1200; at < DURATION; at += beatInterval(at)) beats.push(Math.round(at));
@@ -94,10 +95,10 @@ export function reducer(s: State, a: Action): State {
   }
   if (next.elapsed - next.lastInput[a.lane] < 120) return { ...next, pressed };
   const lastInput = [...next.lastInput]; lastInput[a.lane] = next.elapsed;
-  const note = notes.filter(n => n.lane === a.lane && next.judgments[n.id] === null && Math.abs(n.at - next.elapsed) <= GOOD)
-    .sort((a1, b) => Math.abs(a1.at - next.elapsed) - Math.abs(b.at - next.elapsed))[0];
-  if (!note) return { ...next, pressed, lastInput, wrong: next.wrong + 1, ...scoring(next.scoreUnits - 50), combo: 0, feedback: "Lệch nhịp", feedbackId: next.feedbackId + 1, lastLane: -1 };
-  const grade = Math.abs(note.at - next.elapsed) <= PERFECT ? "perfect" : "good";
+  // A later visible note cannot bypass the first unfinished note, including a hold.
+  const note = notes.find(n => next.judgments[n.id] === null);
+  if (!note || note.lane !== a.lane || next.holds.some(Boolean) || !noteIsVisible(note, next.elapsed)) return { ...next, pressed, lastInput, wrong: next.wrong + 1, ...scoring(next.scoreUnits - 50), combo: 0, feedback: "Bấm theo thứ tự nốt", feedbackId: next.feedbackId + 1, lastLane: -1 };
+  const grade = "perfect";
   if (note.duration) {
     const holds = [...next.holds]; holds[a.lane] = { noteId: note.id, grade, resumeUntil: null };
     return { ...next, pressed, lastInput, holds, feedback: "Giữ đến hết đuôi nốt…", feedbackId: next.feedbackId + 1, lastLane: a.lane };

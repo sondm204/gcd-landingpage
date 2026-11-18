@@ -1,4 +1,4 @@
-.print-app { background: radial-gradient(ellipse at top, #fff9e9, #eee2c9); color: #423b2e; min-height: 100dvh; padding: max(8px, env(safe-area-inset-top)) 14px max(12px, env(safe-area-inset-bottom)); }
+.print-app { background: radial-gradient(ellipse at top, #fff9e9, #eee2c9); color: #423b2e; min-height: var(--game-viewport-height, 100dvh); padding: max(8px, env(safe-area-inset-top)) 14px max(12px, env(safe-area-inset-bottom)); }
 .print-wrap { max-width: 620px; margin: auto; }.print-nav { display: flex; align-items: center; justify-content: space-between; gap: 8px; font-size: 11px; min-height: 32px; }.print-nav > span { font-size: 9px; letter-spacing: .1em; color: #7d725d; }
 .print-intro, .print-result { background: #fffdf5; border: 1px solid #d5c099; padding: clamp(18px, 4vw, 32px); border-radius: 16px; text-align: center; margin-top: 12px; box-shadow: 0 10px 40px #795d2010; }
 .print-app h1 { font: 500 clamp(26px, 5vw, 40px)/1.2 var(--font-display), Georgia, serif; margin: 12px 0; }.print-app h2 { font-size: 23px; margin: 18px 0 8px; }.print-intro > p, .print-result > p { font-size: 13px; line-height: 1.8; }.print-kicker { color: #a14d36; font-size: 10px !important; letter-spacing: .15em; font-weight: 600; }
@@ -13,7 +13,7 @@
 .print-progress.print-progress-twenty > .done { color: #496843; border-color: #496843; background: #dfebd7; }
 .print-mini-art .print-photo { width: auto; aspect-ratio: 4 / 3; margin: 0; }
 .print-primary { display: block; width: 100%; border-radius: 8px; background: #af4934; color: #fffaf0; padding: 13px 16px; font: inherit; font-size: 14px; font-weight: 600; cursor: pointer; }.print-primary:hover { background: #883b2b; }.print-mode { display: block; padding: 14px 0; font-size: 12px; color: #57705b; }.print-intro > small, .print-result > small { font-size: 10px; color: #7d725d; line-height: 1.8; display: block; }
-.print-app[data-phase=playing] { height: 100dvh; overflow: hidden; }.print-app[data-phase=playing] .print-wrap { display: flex; flex-direction: column; height: 100%; gap: 7px; max-width: 540px; }
+.print-app[data-phase=playing] { height: var(--game-viewport-height, 100dvh); overflow: hidden; }.print-app[data-phase=playing] .print-wrap { display: flex; flex-direction: column; height: 100%; gap: 7px; max-width: 540px; }
 .print-play-heading { display: flex; align-items: center; justify-content: space-between; gap: 10px; flex-shrink: 0; }.print-play-heading h1 { font-size: 23px; margin: 0; }.print-play-heading > span { font-size: 13px; background: #fffaf1; padding: 6px 12px; border: 1px solid #d5c099; border-radius: 20px; }
 .print-sound-toggle { background: #fffaf1; color: #655941; padding: 6px 8px; border: 1px solid #d5c099; border-radius: 6px; font-size: 10px; cursor: pointer; }
 @media (max-width: 600px) { .print-nav .print-stage-label { display: none; } }

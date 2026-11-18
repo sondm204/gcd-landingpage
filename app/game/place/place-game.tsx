@@ -1,6 +1,7 @@
 "use client";
 import Image from "next/image";
 import Link from "next/link";
+import GameInstructions from "../components/game-instructions";
 import { useEffect, useReducer, useRef, useState } from "react";
 import { useSearchParams } from "next/navigation";
 import { CLOSE_KM, MAX_SCORE, ROUND_COUNT, requiredClose, initialState, places, reducer, type Result } from "./engine";
@@ -30,7 +31,7 @@ export default function PlaceGame() {
 }
 function Game({ event }: { event: boolean }) {
   const [state, dispatch] = useReducer(reducer, event, initialState);
-  const fullscreen = useGameFullscreen();
+  const fullscreen = useGameFullscreen(["playing", "loading", "review", "paused"].includes(state.phase));
   const music = useBackgroundMusic(!["ready", "result", "paused"].includes(state.phase), "/game/audio/place-background.wav");
   const heading = useRef<HTMLHeadingElement>(null);
   const reviewHeading = useRef<HTMLHeadingElement>(null);
@@ -67,7 +68,7 @@ function Game({ event }: { event: boolean }) {
       <div className="place-intro-compass" aria-hidden="true"><span>N</span><b>✧</b><i>VIỆT NAM</i></div>
       <h1 ref={heading} tabIndex={-1}>Đây là <em>đâu?</em></h1><p className="place-intro-lead">Một khung hình. Một điểm đến.<br />Bạn nhận ra bao nhiêu điều thân thuộc?</p>
       <div className="place-rule-cards"><span><b>{event ? "02" : ROUND_COUNT}</b>khung hình</span><span><b>20s</b>cho mỗi ảnh</span><span><b>&lt;100 km</b>để ghim gần</span></div>
-      <ol><li>Nhìn ảnh không kèm tên, tìm vị trí trên bản đồ Việt Nam.</li><li>Chạm để đặt ghim. Dùng + / − để phóng to, kéo bản đồ để dịch chuyển; có thể sửa ghim trước khi chốt.</li><li>Chọn “Chốt vị trí” khi đã sẵn sàng. Hết giờ sẽ tự chốt ghim hiện tại; chưa đặt ghim được 0 điểm.</li></ol>
+      <GameInstructions><ol><li>Nhìn ảnh không kèm tên, tìm vị trí trên bản đồ Việt Nam.</li><li>Chạm để đặt ghim. Dùng + / − để phóng to, kéo bản đồ để dịch chuyển; có thể sửa ghim trước khi chốt.</li><li>Chọn “Chốt vị trí” khi đã sẵn sàng. Hết giờ sẽ tự chốt ghim hiện tại; chưa đặt ghim được 0 điểm.</li></ol></GameInstructions>
       <p className="place-goal">Ghim gần ít nhất <b>{target}/{event ? 2 : ROUND_COUNT} ảnh</b> để đạt chặng. Mỗi ảnh tối đa {MAX_SCORE} điểm; càng gần, điểm càng cao.</p>
       <button className="place-primary" onClick={start}>Lên đường khám phá →</button>
       <Link className="place-mode" href={`/game/place?mode=${event ? "online" : "event"}`}>Chuyển sang bản {event ? "online" : "sự kiện"}</Link>

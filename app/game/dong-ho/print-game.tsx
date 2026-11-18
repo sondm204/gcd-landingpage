@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import GameInstructions from "../components/game-instructions";
 import { useSearchParams } from "next/navigation";
 import { useEffect, useReducer, useRef, useState } from "react";
 import { MotionConfig, motion, useReducedMotion } from "motion/react";
@@ -30,7 +31,7 @@ function Game({ event }: { event: boolean }) {
   const reduce = useReducedMotion();
   const audio = usePrintAudio();
   const music = useBackgroundMusic(state.phase === "playing", "/game/audio/dong-ho-background.wav");
-  const screen = useGameFullscreen();
+  const screen = useGameFullscreen(state.phase === "playing");
   const target = event ? 1 : 2;
   const reached = state.layers >= target;
   const ink = inkForLayers(state.layers);
@@ -92,7 +93,7 @@ function Game({ event }: { event: boolean }) {
 
   return <MotionConfig reducedMotion="user" transition={reduce ? { duration: 0 } : { duration: .25 }}><main className="print-app" data-phase={state.phase}>
     <div className="print-wrap"><nav className="print-nav"><Link href="/game">← Hộ chiếu Di sản</Link><span className="print-stage-label">CHẶNG 02 · {event ? "SỰ KIỆN" : "ONLINE"}</span>{screen.supported && <button className="print-sound-toggle" aria-label="Chế độ toàn màn hình" aria-pressed={screen.fullscreen} onClick={screen.toggle}>{screen.fullscreen ? "Thu nhỏ" : "Toàn màn hình"}</button>}{state.phase === "playing" && <button className="print-sound-toggle" aria-label="Nhạc nền" aria-pressed={music.enabled} onClick={music.toggle}>{music.enabled ? "Nhạc: bật" : "Nhạc: tắt"}</button>}</nav>
-      {state.phase === "ready" && <section className="print-intro"><p className="print-kicker">SẮC MÀU DÂN GIAN · DẤU ĐÔI MẮT</p><h1 ref={titleRef} tabIndex={-1}>Xếp ván Đông Hồ</h1><FolkPrint layers={MAX_LAYERS} /><h2>Góp một khối. In một lớp màu.</h2><p>Sương Quên đã làm nhạt bức tranh. Xếp những khối mực lên ván để từng lớp màu trở lại.</p><ol><li>Kéo khối lên bảng 8×8, hoặc chạm chọn khối rồi chạm ô để đặt góc trên trái.</li><li>Lấp đầy một hàng hoặc cột để xóa hàng và in một lớp màu. Khối không xoay, không chồng lên nhau.</li><li>Dùng hết 3 khối để nhận khay mới. Không còn khối đặt được thì lượt chơi kết thúc.</li></ol><p className="print-rule">{event ? "In 1 lớp để hoàn thành bản sự kiện." : "In 2 lớp để đạt chặng; chơi tiếp đến 20 lớp để mở trọn bức tranh."} Giới hạn 3 phút.</p><button className="print-primary" onClick={() => { music.start(); screen.enter(); dispatch({ type: "start", seed: Math.floor(Math.random() * 4294967296), now: Date.now() }); }}>Mở ván in →</button><Link className="print-mode" href={`/game/dong-ho?mode=${event ? "online" : "event"}`}>Chuyển sang bản {event ? "online" : "sự kiện"}</Link><small>Kết quả bản thử chưa lưu vào hộ chiếu.</small></section>}
+      {state.phase === "ready" && <section className="print-intro"><p className="print-kicker">SẮC MÀU DÂN GIAN · DẤU ĐÔI MẮT</p><h1 ref={titleRef} tabIndex={-1}>Xếp ván Đông Hồ</h1><FolkPrint layers={MAX_LAYERS} /><h2>Góp một khối. In một lớp màu.</h2><p>Sương Quên đã làm nhạt bức tranh. Xếp những khối mực lên ván để từng lớp màu trở lại.</p><GameInstructions><ol><li>Kéo khối lên bảng 8×8, hoặc chạm chọn khối rồi chạm ô để đặt góc trên trái.</li><li>Lấp đầy một hàng hoặc cột để xóa hàng và in một lớp màu. Khối không xoay, không chồng lên nhau.</li><li>Dùng hết 3 khối để nhận khay mới. Không còn khối đặt được thì lượt chơi kết thúc.</li></ol></GameInstructions><p className="print-rule">{event ? "In 1 lớp để hoàn thành bản sự kiện." : "In 2 lớp để đạt chặng; chơi tiếp đến 20 lớp để mở trọn bức tranh."} Giới hạn 3 phút.</p><button className="print-primary" onClick={() => { music.start(); screen.enter(); dispatch({ type: "start", seed: Math.floor(Math.random() * 4294967296), now: Date.now() }); }}>Mở ván in →</button><Link className="print-mode" href={`/game/dong-ho?mode=${event ? "online" : "event"}`}>Chuyển sang bản {event ? "online" : "sự kiện"}</Link><small>Kết quả bản thử chưa lưu vào hộ chiếu.</small></section>}
       {state.phase === "playing" && <>
         <header className="print-play-heading"><h1>Xếp ván Đông Hồ</h1><button className="print-sound-toggle" aria-label="Âm thanh trò chơi" aria-pressed={audio.enabled} onClick={() => audio.setEnabled(!audio.enabled)}>{audio.enabled ? "Âm thanh: bật" : "Âm thanh: tắt"}</button><span>{state.score} điểm</span></header>
         <div className="print-mini-art"><FolkPrint layers={state.layers} /><p>{reached ? "✦ Đã đạt chặng!" : `Mục tiêu: ${target} lớp màu`}<small>{state.layers}/20 lớp · giới hạn 3 phút</small></p></div>

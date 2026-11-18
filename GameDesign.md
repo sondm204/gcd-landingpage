@@ -164,13 +164,15 @@ Animation dùng **Motion for React** cho khách đến/rời quầy, món lên/x
 
 ### 4.3. Chặng 3 — BẮT NHỊP DI SẢN (Dấu Đôi tai)
 
-Bản thử `/game/rhythm`: 60 giây, 4 làn D–F–J–K, có đếm ngược 3 giây. Nhạc và nốt tăng tốc 100 → 200 BPM. Không có điều kiện đạt/trượt chặng; cuối lượt hiển thị điểm, số nốt đúng, độ chính xác và chuỗi dài nhất.
+Bản thử `/game/rhythm`: 60 giây, 4 làn D–F–J–K, có đếm ngược 3 giây. Nhạc và nốt tăng tốc 133 → 250 BPM, thời gian rơi giảm từ 1,6 xuống 0,9 giây. Bấm nốt ngay khi xuất hiện, không cần căn vạch; phải hoàn thành nốt trước rồi mới bấm nốt sau. Nốt kế tiếp được đánh số và viền sáng. Không có điều kiện đạt/trượt chặng; cuối lượt hiển thị điểm, số nốt đúng, độ chính xác và chuỗi dài nhất.
 
-**Điểm tối đa 300:** mỗi nốt đúng thứ k trong chuỗi nhận `100 + k − 1` đơn vị. Chuỗi càng dài, mỗi nốt càng có giá trị. Hụt nốt, thả sớm hoặc bấm sai trừ 50 đơn vị và đặt chuỗi về 0. Tổng đơn vị tối đa là `N × (N + 199) / 2`; điểm hiển thị `round(300 × đơn vị tích lũy / đơn vị tối đa)`, giới hạn 0–300. Chỉ làm tròn tổng điểm để tránh sai số tích lũy. Đúng toàn bộ, giữ chuỗi trọn lượt đạt đúng 300 điểm. Cả Tuyệt (≤75ms) và Được (≤160ms) đều nối dài chuỗi.
+**Điểm tối đa 300:** mỗi nốt đúng thứ k trong chuỗi nhận `100 + k − 1` đơn vị. Chuỗi càng dài, mỗi nốt càng có giá trị. Hụt nốt, thả sớm hoặc bấm sai thứ tự trừ 50 đơn vị và đặt chuỗi về 0. Tổng đơn vị tối đa là `N × (N + 199) / 2`; điểm hiển thị `round(300 × đơn vị tích lũy / đơn vị tối đa)`, giới hạn 0–300. Chỉ làm tròn tổng điểm để tránh sai số tích lũy. Đúng toàn bộ, giữ chuỗi trọn lượt đạt đúng 300 điểm. Nốt đúng được tính như nhau trong suốt thời gian hiển thị; nốt đi quá đáy màn hình sẽ bị tính trượt.
 
 Nốt dài chỉ nối chuỗi và nhận điểm một lần khi giữ đủ. Nốt sau vẫn rơi phía sau đuôi nốt dài, không yêu cầu bấm làn khác khi đang giữ. Có chuỗi hiện tại, chuỗi dài nhất và điểm nốt tiếp theo hiển thị trực tiếp.
 
 Nhạc nền ngũ cung nguyên bản qua Web Audio cùng đồng hồ với nốt; có tắt âm, toàn màn hình, tạm dừng khi tab ẩn hoặc cửa sổ mất focus. Sau khi tiếp tục, nốt dài đang dở phải được nhấn giữ lại trong 750ms. Kết quả bản thử chưa lưu vào hộ chiếu/chưa dùng đổi quà. Hai chế độ dùng cùng luật tính điểm.
+
+**Bố cục điện thoại:** Màn mở đầu năm game thu gọn và đưa hướng dẫn dài vào hộp “Cách chơi chi tiết”. Màn chơi có giới hạn thời gian dùng chiều cao `visualViewport`, cập nhật khi thanh địa chỉ thay đổi; khóa cuộn trong lượt chơi và khôi phục khi thoát. Kiểm tra ở 320 × 568 và 390 × 740, gồm trường hợp thanh trình duyệt chiếm thêm 70px. Kệ sáu món game 1 phải còn đủ chỗ và không chồng lên khay giao hàng.
 
 ### 4.4. Chặng 4 — ĐÂY LÀ ĐÂU? (Dấu Đôi chân)
 
