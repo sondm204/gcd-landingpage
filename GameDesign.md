@@ -1,0 +1,729 @@
+# HỘ CHIẾU DI SẢN — GAME QR TẠI GLOBAL CITIZEN DAY 2026
+
+> **Tài liệu giải thích dự án và phân rã yêu cầu triển khai**  
+> Phiên bản: 1.0 — 12/11/2026  
+> Tài liệu gốc: *Hộ chiếu Di sản - Game QR tại Global Citizen Day 2026*, 19 trang.  
+> Sự kiện: **05/12/2026**, Hội trường Nguyễn Văn Đạo, ĐHQGHN — JCI Thăng Long.
+
+## Cập nhật triển khai: passport tại sự kiện
+
+Yêu cầu mới thay luồng sự kiện trong đề xuất gốc: tab **Tại sự kiện** không chứa mini-game. Người tham dự ghé gian hàng, quét QR nhận một dấu cho mỗi vị trí; BTC cấu hình mốc dấu và xác nhận trao quà một lần cho mỗi tài khoản. Điểm game online độc lập với con dấu. Đăng nhập bằng SĐT trước, chỉ số mới cần nhập tên hiển thị. Ngày sự kiện hiện tại: **06/12/2026**.
+
+Quy trình hiện hành và hướng dẫn vận hành nằm tại [docs/event-passport.md](docs/event-passport.md) và [docs/game-accounts.md](docs/game-accounts.md). Các mô tả mini-game event, điểm thưởng thực tế và đổi điểm trong phần đề xuất gốc dưới đây được giữ để tham khảo lịch sử, không phải luồng hiện hành.
+
+## 0. Cách đọc tài liệu
+
+- **[Đã nêu trong đề xuất]**: nội dung xuất hiện trong PDF gốc.
+- **[Đề xuất triển khai]**: diễn giải, thiết kế hệ thống hoặc giải pháp kỹ thuật được gợi ý thêm; **chưa phải quyết định của BTC**.
+- **[Cần xác nhận]**: chỗ còn thiếu quy định, hoặc có nguy cơ hiểu khác nhau, cần chốt trước khi lập trình.
+
+Tài liệu này là bản giải thích và đặc tả bước đầu để nhóm sản phẩm, thiết kế, frontend, backend và đội vận hành thống nhất cách hiểu. **Không nên xem nó là bản đặc tả được BTC phê duyệt.**
+
+---
+
+## 1. Tóm tắt dự án trong một phút
+
+**Hộ chiếu Di sản** là một **web game chơi trên điện thoại, không cần cài app**, kể hành trình một người trẻ tìm lại bản sắc di sản Việt Nam thông qua **5 mini-game**. Trò chơi có **hai giai đoạn liên kết**:
+
+| Hạng mục | Giai đoạn online | Giai đoạn tại sự kiện |
+|---|---|---|
+| Thời gian | 24/11–04/12/2026 | 05/12/2026 |
+| Truy cập | Link web hoặc QR trên poster | QR ở cổng và QR riêng tại 5 gian |
+| Trải nghiệm | 5 chặng, lần lượt mở theo lịch | Cùng 5 trò chơi dưới dạng rút gọn, khoảng 90 giây/gian |
+| Người chơi | Tạo nhân vật, nhập thông tin, nhận hộ chiếu số | Đăng nhập lại qua số điện thoại, nhận hộ chiếu giấy |
+| Điểm thưởng | Điểm mini-game, chuỗi ngày, thách đấu | Điểm phiên sự kiện, điểm thưởng thử thách thực tế |
+| Vật phẩm | Con dấu/sticker số và thẻ chia sẻ | Sticker giấy túi mù, đổi mẫu và đổi quà |
+| Mục tiêu | Tạo quan tâm, kéo người chơi đến sự kiện, thi đua trường/CLB | Khuyến khích người tham dự đi qua 5 gian di sản |
+
+**Điều dễ nhầm nhất:** Quét QR ở gian **không phải** chỉ để check-in hay nhận sticker. Theo đề xuất, QR **mở mini-game của chính gian đó**. Người chơi **chơi trên điện thoại**, xuất trình kết quả cho chủ gian để nhận sticker. Sau đó **có thể** chơi thêm thử thách vật lý ngay tại gian để nhận điểm thưởng.
+
+---
+
+## 2. Ý tưởng cốt truyện và cơ chế tiến trình
+
+### 2.1. Câu chuyện
+
+Thông điệp: **“Muốn đi xa, phải biết mình từ đâu đến.”**
+
+Chú Tễu trao cho người chơi một cuốn **hộ chiếu trống**. Một lớp **Sương Quên** đang che phủ bản đồ di sản, khiến nhân vật ban đầu chỉ là **bóng mờ**. Mỗi chặng hoàn thành sẽ trả lại một phần cơ thể/khả năng tượng trưng của nhân vật:
+
+1. **Đôi tay** — nghề thủ công/làng nghề Hà Nội.
+2. **Đôi mắt** — tranh dân gian Đông Hồ.
+3. **Đôi tai** — di sản âm nhạc/trình diễn: Quan họ, Ca trù, Chèo, Xẩm.
+4. **Đôi chân** — xác định vị trí di sản thế giới tại Việt Nam.
+5. **Tiếng nói** — giới thiệu một di sản Việt Nam ra thế giới.
+
+Đủ 5 dấu, nhân vật hiện ra trọn vẹn, biểu trưng một người trẻ có gốc rễ, tự tin hội nhập.
+
+### 2.2. Vòng lặp chơi chính (core loop)
+
+```text
+Mở web
+  → Đăng ký / đăng nhập
+  → Nhận nhân vật + hộ chiếu
+  → Chọn chặng đang mở
+  → Đọc đoạn truyện ngắn
+  → Chơi mini-game
+  → Ghi kết quả, tính điểm
+  → Vượt chặng → nhận con dấu + túi sticker số
+  → Nhân vật khôi phục một phần
+  → Xem hạng / chia sẻ / chờ chặng tiếp theo
+```
+
+**[Đã nêu trong đề xuất]** Người chơi có thể chơi lại; hệ thống lấy **điểm cao nhất của mỗi chặng**.
+
+---
+
+## 3. Trải nghiệm GIAI ĐOẠN ONLINE (24/11–04/12)
+
+### 3.1. Đăng ký và tạo nhân vật
+
+Người chơi mở link hoặc quét QR truyền thông. Màn hình mở đầu cho nhập:
+
+- Tên nhân vật;
+- Số điện thoại;
+- Email;
+- Trường hoặc câu lạc bộ (CLB).
+
+**Vai trò thông tin:** Theo tài liệu, số điện thoại là khóa để **giữ điểm từ online sang ngày 05/12**; email để gửi lời mời và thẻ tổng kết.
+
+**Note** Không cần xác thực OTP
+
+### 3.2. Mở khóa chặng theo lịch
+
+- 24/11: ra mắt, **mở chặng 1**.
+- 26/11–02/12: **hai ngày mở một chặng** theo kế hoạch truyền thông.
+- 04/12: khóa bảng xếp hạng online, phát thẻ tổng kết, chuẩn bị vật phẩm.
+
+**[Cần xác nhận]** PDF chưa liệt kê lịch chính xác cho từng chặng 2–5 (mốc “hai ngày một chặng” có thể suy ra lịch dự kiến, nhưng phải chốt giờ mở và khóa). Chưa rõ chặng cũ còn chơi được khi chặng mới mở không.
+
+### 3.3. Nhận con dấu, sticker và bảng xếp hạng
+
+Mỗi lần vượt một chặng:
+
+1. Ghi điểm và kiểm tra nếu đó là kỷ lục cá nhân.
+2. Nhận dấu ứng với bộ phận nhân vật.
+3. Mở **một túi mù sticker số** (bản thường hoặc bản hiếm ánh kim).
+4. Nhân vật sáng rõ hơn một phần.
+5. Có thể xem xếp hạng cá nhân và của trường/CLB, chia sẻ thành tích.
+
+---
+
+## 4. Chi tiết NĂM MINI-GAME
+
+> Đây là **5 gameplay khác nhau**, không phải 5 câu hỏi trắc nghiệm. Ở sự kiện, cùng mỗi gameplay được cấu hình một phiên bản ngắn hơn.
+
+### 4.1. Chặng 1 — TIỆM BÁCH NGHỆ (Dấu Đôi tay)
+
+**Hình sản phẩm:** sáu ảnh minh hoạ chất liệu thật (men gốm, lụa, nan mây, giấy, lá và tre), nền trong suốt, WebP cục bộ tại `public/game/craft-shop/`. Kệ hàng, đơn của khách và khay giao hàng dùng chung asset để dễ nhận biết. Nguồn tạo và bộ prompt lưu trong README cùng thư mục.
+
+**Điều chỉnh mới nhất 15/11/2026:** Bản chơi thử dùng lượt **60 giây cho cả hai chế độ**, khách đến liên tục, không giới hạn số đơn và không kết thúc sớm theo số đơn. Mỗi đơn giao đúng trọn bộ/thứ tự được **10 điểm cố định**; chuỗi đúng chỉ là chỉ số, không nhân điểm. Bỏ điều kiện vượt chặng theo số đơn ở giao diện chơi thử, kết thúc hiển thị tổng điểm và số đơn đúng. Kệ có 6 món: bình gốm, khăn lụa, giỏ mây, quạt giấy, nón lá và **chuồn chuồn tre Thạch Xá**. Các quy định về giới hạn đơn/điểm ở mô tả lịch sử bên dưới đã được thay thế trong bản chơi thử.
+
+**Cập nhật bản chơi thử theo yêu cầu 15/11/2026:** Có tối đa 3 khách cùng đứng quầy. Mỗi khách có đơn hiện hình gồm 2–3 món (có thể lặp), phải xếp khớp toàn bộ đơn theo thứ tự trái → phải rồi nhấn Giao hàng. Hệ thống tự tìm khách có đơn khớp; không cần chọn khách. Khay tối đa 3 món, hỗ trợ bỏ từng món hoặc xóa khay. Giao sai giữ nguyên đơn/khay để sửa nhưng ngắt chuỗi đúng. Giao đúng cộng 20 điểm, mỗi đơn đúng liên tiếp thêm 10, tối đa 60 điểm/đơn; khách rời quầy và người mới đến nếu còn đơn.
+
+Mỗi khách có hạn chờ riêng: online 24 giây, sự kiện 32 giây; hai khách mở đầu phía sau có thêm 3/6 giây. Còn 30% thời gian, thanh chờ chuyển đỏ, khách cau mày và lắc người. Hết hạn khách rời đi, đơn thất bại và ngắt chuỗi. Online giữ 5 đơn/60 giây, cần đúng 4; bản sự kiện thử nghiệm 3 đơn/90 giây, cần đúng 3. Đồng hồ theo thời gian thực kể cả khi tab bị ẩn. Đây là cấu hình thử nghiệm mới, chưa thay thế các quy định BTC trong đề xuất gốc bên dưới.
+
+Animation dùng **Motion for React** cho khách đến/rời quầy, món lên/xuống khay, lắc khay khi sai và điểm số. `MotionConfig reducedMotion="user"` tôn trọng cài đặt giảm chuyển động. Logic thuần tại `app/game/craft-shop/engine.ts`, kiểm tra bằng `node --test scripts/craft-shop.test.mjs` và `tests/craft-shop.spec.ts`.
+
+**Chủ đề:** Làng nghề Hà Nội. Người chơi xin học việc ở tiệm thủ công, hiểu rằng di sản sống trong đôi tay người thợ.
+
+**Gameplay:** Khách bước vào và gọi một loại sản phẩm. Người chơi nhìn các vật phẩm đang có, **chạm chọn đúng sản phẩm ứng với làng nghề**, sau đó **giao hàng** trước khi khách hết kiên nhẫn.
+
+**Luật ONLINE [Đã nêu trong đề xuất]:**
+
+- Có **5 đơn hàng trong 60 giây**.
+- Giao đúng liên tiếp tạo **combo nhân điểm**; giao sai làm mất chuỗi.
+- **Hoàn thành đúng 4 đơn** thì vượt chặng.
+
+**Bản SỰ KIỆN [Đã nêu trong đề xuất]:** **Giao 3 đơn** trên điện thoại. Thời lượng chung tại gian khoảng 90 giây, chưa có quy định riêng về đồng hồ game của bản rút gọn.
+
+**Thử thách thực tế:** Sờ và đoán chất liệu bên trong hộp kín.
+
+**Ví dụ minh họa [Đề xuất triển khai]:** Khách gọi “bình gốm Bát Tràng”. Trong 3 lựa chọn bình gốm, giỏ mây, quạt giấy, người chơi chọn bình gốm rồi bấm “Giao hàng”. Các vật phẩm ví dụ này **chưa phải danh sách sản phẩm chính thức**.
+
+**[Cần xác nhận]:** Danh sách làng nghề/sản phẩm, quy tắc xuất hiện khách hàng, số điểm mỗi đơn và thời gian dành cho bản sự kiện.
+
+### 4.2. Chặng 2 — XẾP VÁN ĐÔNG HỒ (Dấu Đôi mắt)
+
+**Giới hạn thời gian mới:** Mỗi lượt tối đa **3 phút** cho cả online và sự kiện. Đồng hồ bắt đầu sau khi mở ván, tính theo thời gian thực kể cả khi rời tab. Hết giờ tự chốt số lớp/điểm đã đạt và dừng nhạc; đặt khối tại hoặc sau hạn không được tính. Bản chơi có thể kết thúc sớm khi đạt 20 lớp, hết chỗ hoặc người chơi chốt sau khi đạt mục tiêu.
+
+**Cập nhật luật mới nhất:** Mở tối đa **20 lớp**, mỗi hàng/cột đầy tương ứng 1 lớp và **10 điểm**, không cộng điểm cho ô đặt. Hàng và cột được kiểm tra đồng thời trước khi xóa, giao điểm không làm mất một lượt tính; giới hạn điểm 200. Dùng ảnh `public/game/tranh_dong_ho.webp`, phủ bằng lưới 5×4 gồm 20 vùng mở dần. Kéo thả giữ đúng ô đang cầm, tính tọa độ từ ô thực tế (loại trừ viền/padding), hình kéo cùng kích thước và vị trí với preview, không bù lệch cố định. Các mô tả 4 lớp và điểm/ô ở lịch sử bên dưới đã được thay thế.
+
+**Bản chơi thử triển khai 15/11/2026 — `/game/dong-ho`:** Ván 8×8, khay 3 khối cố định hướng, dùng hết khay mới cấp 3 khối mới. Kéo thả bằng chuột/cảm ứng hoặc chọn khối rồi chạm/Enter lên ô neo góc trên trái. Không cho vượt mép hoặc đè ô đã có mực. Mỗi hàng ngang đầy bị xóa (ô bên trên không rơi), tương ứng 1 lớp in; nhiều hàng đầy đồng thời in nhiều lớp. Cột dọc không xóa. Tối đa 4 lớp theo vàng → đỏ → xanh → nét đen. Online đạt mục tiêu ở 2 lớp, có thể chốt hoặc tiếp tục đến 4 lớp; sự kiện đạt 1 lớp và có thể chốt. Hết chỗ đặt bất kỳ khối còn lại thì kết thúc. Không giới hạn giờ. Điểm thử nghiệm: 1 điểm/ô đặt + 100 điểm/hàng. Tranh SVG nguyên bản lấy cảm hứng lợn dân gian, không phải bản sao hiện vật Đông Hồ. Kết quả chưa lưu hộ chiếu/chưa dùng đổi quà. Các lựa chọn này là cách triển khai thử cho các câu hỏi còn mở bên dưới.
+
+**Chủ đề:** Tranh dân gian Đông Hồ. Bức tranh bị Sương Quên xóa trắng, cần in nhiều lớp màu để khôi phục.
+
+**Gameplay:** Bảng gồm **8×8 ô**. Người chơi **kéo các khối màu** và thả lên ván. Khi lấp đầy một hàng, một lớp màu được hoàn thành; hoàn thành nhiều lớp sẽ làm hiện tranh.
+
+**Luật ONLINE [Đã nêu trong đề xuất]:**
+
+- **Không giới hạn thời gian**.
+- Nếu **không còn chỗ để đặt khối**, lượt chơi dừng.
+- **Hoàn thành 2 lớp** thì vượt chặng.
+- **Đủ 4 lớp** thì bức tranh hiện ra, trong đó **nét đen là lớp cuối**.
+
+**Bản SỰ KIỆN:** In xong **1 lớp màu** trên điện thoại.
+
+**Thử thách thực tế:** Tự tay in một lớp màu bằng ván khắc thật.
+
+**[Cần xác nhận]:** Cơ chế xóa hàng khác gì Block Blast thông thường, sinh khối thế nào, có cho xoay khối không, nội dung tranh và cách chấm điểm.
+
+### 4.3. Chặng 3 — BẮT NHỊP DI SẢN (Dấu Đôi tai)
+
+Bản thử `/game/rhythm`: 60 giây, 4 làn D–F–J–K, có đếm ngược 3 giây. Nhạc và nốt tăng tốc 133 → 250 BPM, thời gian rơi giảm từ 1,6 xuống 0,9 giây. Bấm nốt ngay khi xuất hiện, không cần căn vạch; phải hoàn thành nốt trước rồi mới bấm nốt sau. Nốt kế tiếp được đánh số và viền sáng. Không có điều kiện đạt/trượt chặng; cuối lượt hiển thị điểm, số nốt đúng, độ chính xác và chuỗi dài nhất.
+
+**Điểm tối đa 300:** mỗi nốt đúng thứ k trong chuỗi nhận `100 + k − 1` đơn vị. Chuỗi càng dài, mỗi nốt càng có giá trị. Hụt nốt, thả sớm hoặc bấm sai thứ tự trừ 50 đơn vị và đặt chuỗi về 0. Tổng đơn vị tối đa là `N × (N + 199) / 2`; điểm hiển thị `round(300 × đơn vị tích lũy / đơn vị tối đa)`, giới hạn 0–300. Chỉ làm tròn tổng điểm để tránh sai số tích lũy. Đúng toàn bộ, giữ chuỗi trọn lượt đạt đúng 300 điểm. Nốt đúng được tính như nhau trong suốt thời gian hiển thị; nốt đi quá đáy màn hình sẽ bị tính trượt.
+
+Nốt dài bắt đầu tính thời gian ngay khi người chơi bấm: `endAt = thời điểm bấm + thời lượng nốt`, không chờ nốt xuống cuối màn hình. Đầu nốt đứng tại vị trí được bấm, đuôi thu ngắn dần, hiển thị thời gian còn lại và thanh tiến độ. Chỉ nối chuỗi và nhận điểm một lần khi giữ đủ. Nốt sau vẫn rơi và phải chờ hoàn thành nốt giữ mới được bấm. Tạm dừng giữ nguyên tiến độ; thả sớm vẫn bị tính trượt. Có chuỗi hiện tại, chuỗi dài nhất và điểm nốt tiếp theo hiển thị trực tiếp.
+
+Nhạc nền ngũ cung nguyên bản qua Web Audio cùng đồng hồ với nốt; có tắt âm, toàn màn hình, tạm dừng khi tab ẩn hoặc cửa sổ mất focus. Sau khi tiếp tục, nốt dài đang dở phải được nhấn giữ lại trong 750ms. Kết quả bản thử chưa lưu vào hộ chiếu/chưa dùng đổi quà. Hai chế độ dùng cùng luật tính điểm.
+
+**Bố cục điện thoại:** Màn mở đầu năm game thu gọn và đưa hướng dẫn dài vào hộp “Cách chơi chi tiết”. Màn chơi có giới hạn thời gian dùng chiều cao `visualViewport`, cập nhật khi thanh địa chỉ thay đổi; khóa cuộn trong lượt chơi và khôi phục khi thoát. Kiểm tra ở 320 × 568 và 390 × 740, gồm trường hợp thanh trình duyệt chiếm thêm 70px. Kệ sáu món game 1 phải còn đủ chỗ và không chồng lên khay giao hàng.
+
+### 4.4. Chặng 4 — ĐÂY LÀ ĐÂU? (Dấu Đôi chân)
+
+**Cập nhật bộ câu hỏi:** online chơi đủ 10 ảnh, không lặp, gồm 3 miền Bắc (Hạ Long, Khuê Văn Các, Tràng An), 4 miền Trung (Hội An, Ngọ Môn, Mỹ Sơn, Phong Nha), 3 miền Nam (Dinh Độc Lập, Bến Thành, Cái Răng). Mỗi câu tối đa **30 điểm**, công thức `round(30 × exp(-km / 250))`; tổng online tối đa 300 điểm, đạt khi ghim gần ít nhất 7/10 câu. Bản sự kiện giữ 2 câu, tối đa 60 điểm và cần ít nhất 1 câu ghim gần. Các thông số trong đoạn này thay thế số lượng/thang điểm cũ bên dưới. Nhãn khung hình hiển thị từ 01 đến 10.
+
+**Bản thử triển khai — `/game/place`:** bộ 30 địa điểm, mỗi miền Bắc / Trung / Nam có 10 địa điểm. Mỗi lượt chọn ngẫu nhiên 10 địa điểm không trùng, áp dụng cả online và sự kiện. Bắt đầu/chơi lại tạo seed mới, xáo trộn cả tập ảnh được chọn và thứ tự xuất hiện. Ảnh WebP tải từ nội bộ, kèm tác giả, giấy phép và liên kết nguồn. Mỗi ảnh có 20 giây, chỉ đếm sau khi ảnh tải xong; lỗi tải có nút thử lại. Được chỉnh ghim trước khi chốt; hết giờ tự chốt ghim cuối cùng, chưa có ghim nhận 0 điểm. Khoảng cách dùng Haversine, điểm mỗi ảnh `round(30 × exp(-km / 250))`, tối đa 30; “ghim gần” là sai lệch **<100 km**. Online cần ít nhất 7/10 ảnh ghim gần; bản sự kiện cần ít nhất 1/10. Có tạm dừng thủ công/tự động khi tab bị ẩn, nhạc nền riêng, toàn màn hình và điều khiển bản đồ bằng cảm ứng, chuột hoặc phím mũi tên. Site header ẩn riêng trong game. Kết quả chưa lưu vào hộ chiếu hay dùng đổi quà.
+
+Ảnh thật Hạ Long, Chùa Cầu, Ngọ Môn và bản đồ vector tải cục bộ. Bản đồ có nhãn Hoàng Sa/Trường Sa (Việt Nam), phóng to tối đa 4×, kéo để di chuyển; phép đổi tọa độ dùng SVG CTM để ghim đúng khi zoom hoặc có khoảng trống quanh bản đồ. Sau mỗi câu hiện tên di sản, vị trí đúng, ghim đã chọn và vùng 100 km. Chi tiết nguồn, giấy phép ảnh và mức khái quát bản đồ: `public/game/place/README.md`. Dữ liệu địa điểm/ảnh thay ở `app/game/place/engine.ts`.
+
+**Cảm ứng:** kéo một ngón để di chuyển; chụm/tách hai ngón để thu phóng 1–4× quanh trung điểm hai ngón. Có thể kéo tiếp khi nhấc một ngón. Kéo, pinch và thao tác bị huỷ không đặt ghim; chạm đơn sau đó vẫn dùng phép đổi tọa độ hiện tại. Các nút +/−, đặt lại và phím mũi tên vẫn hoạt động.
+
+**Chủ đề:** Di sản thế giới tại Việt Nam. Người chơi nhìn ảnh di sản rồi xác định địa điểm trên bản đồ.
+
+**Gameplay:** Hiển thị ảnh **không kèm tên di sản**. Người chơi chọn **một điểm trên bản đồ** để đặt ghim. Điểm càng gần vị trí thật càng cao.
+
+**Luật ONLINE [Đã nêu trong đề xuất]:**
+
+- **10 ảnh/lượt**, mỗi ảnh **20 giây**.
+- **Vượt khi có ít nhất 2 ảnh** được ghim sai lệch **dưới 100 km**.
+
+**Bản SỰ KIỆN:** Ghim vị trí cho **7 ảnh** trên điện thoại.
+
+**Thử thách thực tế:** Gắn cờ di sản quê mình lên bản đồ lớn tại gian.
+
+**Lưu ý [Đã nêu trong đề xuất]:** Bản đồ trong game phải là bản đồ chuẩn, có **Hoàng Sa và Trường Sa**.
+
+**[Cần xác nhận]:** Danh sách ảnh và tọa độ đích, công thức khoảng cách km, cách xử lý đảo/quần đảo, thư viện dữ liệu bản đồ và nguồn hình ảnh có bản quyền.
+
+### 4.5. Chặng 5 — ĐẠI SỨ DI SẢN (Dấu Tiếng nói)
+
+**Triển khai `/game/postcard`:** chọn một trong 30 địa điểm, 3 khung Cội nguồn / Sắc Việt / Vươn xa; viết lời thư tiếng Anh 1–20 từ, tối đa 240 ký tự, tên người gửi tối đa 40 ký tự. Chỉ gửi thư riêng đến BTC, không quay video, tải PNG hay chia sẻ file. Mỗi thư hợp lệ nhận 100 điểm, điểm cao nhất game 5 chỉ đóng góp 100 vào tổng điểm. Preview cập nhật chữ bằng DOM, giữ các họa tiết giấy và nguồn/giấy phép ảnh từ `postcard-art.ts`; bản nháp được lưu cục bộ.
+
+Thư lưu trong bảng riêng `game_letters`, gắn với tài khoản và lượt chơi; gửi lại cùng nội dung không tạo thư hoặc cộng điểm trùng. Chưa mở tường công khai/bình chọn. Bản sự kiện dùng cùng công cụ. Game mở từ lobby, ẩn site header và hỗ trợ fullscreen theo thiết bị. Tài khoản bằng số điện thoại + tên hiển thị duy nhất; mỗi game có 3 lượt dùng chung online/sự kiện. Tổng điểm cộng kết quả cao nhất từng game. Chi tiết dữ liệu và vận hành: `docs/game-accounts.md`.
+
+**Chủ đề:** Di sản tự chọn. Người chơi giới thiệu di sản Việt Nam với bạn bè quốc tế.
+
+**Gameplay:** Chọn khung thiệp, viết một câu tiếng Anh giới thiệu di sản rồi gửi thư đến BTC.
+
+**Luật ONLINE [Đã nêu trong đề xuất]:**
+
+- Nội dung **tối đa 20 từ**.
+- **BTC phải duyệt** trước khi postcard hiển thị trên tường postcard.
+- Postcard được bình chọn nhiều nhất **mỗi ngày** nhận sticker hiếm.
+
+**Bản SỰ KIỆN:** Viết postcard trên điện thoại.
+
+**Thử thách thực tế:** Nói **30 giây tiếng Anh** giới thiệu một di sản.
+
+**Phần mở rộng chưa triển khai:** tường thư công khai, duyệt nội dung và bình chọn. Không ảnh hưởng điểm cố định 100 của thư hợp lệ hiện tại.
+
+### 4.6. So sánh 5 game ở hai giai đoạn
+
+| # | Mini-game | Chế độ online | Chế độ sự kiện trên điện thoại | Thử thách thực tế (tùy chọn) |
+|---|---|---|---|---|
+| 1 | Tiệm Bách nghệ | 5 đơn/60s, đúng 4 đơn | Giao 3 đơn | Sờ đoán chất liệu |
+| 2 | Xếp ván Đông Hồ | Ván 8×8, vượt khi 2 lớp | In 1 lớp | In với ván khắc thật |
+| 3 | Bắt nhịp di sản | Nhạc 60s tăng tốc, đúng ≥60%, có nốt giữ | Giữ nhịp 60s | Gõ phách 15s |
+| 4 | Đây là đâu? | 3 ảnh × 20s, 2 ảnh lệch <100 km | Ghim 2 ảnh | Gắn cờ lên bản đồ lớn |
+| 5 | Đại sứ di sản | Gửi thư tiếng Anh ≤20 từ; 100 điểm | Gửi thư | Thuyết trình tiếng Anh 30s |
+
+---
+
+## 5. Giai đoạn TẠI SỰ KIỆN — giải thích chính xác vai trò của QR
+
+### 5.1. Có những QR nào?
+
+**Theo tài liệu:**
+
+1. **QR tại cổng:** mở luồng đăng nhập/check-in bằng số điện thoại và nhận hộ chiếu giấy.
+2. **QR riêng ở từng gian:** QR gian 1 mở game 1; QR gian 2 mở game 2; ...; QR gian 5 mở game 5.
+
+**[Đề xuất triển khai]** Tạo URL dạng:
+
+```text
+https://game.example.com/event/check-in
+https://game.example.com/event/stages/1
+https://game.example.com/event/stages/2
+https://game.example.com/event/stages/3
+https://game.example.com/event/stages/4
+https://game.example.com/event/stages/5
+```
+
+`game.example.com` là tên miền **minh họa**, không phải URL thật của sự kiện. QR chứa đường dẫn tới đúng màn hình/chặng và phiên bản `event`.
+
+### 5.2. Luồng của một người chơi ở gian 1 — ví dụ từng bước
+
+1. Người tham dự đã vào sự kiện, có thể đã chơi online hoặc chưa (**trường hợp chưa chơi cần BTC chốt cơ chế**).
+2. Đến gian **Tiệm Bách nghệ**, dùng camera điện thoại **quét QR** dán tại gian.
+3. Trình duyệt mở mini-game **Tiệm Bách nghệ — chế độ sự kiện**.
+4. Nếu chưa có phiên đăng nhập, **[Đề xuất triển khai]** chuyển tới đăng nhập bằng số điện thoại rồi quay trở lại mini-game.
+5. Game hiện yêu cầu giao **3 đơn hàng**. Người chơi thao tác chọn/giao sản phẩm trên **chính điện thoại của họ**.
+6. Sau khi vượt game, màn hình hiển thị **kết quả hoàn thành**.
+7. Người chơi **đưa màn hình kết quả cho chủ gian**.
+8. Chủ gian **phát một túi sticker giấy**. Tài liệu không yêu cầu làm thử thách thực tế mới được nhận sticker.
+9. Nếu muốn có thêm điểm, người chơi làm **thử thách sờ và đoán chất liệu**.
+10. Nhân viên gian hàng **nhập mã 4 số** để xác nhận điểm thưởng theo luồng trong PDF (chi tiết ai nhập mã ở thiết bị nào chưa được chốt).
+11. Người chơi tiếp tục sang gian 2, quét **QR gian 2** và chơi mini-game xếp ván Đông Hồ.
+
+### 5.3. Sơ đồ luồng tại sự kiện
+
+```mermaid
+flowchart TD
+    A[Người tham dự đến sự kiện] --> B[Quét QR tại cổng]
+    B --> C[Đăng nhập bằng số điện thoại]
+    C --> D[Nhận hộ chiếu giấy]
+    D --> E[Đi đến một gian di sản]
+    E --> F[Quét QR riêng của gian]
+    F --> G[Mở mini-game tương ứng - chế độ event]
+    G --> H[Chơi bản rút gọn]
+    H --> I{Vượt game?}
+    I -- Chưa --> J[Theo quy định chơi lại cần chốt]
+    J --> H
+    I -- Có --> K[Hiện màn hình kết quả]
+    K --> L[Cho chủ gian xem để nhận túi sticker giấy]
+    L --> M{Muốn điểm thưởng?}
+    M -- Có --> N[Thử thách thực tế tại gian]
+    N --> O[Nhân viên xác nhận bằng mã 4 số]
+    M -- Không --> P[Tiếp tục]
+    O --> P
+    P --> Q{Đủ 5 mẫu sticker?}
+    Q -- Chưa --> R[Đổi mẫu trùng hoặc đi gian khác]
+    R --> E
+    Q -- Có --> S[Đến quầy BTC đổi quà]
+```
+
+**Lưu ý:** Nhánh “chơi lại khi chưa vượt” trong sơ đồ là phần **cần chốt**, không phải quy định đã được mô tả cụ thể cho sự kiện.
+
+### 5.4. Người chơi có bắt buộc đứng tại gian mới chơi được không?
+
+**[Cần xác nhận]** Tài liệu nói người tham dự quét QR của gian để chơi, nhưng **không đưa ra biện pháp kỹ thuật để khóa việc truy cập từ xa**. QR nếu là URL tĩnh có thể bị chụp và chia sẻ.
+
+**[Đề xuất triển khai]** Ít nhất cần xác thực thời gian sự kiện, tài khoản và việc đã nhận thưởng; nếu yêu cầu bảo đảm người chơi có mặt tại gian, có thể bổ sung **mã thay đổi theo thời gian do nhân viên cung cấp** hoặc xác nhận tại gian. Các giải pháp này làm tăng khối lượng phát triển và chưa có trong đề xuất.
+
+---
+
+## 6. Điểm số, danh hiệu, vật phẩm và giải thưởng
+
+### 6.1. Điểm online
+
+**[Đã nêu trong đề xuất]** Điểm tối đa online **1.300 điểm**:
+
+| Thành phần | Tối đa |
+|---|---:|
+| 5 chặng × 200 điểm | 1.000 |
+| Chuỗi ngày | 200 |
+| Thách đấu | 100 |
+| **Tổng** | **1.300** |
+
+Người chơi được chơi lại; ghi nhận **điểm cao nhất** cho mỗi chặng. Bảng xếp hạng trường/CLB lấy **20 thành viên điểm cao nhất** của mỗi đơn vị.
+
+### 6.2. Mang điểm sang sự kiện
+
+**[Đã nêu trong đề xuất]** Điểm online mang sang làm **điểm khởi đầu, tối đa 200 điểm**. Bảng xếp hạng ngày sự kiện chốt **trước giờ nghỉ trưa**, vinh danh **top 10 đầu phiên chiều**.
+
+**[Cần xác nhận]** Chưa có công thức quy đổi 0–1.300 điểm online thành tối đa 200 điểm sự kiện; chưa có thang điểm mini-game event và thử thách thực tế.
+
+### 6.3. Danh hiệu
+
+| Mốc | Danh hiệu | Quyền lợi theo đề xuất |
+|---|---|---|
+| 1–2 sticker | Lữ khách | Ảnh hộ chiếu để chia sẻ |
+| 3–4 sticker | Nhà thám hiểm | Ưu tiên check-in nhanh ngày 05/12 |
+| 5 sticker | Đại sứ di sản | Quà lưu niệm, tên trên tường vinh danh |
+
+### 6.4. Phân biệt hai loại sticker
+
+- **Sticker số (online):** 5 con dấu ứng với 5 phần của nhân vật; mỗi dấu có **bản thường/bản hiếm**; có cơ chế mở túi mù.
+- **Sticker giấy (ngày 05/12):** Vượt mini-game tại gian → **bốc một túi mù**; mẫu trùng có thể đổi với người khác; **đủ 5 mẫu** thì đến quầy BTC nhận quà.
+
+**[Cần xác nhận]** Cơ chế phát túi mù làm phát sinh khả năng đã chơi đủ 5 gian nhưng vẫn thiếu mẫu do bị trùng; đề xuất cho phép đổi, nhưng chưa quy định bảo đảm nguồn cung, giao dịch đổi, điều kiện xác minh “đủ 5 mẫu”, hay mỗi người nhận tối đa bao nhiêu túi.
+
+### 6.5. Giải thưởng dự kiến
+
+- Top 10 online.
+- Top 10 tại sự kiện.
+- Trường hoặc CLB dẫn đầu.
+
+Số lượng và giá trị quà **chưa có trong tài liệu**.
+
+---
+
+## 7. Chức năng phần mềm cần xây dựng
+
+Bảng này chuyển nội dung đề xuất thành **danh sách chức năng dự kiến**, không ngụ ý mọi chi tiết đã chốt.
+
+| Nhóm | Chức năng | Nguồn/yêu cầu |
+|---|---|---|
+| Tài khoản | Tạo người chơi, lưu tên/số điện thoại/email/trường/CLB | Đã nêu |
+| Tài khoản | Đăng nhập lại ở sự kiện; khôi phục tiến trình | Đã nêu ở mức luồng |
+| Hộ chiếu | Hiển thị nhân vật bóng mờ, 5 con dấu, 5 phần được mở | Đã nêu |
+| Gameplay | Mini-game Tiệm Bách nghệ | Đã nêu |
+| Gameplay | Mini-game Xếp ván Đông Hồ | Đã nêu |
+| Gameplay | Mini-game Bắt nhịp di sản | Đã nêu |
+| Gameplay | Mini-game Đây là đâu? | Đã nêu |
+| Gameplay | Mini-game Đại sứ di sản | Đã nêu |
+| Gameplay | 2 bộ luật online/event, lưu điểm tốt nhất online | Đã nêu ở mức chức năng |
+| Gamification | Túi mù, sticker thường/hiếm, huy hiệu | Đã nêu |
+| Gamification | Đoán chữ hằng ngày và chuỗi ngày | Đã nêu |
+| Gamification | Thách đấu qua link | Đã nêu |
+| Xếp hạng | Cá nhân, trường/CLB, xếp hạng tại sự kiện | Đã nêu |
+| Chia sẻ | Ảnh hộ chiếu/thẻ tổng kết | Đã nêu |
+| Event | QR check-in và QR riêng từng gian | Đã nêu |
+| Event | Xác nhận game hoàn thành và phát sticker giấy | Có trong luồng nghiệp vụ; phần mềm xác nhận cần thiết kế |
+| Event | Mã 4 số xác nhận thử thách thật | Đã nêu |
+| Postcard | Viết, chọn khung, có thể quay clip, duyệt và bình chọn | Đã nêu |
+| Admin | Duyệt postcard | BTC duyệt, cần màn hình hoặc quy trình phù hợp |
+| Admin | Quản trị nội dung, lịch mở chặng, chống gian lận, quản lý quà | Đề xuất triển khai |
+| Vận hành | Tổng hợp kết quả, xuất bảng top 10, đối soát người nhận quà | Đề xuất triển khai |
+
+---
+
+## 8. Thiết kế hệ thống gợi ý cho đội kỹ thuật
+
+> **Toàn bộ mục 8 là [Đề xuất triển khai], không xuất hiện như yêu cầu công nghệ bắt buộc trong PDF.**
+
+### 8.1. Kiến trúc tối giản
+
+```mermaid
+flowchart LR
+    A[Điện thoại người chơi] --> B[Web frontend]
+    B --> C[Game UI và engine]
+    B --> D[Backend API]
+    C --> D
+    D --> E[(PostgreSQL)]
+    F[Nhân viên và BTC] --> G[Admin web]
+    G --> D
+    D --> H[Lưu ảnh/postcard/media nếu dùng]
+```
+
+**Stack tham khảo:**
+
+- **Frontend:** React hoặc Next.js; bố cục mobile-first.
+- **Gameplay 2D:** Phaser cho các mini-game có animation, timing, tương tác kéo-thả; các form, postcard, bảng hạng có thể dùng React thông thường.
+- **Backend:** Spring Boot, Node.js hoặc FastAPI; nên ưu tiên stack đội ngũ vận hành thành thạo.
+- **Database:** PostgreSQL.
+- **Media:** object storage để lưu ảnh/clip nếu bật tải lên.
+- **Triển khai:** HTTPS, CDN/cache tài nguyên tĩnh, quan sát lỗi và log.
+
+### 8.2. Gợi ý chia cấu trúc frontend
+
+```text
+/pages
+  /register
+  /passport
+  /leaderboard
+  /daily-challenge
+  /challenge/:id
+  /stages/:stageId             # online
+  /event/check-in
+  /event/stages/:stageId       # phiên bản event
+  /event/result/:attemptId
+  /admin                       # có thể là app tách riêng
+
+/game
+  /craft-shop                 # Tiệm Bách nghệ
+  /dong-ho-blocks             # Xếp ván Đông Hồ
+  /heritage-rhythm            # Bắt nhịp di sản
+  /heritage-map               # Đây là đâu?
+  /heritage-postcard          # Đại sứ di sản
+```
+
+### 8.3. Model dữ liệu sơ bộ
+
+| Entity | Chức năng chính |
+|---|---|
+| `users` | Thông tin người chơi và định danh |
+| `organizations` | Trường/CLB |
+| `characters` | Tên nhân vật, trạng thái khôi phục |
+| `stages` | Danh mục 5 chặng, lịch mở |
+| `game_attempts` | Lượt chơi, mode online/event, điểm, kết quả, thời điểm |
+| `stage_progress` | Điểm cao nhất, số lần vượt, con dấu đã nhận |
+| `stickers` | Danh mục mẫu, hiếm/thường |
+| `user_stickers` | Sticker số mà người chơi sở hữu |
+| `daily_challenges` | Câu đoán chữ hằng ngày |
+| `daily_results` | Chuỗi ngày, câu đã giải |
+| `duels` | Lời thách đấu, kết quả |
+| `postcards` | Nội dung, trạng thái duyệt, lượt bình chọn |
+| `event_booths` | Danh sách gian và QR |
+| `event_bonus_claims` | Lượt xác nhận điểm thưởng thực tế |
+| `reward_claims` | Ghi nhận quà đã phát/đã đổi |
+
+**Quan trọng:** Sticker giấy có thể vận hành hoàn toàn thủ công trong bản đầu tiên. Nếu BTC muốn chống phát lại/đổi quà lặp bằng hệ thống, cần thêm cơ chế ghi nhận phát và đổi vật phẩm vật lý.
+
+### 8.4. API gợi ý (chưa phải API contract)
+
+```http
+POST /api/users/register
+POST /api/auth/login
+GET  /api/me/passport
+GET  /api/stages
+POST /api/stages/{stageId}/attempts
+POST /api/stages/{stageId}/attempts/{attemptId}/complete
+GET  /api/leaderboards?mode=online
+GET  /api/leaderboards?mode=event
+GET  /api/daily-challenge
+POST /api/daily-challenge/submit
+POST /api/duels
+POST /api/postcards
+POST /api/postcards/{id}/vote
+POST /api/event/check-in
+POST /api/event/booths/{boothId}/bonus-claims
+POST /api/admin/postcards/{id}/approve
+```
+
+**Không tin điểm do trình duyệt tự gửi:** Trò xếp khối, tap theo nhạc và các trò tương tác client-side có nguy cơ bị sửa request. Nên có giới hạn kết quả hợp lệ, dấu thời gian lượt chơi, kiểm tra luật tối thiểu ở server, chống spam/rate limit và lịch sử audit. Mức độ chống gian lận phụ thuộc ngân sách, thời gian và giá trị giải thưởng.
+
+### 8.5. Hai chế độ game: một gameplay, hai cấu hình
+
+```ts
+// Minh họa ý tưởng, không phải mã nguồn chính thức
+const modes = {
+  online: {
+    craftShop: { orders: 5, timeSeconds: 60, minCorrect: 4 },
+    dongHo: { minLayers: 2 },
+    rhythm: { durationSeconds: 60, minAccuracy: 0.6 },
+    heritageMap: { images: 3, secondsPerImage: 20, minWithin100Km: 2 },
+  },
+  event: {
+    craftShop: { orders: 3 },
+    dongHo: { minLayers: 1 },
+    rhythm: { durationSeconds: 60 },
+    heritageMap: { images: 2 },
+  },
+};
+```
+
+Ví dụ trên **chỉ đưa vào các thông số được tài liệu nêu rõ**, không tự đặt điểm số hay quy tắc thắng cho các trường còn thiếu.
+
+---
+
+## 9. Luồng màn hình dự kiến
+
+**[Đề xuất triển khai]**
+
+### 9.1. Người chơi online
+
+```text
+Landing / Intro
+  ├─ Đăng ký / đăng nhập
+  └─ Nhân vật + hộ chiếu
+       ├─ Danh sách 5 chặng / chặng khóa
+       │    └─ Cốt truyện → mini-game → kết quả → con dấu/sticker
+       ├─ Đoán chữ hằng ngày
+       ├─ Thách đấu qua link
+       ├─ Bảng xếp hạng cá nhân / trường
+       ├─ Album sticker
+       └─ Thẻ tổng kết để chia sẻ
+```
+
+### 9.2. Người chơi ngày sự kiện
+
+```text
+Quét QR cổng → Đăng nhập → Hộ chiếu sự kiện
+  → Quét QR gian N → Chơi mini-game N (mode event)
+  → Kết quả để nhân viên đối chiếu
+  → Nhận sticker giấy
+  → (Tùy chọn) Thử thách thật → Nhân viên nhập mã 4 số
+  → Gian tiếp theo / trao đổi sticker / quầy đổi quà
+```
+
+### 9.3. Đội BTC/nhân viên
+
+```text
+Admin / công cụ vận hành
+  ├─ Theo dõi số người chơi và lượt hoàn thành
+  ├─ Duyệt postcard trước khi công khai
+  ├─ Xác nhận và theo dõi điểm thưởng gian hàng
+  ├─ Xem bảng xếp hạng online/event
+  └─ Đối soát việc cấp quà và vinh danh
+```
+
+Phân quyền chi tiết, giao diện admin và quy trình nhận thưởng vẫn cần đặc tả.
+
+---
+
+## 10. Kế hoạch triển khai theo tài liệu gốc
+
+| Thời gian | Công việc |
+|---|---|
+| **12–16/11** | Chốt kịch bản, di sản, bộ 5 sticker |
+| **17–23/11** | Dựng game, chạy thử với **20–30 thành viên JCI** |
+| **24/11** | Ra mắt game online, mở chặng 1 |
+| **26/11–02/12** | Hai ngày mở một chặng, kết hợp truyền thông và xếp hạng trường |
+| **04/12** | Khóa bảng online; in QR, sticker, hộ chiếu |
+| **05/12** | Vận hành game tại 5 gian hàng |
+
+Kênh tiếp cận: Đoàn trường/CLB, khách mời diễn đàn, thí sinh Surantia và Public Speaking & Debating, poster có QR.
+
+**Đánh giá kỹ thuật [Đề xuất triển khai]:** Lịch 17–23/11 để phát triển và test **5 gameplay khác nhau** cộng với hệ thống tài khoản/điểm/sticker/QR là rất gấp. Cần thống nhất **phạm vi MVP** và phân công rõ người phụ trách backend, frontend/game, UI/assets, nội dung di sản, kiểm thử, vận hành. Không nên cam kết ngày ra mắt trước khi chốt nguồn lực.
+
+### 10.1. MVP được đề xuất nếu thiếu thời gian
+
+**Ưu tiên P0 — bắt buộc để luồng sự kiện hoạt động:**
+
+1. Đăng ký/đăng nhập, giữ tài khoản qua hai giai đoạn.
+2. 5 mini-game có thể chơi trên điện thoại với 2 mode.
+3. Lưu kết quả, điều kiện vượt, mở con dấu/hộ chiếu.
+4. QR cổng, QR từng gian và màn hình kết quả.
+5. Bảng điểm và export top 10 đơn giản.
+6. Cơ chế nhân viên xác nhận điểm thưởng (nếu tổ chức hoạt động thật).
+7. Test trên máy thật, mạng di động thật, tải đồng thời tối thiểu theo ước lượng lượng khách.
+
+**Ưu tiên P1 — chỉ triển khai khi P0 ổn định:**
+
+- Chuỗi ngày, thách đấu link, sticker hiếm, tính năng chia sẻ nâng cao.
+- Postcard có video và bình chọn, nếu chưa chuẩn bị đủ quy trình duyệt và lưu trữ.
+- Quản lý phát sticker giấy và đổi quà hoàn toàn số hóa.
+
+Việc lùi P1 là **đề xuất quản lý phạm vi**, không phải thay đổi đã được BTC đồng ý.
+
+---
+
+## 11. Danh sách cần chốt với BTC — ưu tiên theo mức ảnh hưởng
+
+### 11.1. Sáu quyết định có sẵn trong PDF (trang 18)
+
+1. Danh sách **5 di sản chính thức** và **đơn vị đứng mỗi gian**.
+2. **Ngân sách quà**, số lượng sticker và hộ chiếu giấy.
+3. **Ai dựng game:** đội kỹ thuật riêng hay bản web từ kịch bản.
+4. Game **tiếng Việt hay song ngữ Việt–Anh**.
+5. Nhà tài trợ có được **gắn logo lên chặng hoặc sticker** không.
+6. Nguồn **ảnh/âm thanh có quyền sử dụng** cho chặng 2 và 3.
+
+### 11.2. Câu hỏi bổ sung để viết đặc tả kỹ thuật
+
+**Tài khoản & dữ liệu**
+
+- Có xác minh OTP số điện thoại? Một số điện thoại được phép có mấy tài khoản?
+- Người chưa chơi online có thể đăng ký tại cổng ngày 05/12 không?
+- Có yêu cầu độ tuổi, chấp thuận thu thập thông tin, thời hạn lưu số điện thoại/email/video không?
+
+**Luật & điểm**
+
+- Chi tiết cách chấm **0–200 điểm cho từng game**?
+- Công thức mang điểm online sang sự kiện (tối đa 200)?
+- Các chặng event được chơi lại không? Một người được nhận sticker giấy mấy lần/gian?
+- Khi thua chặng hoặc gặp lỗi mạng, xử lý thế nào?
+- Tổng điểm bảng xếp hạng sự kiện bao gồm điểm nào, chốt chính xác giờ nào?
+
+**Vận hành gian hàng**
+
+- Mỗi gian có nhân viên và thiết bị riêng không? Ai nhập mã 4 số, mã tĩnh hay mã theo lượt?
+- QR có được phép chia sẻ ra ngoài? Có cần xác minh đang ở gian không?
+- Nhân viên xác minh màn hình hoàn thành bằng mắt hay quét một mã xác nhận của người chơi?
+- Số lượng túi sticker từng gian, kiểm soát nhận lặp, cách xử lý thiếu/trùng mẫu?
+
+**Nội dung/media**
+
+- 5 bộ hình, bản thu, câu hỏi, danh sách địa điểm và đáp án do ai cung cấp/duyệt?
+- Chặng 5: tiêu chí vượt, duyệt nội dung, duyệt/ngăn bình chọn giả, lưu video và quyền sử dụng hình ảnh?
+
+**Tải & thiết bị**
+
+- Dự kiến bao nhiêu người tham dự, số người online cùng lúc, kết nối Wi-Fi hay 4G/5G?
+- Danh sách thiết bị/trình duyệt tối thiểu; rhythm game có cần hiệu chỉnh độ trễ âm thanh không?
+- Có phương án dự phòng nếu mất Internet tại sự kiện không?
+
+---
+
+## 12. Rủi ro và cách xử lý đề xuất
+
+| Rủi ro | Hệ quả | Phương án gợi ý |
+|---|---|---|
+| Deadline rất ngắn | Game chưa ổn định | Chốt MVP, chia game độc lập theo owner, test tích hợp sớm |
+| QR bị chia sẻ | Chơi event ngoài gian | Xác nhận tại gian, giới hạn nhận thưởng; bổ sung mã ngắn theo phiên nếu cần |
+| Một người nhận nhiều sticker | Gian thiếu quà, gây tranh cãi | Ghi nhận đã thưởng theo user + gian, có quyền xử lý ngoại lệ |
+| Kết quả bị chỉnh từ client | Sai leaderboard | Kiểm tra và giới hạn dữ liệu ở backend, giám sát lượt bất thường |
+| Mạng đông người chập chờn | Mất kết quả, ùn tắc | Retry an toàn, lưu trạng thái tạm, mạng dự phòng |
+| Rhythm game lệch nhịp trên điện thoại | Người chơi bị trừ điểm oan | Kiểm thử đa thiết bị, vùng timing đủ dung sai |
+| Chặng 5 gửi nội dung không phù hợp | Rủi ro truyền thông | Hàng đợi duyệt, báo cáo nội dung, hạn chế spam |
+| Dùng ảnh/nhạc không có quyền | Rủi ro bản quyền | Chỉ dùng asset có quyền sử dụng; lưu nguồn/license |
+| Điểm/luật chưa chốt | Hai bên hiểu khác nhau | Duyệt bảng rule và ví dụ tính điểm trước khi lập trình |
+
+---
+
+## 13. Acceptance criteria gợi ý để nghiệm thu
+
+**[Đề xuất triển khai]** Mỗi điều kiện cần được BTC đồng ý trước khi sử dụng để nghiệm thu.
+
+- [ ] Người mới mở web trên điện thoại, đăng ký và nhìn thấy hộ chiếu.
+- [ ] Người cũ đăng nhập lại bằng số điện thoại và không mất dấu/điểm đã lưu.
+- [ ] Có thể mở đúng mini-game theo từng chặng, đúng thời gian mở online.
+- [ ] Mỗi mini-game áp dụng đúng quy tắc vượt của online.
+- [ ] Mỗi mini-game có mode event phù hợp bảng ở mục 4.6.
+- [ ] Điểm cao nhất được cập nhật khi chơi lại online, không bị ghi đè bởi điểm thấp hơn.
+- [ ] Vượt chặng chỉ nhận dấu theo chính sách được chốt, không phát trùng ngoài ý muốn.
+- [ ] Quét từng QR gian dẫn đúng game tương ứng.
+- [ ] Chơi xong hiển thị kết quả rõ ràng để nhân viên phát sticker giấy.
+- [ ] Điểm thưởng thử thách thật chỉ được xác nhận theo đúng quyền nhân viên.
+- [ ] Điểm online chuyển sang event không vượt 200 theo công thức đã duyệt.
+- [ ] Bảng xếp hạng và top 10 chốt theo mốc thời gian đã duyệt.
+- [ ] Postcard chưa duyệt không được xuất hiện công khai.
+- [ ] Các game hoạt động trên danh sách thiết bị thật đã thống nhất.
+- [ ] Đã diễn tập luồng từ check-in đến đổi quà và phương án xử lý sự cố.
+
+---
+
+## 14. Kết luận dành cho developer
+
+**Dự án thực chất là một hệ thống trải nghiệm sự kiện, không chỉ là một trò chơi đơn lẻ:**
+
+```text
+                   HỘ CHIẾU DI SẢN
+                          │
+            ┌─────────────┴─────────────┐
+            │                           │
+   TRƯỚC SỰ KIỆN                  TẠI SỰ KIỆN
+   24/11–04/12                      05/12
+            │                           │
+  Chơi 5 chặng đầy đủ          QR gian → cùng game
+  Cày điểm, lên hạng            phiên bản rút gọn
+  Nhận dấu/sticker số           Nhận sticker giấy
+  Chuỗi ngày/thách đấu          Thử thách thật (+ điểm)
+            │                           │
+            └──────────┬────────────────┘
+                       │
+         Chung tài khoản + nhân vật
+         Điểm online mang sang (≤200)
+```
+
+**Điều cần nắm vững khi triển khai:**
+
+1. **Chỉ có 5 loại mini-game**, không phải 5 game online cộng 5 game offline tách biệt. Mỗi loại có **hai chế độ luật**.
+2. QR gian hàng là **đường dẫn để mở trò chơi trên điện thoại**, không phải game tương tác với QR liên tục.
+3. Trò chơi **ngoài đời tại gian** là thử thách **tùy chọn để cộng điểm**, không phải điều kiện bắt buộc để lấy sticker giấy.
+4. Người chơi online và sự kiện dùng chung nhận diện/tiến trình, nhưng **điểm chuyển sang sự kiện có trần 200**.
+5. Cần xác nhận sớm **cách chấm điểm, phát thưởng, cơ chế đăng nhập, tiêu chí vượt chặng 5, thiết kế xác nhận tại gian**; đây là các điểm ảnh hưởng trực tiếp đến backend, UX và vận hành.
+
+---
+
+## Phụ lục A. Tra cứu nhanh với PDF gốc
+
+| Nội dung | Trang PDF |
+|---|---:|
+| Giới thiệu, thông điệp | 1–3 |
+| Tạo nhân vật, hộ chiếu | 4–5 |
+| Xu hướng chơi | 6 |
+| 5 mini-game | 7–11 |
+| Cơ chế quay lại | 12 |
+| Điểm, danh hiệu | 13 |
+| Sticker, quà | 14 |
+| Quy tắc tại 5 gian | 15 |
+| Luồng QR/ngày sự kiện | 16 |
+| Timeline | 17 |
+| 6 vấn đề cần chốt | 18 |
+| Tổng kết hai giai đoạn | 19 |
+
+**Nguồn duy nhất của các yêu cầu sự kiện trong tài liệu này:** bản PDF người dùng cung cấp *Hộ chiếu Di sản - Game QR tại Global Citizen Day 2026 (1).pdf*. Các thiết kế API, kiến trúc, UI flow, quản lý MVP, kiểm thử, xử lý rủi ro được đánh dấu là đề xuất riêng, không phải yêu cầu đã được duyệt.

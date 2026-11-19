@@ -720,5 +720,7 @@
   "m0685": "Experience point",
   "m0686": "Experience support point",
   "m0687": "TR01–TR02 are assigned and not open for registration.",
-  "m0688": "Cultural experience support"
+  "m0688": "Cultural experience support",
+  "navHeritagePassport": "Heritage Passport",
+  "passportAdminLoginDescription": "Sign in with your organizer account to manage QR codes, passport stamps and gift handovers."
 }

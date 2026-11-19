@@ -720,5 +720,7 @@
   "m0685": "Điểm trải nghiệm",
   "m0686": "Điểm hỗ trợ trải nghiệm",
   "m0687": "TR01–TR02 đã bố trí, không nhận đăng ký mới.",
-  "m0688": "Hỗ trợ trải nghiệm văn hoá"
+  "m0688": "Hỗ trợ trải nghiệm văn hoá",
+  "navHeritagePassport": "Hộ chiếu Di sản",
+  "passportAdminLoginDescription": "Đăng nhập bằng tài khoản ban tổ chức để quản lý QR, con dấu và xác nhận trao quà."
 }
