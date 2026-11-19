@@ -30,12 +30,14 @@ export type Action = { type: "start"; orders: Order[]; now: number; seed?: numbe
 export function initialState(mode: Mode): State {
   return { phase: "ready", mode, orders: [], customers: [], nextOrder: 0, tray: [], seed: 1, score: 0, combo: 0, answers: [], end: 0, now: 0, notice: null, revision: 0 };
 }
-export function shuffledOrders(): Order[] {
+export function shuffledOrders(initialSeed?: number): Order[] {
+  let value = initialSeed;
+  const random = () => { if (value === undefined) return Math.random(); value = (Math.imul(value, 1664525) + 1013904223) >>> 0; return value / 4294967296; };
   const orders: Order[] = [];
   const seen = new Set<string>();
   while (orders.length < 3) {
     const count = orders.length % 2 === 0 ? 2 : 3;
-    const items = Array.from({ length: count }, () => products[Math.floor(Math.random() * products.length)].id);
+    const items = Array.from({ length: count }, () => products[Math.floor(random() * products.length)].id);
     if (seen.has(items.join(","))) continue;
     seen.add(items.join(","));
     orders.push({ id: orders.length + 1, items });

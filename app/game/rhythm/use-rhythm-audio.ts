@@ -4,16 +4,21 @@ import { DURATION, LEAD_IN, beatInterval, beats, notes } from "./engine";
 
 export function useRhythmAudio() {
   const context = useRef<AudioContext | null>(null);
+  const prepared = useRef<AudioContext | null>(null);
   const origin = useRef(0);
   const [muted, setMuted] = useState(false);
   const master = useRef<GainNode | null>(null);
   function stop() {
     const audio = context.current; context.current = null; master.current = null;
     if (audio && audio.state !== "closed") void audio.close().catch(() => {});
+    if (prepared.current && prepared.current.state !== "closed") void prepared.current.close().catch(() => {});
+    prepared.current = null;
   }
+  async function prepare() { prepared.current ??= new AudioContext(); await prepared.current.resume(); }
   async function start() {
+    const ready = prepared.current; prepared.current = null;
     stop();
-    const audio = new AudioContext(); context.current = audio;
+    const audio = ready || new AudioContext(); context.current = audio;
     await audio.resume();
     if (context.current !== audio) return false;
     const gain = audio.createGain(); gain.gain.value = muted ? 0 : .5; gain.connect(audio.destination); master.current = gain;
@@ -56,6 +61,6 @@ export function useRhythmAudio() {
     const next = !muted; setMuted(next);
     if (master.current && context.current) master.current.gain.setTargetAtTime(next ? 0 : .5, context.current.currentTime, .02);
   }
-  useEffect(() => () => { const a = context.current; context.current = null; if (a && a.state !== "closed") void a.close().catch(() => {}); }, []);
-  return { start, stop, pause, resume, elapsed, muted, toggle };
+  useEffect(() => () => { const a = context.current; context.current = null; if (a && a.state !== "closed") void a.close().catch(() => {}); const p = prepared.current; prepared.current = null; if (p && p.state !== "closed") void p.close().catch(() => {}); }, []);
+  return { prepare, start, stop, pause, resume, elapsed, muted, toggle };
 }

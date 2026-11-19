@@ -38,5 +38,6 @@ export function useBackgroundMusic(active: boolean, source: string) {
   useEffect(() => () => {
     if (track.current) { track.current.pause(); track.current.removeAttribute("src"); track.current.load(); track.current = null; }
   }, []);
-  return { enabled, toggle, start };
+  function stop() { if (track.current) { track.current.pause(); track.current.currentTime = 0; } }
+  return { enabled, toggle, start, stop };
 }

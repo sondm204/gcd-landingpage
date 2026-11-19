@@ -1,4 +1,4 @@
-import { expect, test, type Page } from "@playwright/test";
+import { expect, test, type Page } from "./game-fixture";
 import { MAP_HEIGHT, MAP_WIDTH, places, project } from "../app/game/place/engine";
 
 async function begin(page: Page, event = false) {

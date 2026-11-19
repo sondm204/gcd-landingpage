@@ -1,4 +1,4 @@
-import { test, expect } from "@playwright/test";
+import { test, expect } from "./game-fixture";
 
 const games = [
   { route: "craft-shop", prefix: "craft" },

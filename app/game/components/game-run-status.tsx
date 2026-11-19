@@ -1,0 +1,5 @@
+"use client";
+import Link from "next/link";
+import type { RankedRun } from "../hooks/use-ranked-game";
+export function GameStartStatus({ run }: { run: RankedRun }) { return <div className="game-run-status"><small>Còn {run.remaining}/3 lượt · Tính lượt khi bắt đầu</small>{run.error && <p role="alert">{run.error}</p>}{run.saveStatus === "saving" && <p role="status">Đang lưu lượt trước…</p>}{run.canRetry && <button disabled={run.busy} onClick={() => void run.retry()}>Thử lưu lại lượt trước</button>}</div>; }
+export function GameResultStatus({ run }: { run: RankedRun }) { return <div className="game-run-result" aria-live="polite">{(run.saveStatus === "saving" || run.saveStatus === "idle") ? <p>Đang ghi nhận kết quả…</p> : run.saveStatus === "saved" ? <p>✓ Đã lưu <b>{run.savedScore} điểm</b> · Tổng điểm lấy kết quả cao nhất mỗi game.</p> : <><p>{run.error || "Chưa lưu được kết quả."}</p>{run.canRetry && <button disabled={run.busy} onClick={() => void run.retry()}>Thử lưu lại · không tốn thêm lượt</button>}</>}<Link href="/game/leaderboard">Xem bảng xếp hạng ↗</Link></div>; }

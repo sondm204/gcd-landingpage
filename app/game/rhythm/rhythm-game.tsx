@@ -1,8 +1,10 @@
 "use client";
 import Link from "next/link";
 import GameInstructions from "../components/game-instructions";
+import { useRankedGame } from "../hooks/use-ranked-game";
+import { GameStartStatus, GameResultStatus } from "../components/game-run-status";
 import { useSearchParams } from "next/navigation";
-import { useCallback, useEffect, useReducer, useRef, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { DURATION, GOOD, MAX_SCORE, pointsForNextNote, noteIsVisible, beatInterval, initialState, notes, reducer, travelTime } from "./engine";
 import { useRhythmAudio } from "./use-rhythm-audio";
 import { useGameFullscreen } from "../hooks/use-game-fullscreen";
@@ -14,7 +16,8 @@ export default function RhythmGame() {
   return <Game key={mode} event={mode === "event"} />;
 }
 function Game({ event }: { event: boolean }) {
-  const [state, dispatch] = useReducer(reducer, undefined, initialState);
+  const run = useRankedGame("rhythm", event ? "event" : "online", reducer, initialState);
+  const { state, dispatch } = run;
   const audio = useRhythmAudio(); const screen = useGameFullscreen(state.phase === "playing" || state.phase === "paused");
   const [error, setError] = useState(""); const [starting, setStarting] = useState(false);
   const latest = useRef({ audio, phase: state.phase });
@@ -31,14 +34,14 @@ function Game({ event }: { event: boolean }) {
     const first = inputs.current[lane].size === 0;
     inputs.current[lane].add(source);
     if (first) dispatch({ type: "hit", lane, elapsed: latest.current.audio.elapsed() });
-  }, []);
+  }, [dispatch]);
   const up = useCallback((lane: number, source: string) => {
     if (!inputs.current[lane].delete(source) || inputs.current[lane].size > 0 || latest.current.phase !== "playing") return;
     dispatch({ type: "release", lane, elapsed: latest.current.audio.elapsed() });
-  }, []);
+  }, [dispatch]);
   async function start() {
     setError(""); setStarting(true);
-    try { screen.enter(); if (await audio.start()) dispatch({ type: "start" }); }
+    try { screen.enter(); await audio.prepare(); if (await run.begin()) { if (await audio.start()) dispatch({ type: "start" }); } else audio.stop(); }
     catch { audio.stop(); setError("Chưa thể mở âm thanh. Hãy cho phép âm thanh trên trình duyệt rồi thử lại."); }
     finally { setStarting(false); }
   }
@@ -64,7 +67,7 @@ function Game({ event }: { event: boolean }) {
     document.addEventListener("visibilitychange", hide);
     window.addEventListener("blur", blur);
     return () => { cancelAnimationFrame(frame); document.removeEventListener("visibilitychange", hide); window.removeEventListener("blur", blur); };
-  }, [playing]);
+  }, [playing, dispatch]);
   useEffect(() => {
     if (state.phase === "result") { latest.current.audio.stop(); title.current?.focus(); }
   }, [state.phase]);
@@ -97,7 +100,7 @@ function Game({ event }: { event: boolean }) {
         <li>Tối đa {MAX_SCORE} điểm. Mỗi nốt đúng nối dài chuỗi và tăng điểm cho nốt tiếp theo. Hụt, thả sớm hoặc bấm sai sẽ ngắt chuỗi, trừ nửa giá trị nốt cơ bản. Điểm thấp nhất là 0.</li>
       </ol>
       <p className="rhythm-note">Nhạc nền ngũ cung nguyên bản với giai điệu, hợp âm và nhịp gõ tăng tốc cùng màn chơi; chưa phải bản thu Quan họ, Ca trù, Chèo hay Xẩm. Game tự tạm dừng khi rời tab.</p></GameInstructions>
-      <button className="rhythm-primary" disabled={starting} onClick={() => void start()}>{starting ? "Đang mở âm thanh…" : "Lên sân khấu →"}</button>
+      <GameStartStatus run={run} /><button className="rhythm-primary" disabled={starting || run.busy || !run.remaining} onClick={() => void start()}>{starting || run.busy ? "Đang mở lượt chơi…" : "Lên sân khấu →"}</button>
       <p className="rhythm-error" role="alert">{error}</p>
       <Link className="rhythm-mode" href={`/game/rhythm?mode=${event ? "online" : "event"}`}>Chuyển sang bản {event ? "online" : "sự kiện"}</Link>
     </section>}
@@ -133,6 +136,6 @@ function Game({ event }: { event: boolean }) {
       <p className="rhythm-bottom-note">Bấm nốt sáng theo thứ tự · Xuất hiện là bấm được · Nốt có đuôi: giữ</p>
       {state.phase === "paused" && <div className="rhythm-pause" role="dialog" aria-modal="true" aria-label="Game đã tạm dừng"><div><h2>Giữ lại nhịp này</h2><p>Nhạc và nốt đã tạm dừng. Sẵn sàng rồi tiếp tục nhé!</p>{state.holds.some(Boolean) && <p>Nốt dài đang dở: nhấn giữ lại làn đó ngay sau khi tiếp tục (trong 0,75 giây).</p>}<button className="rhythm-primary" autoFocus onClick={() => void resume()}>Tiếp tục →</button><p role="alert">{error}</p><Link href="/game">Về hành trình</Link></div></div>}
     </>}
-    {state.phase === "result" && <section className="rhythm-result"><p className="rhythm-kicker">KẾT THÚC LƯỢT CHƠI</p><h1 ref={title} tabIndex={-1}>Giai điệu của bạn</h1><div className="rhythm-result-score">{state.score}<small>/ {MAX_SCORE} điểm</small></div><p>{hits}/{notes.length} nốt đúng · {Math.round(hits / notes.length * 100)}%</p><div className="rhythm-results-grid"><span><b>{hits}</b>Đúng</span><span><b>{state.wrong}</b>Sai thứ tự</span><span><b>{notes.length - hits}</b>Trượt</span><span><b>{state.maxCombo}</b>Chuỗi dài nhất</span></div><p>Bấm sai thứ tự: {state.wrong} lần. Tiếp tục luyện tập để nối dài chuỗi đúng nhé!</p><button className="rhythm-primary" onClick={() => dispatch({ type: "reset" })}>Chơi lại</button><Link className="rhythm-mode" href="/game">Về hành trình 5 chặng →</Link><small className="rhythm-note">Kết quả bản chơi thử chưa lưu vào hộ chiếu, chưa dùng nhận sticker hay đổi quà.</small></section>}
+    {state.phase === "result" && <section className="rhythm-result"><p className="rhythm-kicker">KẾT THÚC LƯỢT CHƠI</p><h1 ref={title} tabIndex={-1}>Giai điệu của bạn</h1><div className="rhythm-result-score">{state.score}<small>/ {MAX_SCORE} điểm</small></div><p>{hits}/{notes.length} nốt đúng · {Math.round(hits / notes.length * 100)}%</p><div className="rhythm-results-grid"><span><b>{hits}</b>Đúng</span><span><b>{state.wrong}</b>Sai thứ tự</span><span><b>{notes.length - hits}</b>Trượt</span><span><b>{state.maxCombo}</b>Chuỗi dài nhất</span></div><p>Bấm sai thứ tự: {state.wrong} lần. Tiếp tục luyện tập để nối dài chuỗi đúng nhé!</p><GameResultStatus run={run} /><button className="rhythm-primary" onClick={() => dispatch({ type: "reset" })}>Chơi lại</button><Link className="rhythm-mode" href="/game">Về hành trình 5 chặng →</Link><small className="rhythm-note">Điểm được ghi nhận vào tài khoản sau khi kết thúc.</small></section>}
   </div></main>;
 }

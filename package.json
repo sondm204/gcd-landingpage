@@ -10,6 +10,8 @@
     "test:e2e": "playwright test",
     "test:booths:db": "node scripts/test-booths-db.mjs",
     "test:booths:app": "node scripts/test-booths-app.mjs",
+    "test:games:db": "node scripts/test-booths-db.mjs",
+    "test:games:app": "node scripts/test-games-app.mjs",
     "test:flyway": "node --test scripts/flyway.test.mjs",
     "test:booths:flyway": "node scripts/test-booths-db.mjs --flyway",
     "db:migrate": "node scripts/flyway.mjs migrate",

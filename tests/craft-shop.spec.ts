@@ -1,4 +1,4 @@
-import { test, expect } from "@playwright/test";
+import { test, expect } from "./game-fixture";
 
 const names: Record<string, string> = { pot: "Bình gốm", silk: "Khăn lụa", basket: "Giỏ mây", fan: "Quạt giấy", hat: "Nón lá", dragonfly: "Chuồn chuồn tre" };
 

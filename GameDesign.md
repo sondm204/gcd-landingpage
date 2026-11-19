@@ -203,13 +203,13 @@ Nhạc nền ngũ cung nguyên bản qua Web Audio cùng đồng hồ với nố
 
 ### 4.5. Chặng 5 — ĐẠI SỨ DI SẢN (Dấu Tiếng nói)
 
-**Bản thử `/game/postcard`:** chọn một trong 10 ảnh có sẵn, 3 khung Cội nguồn / Sắc Việt / Vươn xa; viết lời nhắn tiếng Anh 1–20 từ, tối đa 240 ký tự, tên người gửi tối đa 40 ký tự. Không tự chấm chất lượng ngôn ngữ, không tính điểm hay điều kiện vượt chặng. Preview cập nhật chữ trực tiếp bằng DOM, không tạo lại ảnh khi gõ. PNG 1200×1500 chỉ được tạo khi tải; có tên điểm đến, lời nhắn và nguồn/giấy phép ảnh. Preview và PNG dùng chung lớp trang trí từ `postcard-art.ts`: vân/sợi giấy, viền kim sắc, hoa sen / mặt trời trống đồng / sóng nước theo mẫu, cùng khung ảnh có độ nổi. Bản nháp lưu cục bộ, tự phục hồi khi bắt đầu lại trên cùng trình duyệt. Có chia sẻ file bằng Web Share nếu thiết bị hỗ trợ.
+**Triển khai `/game/postcard`:** chọn một trong 30 địa điểm, 3 khung Cội nguồn / Sắc Việt / Vươn xa; viết lời thư tiếng Anh 1–20 từ, tối đa 240 ký tự, tên người gửi tối đa 40 ký tự. Chỉ gửi thư riêng đến BTC, không quay video, tải PNG hay chia sẻ file. Mỗi thư hợp lệ nhận 100 điểm, điểm cao nhất game 5 chỉ đóng góp 100 vào tổng điểm. Preview cập nhật chữ bằng DOM, giữ các họa tiết giấy và nguồn/giấy phép ảnh từ `postcard-art.ts`; bản nháp được lưu cục bộ.
 
-Quay clip tối đa 15 giây là tuỳ chọn, chỉ xin camera/micro khi người dùng bấm quay. Có xem lại, tải clip, quay lại; tự dừng khi ẩn tab và giải phóng camera khi rời trang. Clip/ảnh chưa tải lên máy chủ. Bản thử chưa có API gửi/duyệt/tường công khai/bình chọn, chưa cấp điểm hoặc con dấu; các yêu cầu công khai bên dưới dành cho giai đoạn tích hợp backend. Bản sự kiện dùng cùng công cụ sáng tạo. Game mở từ lobby, ẩn site header và hỗ trợ fullscreen theo thiết bị.
+Thư lưu trong bảng riêng `game_letters`, gắn với tài khoản và lượt chơi; gửi lại cùng nội dung không tạo thư hoặc cộng điểm trùng. Chưa mở tường công khai/bình chọn. Bản sự kiện dùng cùng công cụ. Game mở từ lobby, ẩn site header và hỗ trợ fullscreen theo thiết bị. Tài khoản bằng số điện thoại + tên hiển thị duy nhất; mỗi game có 3 lượt dùng chung online/sự kiện. Tổng điểm cộng kết quả cao nhất từng game. Chi tiết dữ liệu và vận hành: `docs/game-accounts.md`.
 
 **Chủ đề:** Di sản tự chọn. Người chơi giới thiệu di sản Việt Nam với bạn bè quốc tế.
 
-**Gameplay:** Chọn khung **postcard**, viết một câu tiếng Anh giới thiệu di sản. Người chơi **có thể** quay clip **15 giây** đọc câu đó.
+**Gameplay:** Chọn khung thiệp, viết một câu tiếng Anh giới thiệu di sản rồi gửi thư đến BTC.
 
 **Luật ONLINE [Đã nêu trong đề xuất]:**
 
@@ -221,7 +221,7 @@ Quay clip tối đa 15 giây là tuỳ chọn, chỉ xin camera/micro khi ngư�
 
 **Thử thách thực tế:** Nói **30 giây tiếng Anh** giới thiệu một di sản.
 
-**[Cần xác nhận]:** Điều kiện nào tính là “vượt chặng”; cách chấm tối đa 200 điểm cho bài viết sáng tạo; có bắt buộc duyệt trước khi phát dấu không; có cần tải clip lên server hay chỉ quay tại chỗ; quy tắc bỏ phiếu và chống spam.
+**Phần mở rộng chưa triển khai:** tường thư công khai, duyệt nội dung và bình chọn. Không ảnh hưởng điểm cố định 100 của thư hợp lệ hiện tại.
 
 ### 4.6. So sánh 5 game ở hai giai đoạn
 
@@ -231,7 +231,7 @@ Quay clip tối đa 15 giây là tuỳ chọn, chỉ xin camera/micro khi ngư�
 | 2 | Xếp ván Đông Hồ | Ván 8×8, vượt khi 2 lớp | In 1 lớp | In với ván khắc thật |
 | 3 | Bắt nhịp di sản | Nhạc 60s tăng tốc, đúng ≥60%, có nốt giữ | Giữ nhịp 60s | Gõ phách 15s |
 | 4 | Đây là đâu? | 3 ảnh × 20s, 2 ảnh lệch <100 km | Ghim 2 ảnh | Gắn cờ lên bản đồ lớn |
-| 5 | Đại sứ di sản | Postcard tiếng Anh ≤20 từ; có thể quay 15s | Viết postcard | Thuyết trình tiếng Anh 30s |
+| 5 | Đại sứ di sản | Gửi thư tiếng Anh ≤20 từ; 100 điểm | Gửi thư | Thuyết trình tiếng Anh 30s |
 
 ---
 

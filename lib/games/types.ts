@@ -1,0 +1,9 @@
+export const gameIds = ["craft", "print", "rhythm", "place", "postcard"] as const;
+export type GameId = typeof gameIds[number];
+export const gameNames: Record<GameId, string> = { craft: "Tiệm Bách nghệ", print: "Xếp ván Đông Hồ", rhythm: "Bắt nhịp di sản", place: "Đây là đâu?", postcard: "Đại sứ di sản" };
+export const ATTEMPT_LIMIT = 3;
+export type Player = { id: string; display_name: string };
+export type Usage = { game: GameId; used: number; best: number | null };
+export type GameSession = { player: Player | null; usage: Usage[] };
+export type Attempt = { id: string; game: GameId; mode: "online" | "event"; seed: number; attempt_number: number; started_at: string; status: string; score: number | null };
+export type Leader = { rank: number; player_id: string; display_name: string; score: number; best_scores: Partial<Record<GameId, number>>; total_rows: number };

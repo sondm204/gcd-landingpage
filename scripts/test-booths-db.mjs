@@ -39,6 +39,16 @@ try {
   }
   run("psql", [...connection, "--single-transaction", "-f", resolve("db/tests/invariants.sql")]);
   run("psql", [...connection, "--single-transaction", "-f", resolve("db/tests/admin-edits.sql")]);
+  run("psql", [...connection, "--single-transaction", "-f", resolve("db/tests/games.sql")]);
+  const concurrentPlayer = run("psql", [...connection, "-At", "-c", "select id from public.game_players where phone='+84900000003'"]);
+  const gameStarts = await Promise.all(Array.from({ length: 4 }, () => new Promise(done => {
+    const child = spawn(join(bin, "psql" + ext), [...connection, "-c", `select public.game_start_attempt('${concurrentPlayer}','place','online',gen_random_uuid(),42);`], { windowsHide: true });
+    let stderr = ""; child.stderr.on("data", value => stderr += value); child.stdout.resume(); child.on("close", code => done({ code, stderr }));
+  })));
+  assert.equal(gameStarts.filter(r => r.code === 0).length, 3);
+  assert.match(gameStarts.find(r => r.code !== 0).stderr, /ATTEMPT_LIMIT/);
+  assert.equal(run("psql", [...connection, "-At", "-c", `select count(*) from public.game_attempts where player_id='${concurrentPlayer}'`]), "3");
+  console.log("PASS: game account uniqueness, private data, best-score leaderboards, letter idempotency and concurrent three-attempt limit.");
   function approve(id) {
     return new Promise((done) => {
       const child = spawn(join(bin, "psql" + ext), [...connection, "-c", `select public.review_booth_proposal('${id}', 'approved', '11111111-1111-4111-8111-111111111111', 'Concurrency check');`], { windowsHide: true });

@@ -2,7 +2,9 @@
 import Image from "next/image";
 import Link from "next/link";
 import GameInstructions from "../components/game-instructions";
-import { useEffect, useReducer, useRef, useState } from "react";
+import { useRankedGame } from "../hooks/use-ranked-game";
+import { GameStartStatus, GameResultStatus } from "../components/game-run-status";
+import { useEffect, useRef, useState } from "react";
 import { useSearchParams } from "next/navigation";
 import { CLOSE_KM, MAX_SCORE, ROUND_COUNT, requiredClose, initialState, places, reducer, type Result } from "./engine";
 import VietnamMap from "./vietnam-map";
@@ -30,7 +32,8 @@ export default function PlaceGame() {
   return <Game key={String(event)} event={event} />;
 }
 function Game({ event }: { event: boolean }) {
-  const [state, dispatch] = useReducer(reducer, event, initialState);
+  const run = useRankedGame("place", event ? "event" : "online", reducer, () => initialState(event));
+  const { state, dispatch } = run;
   const fullscreen = useGameFullscreen(["playing", "loading", "review", "paused"].includes(state.phase));
   const music = useBackgroundMusic(!["ready", "result", "paused"].includes(state.phase), "/game/audio/place-background.wav");
   const heading = useRef<HTMLHeadingElement>(null);
@@ -52,14 +55,14 @@ function Game({ event }: { event: boolean }) {
     const timer = window.setInterval(tick, 100);
     document.addEventListener("visibilitychange", hide);
     return () => { window.clearInterval(timer); document.removeEventListener("visibilitychange", hide); };
-  }, [playing]);
+  }, [playing, dispatch]);
   useEffect(() => {
     if (state.phase === "review") reviewHeading.current?.focus();
     if (state.phase === "ready" || state.phase === "result") heading.current?.focus();
   }, [state.phase]);
-  function start() {
+  async function start() {
     fullscreen.enter(); music.start();
-    dispatch({ type: "start", seed: crypto.getRandomValues(new Uint32Array(1))[0] });
+    if (!await run.begin(seed => ({ type: "start", seed }))) music.stop();
   }
   return <main className="place-app" data-phase={state.phase} data-active={board}><div className="place-wrap">
     <nav className="place-nav"><Link href="/game">← Hộ chiếu Di sản</Link><div>{fullscreen.supported && <button onClick={fullscreen.toggle}>{fullscreen.fullscreen ? "Thu nhỏ" : "Toàn màn hình"}</button>}<button aria-label="Nhạc nền" aria-pressed={music.enabled} onClick={music.toggle}>{music.enabled ? "Nhạc: bật" : "Nhạc: tắt"}</button></div></nav>
@@ -70,9 +73,9 @@ function Game({ event }: { event: boolean }) {
       <div className="place-rule-cards"><span><b>{ROUND_COUNT}</b>khung hình</span><span><b>20s</b>cho mỗi ảnh</span><span><b>&lt;100 km</b>để ghim gần</span></div>
       <GameInstructions><ol><li>Mỗi lượt chọn ngẫu nhiên {ROUND_COUNT} trong {places.length} địa điểm, không trùng ảnh. Nhìn ảnh không kèm tên, tìm vị trí trên bản đồ Việt Nam.</li><li>Chạm để đặt ghim. Dùng + / − để phóng to, kéo bản đồ để dịch chuyển; có thể sửa ghim trước khi chốt.</li><li>Chọn “Chốt vị trí” khi đã sẵn sàng. Hết giờ sẽ tự chốt ghim hiện tại; chưa đặt ghim được 0 điểm.</li></ol></GameInstructions>
       <p className="place-goal">Ghim gần ít nhất <b>{target}/{ROUND_COUNT} ảnh</b> để đạt chặng. Mỗi ảnh tối đa {MAX_SCORE} điểm; càng gần, điểm càng cao.</p>
-      <button className="place-primary" onClick={start}>Lên đường khám phá →</button>
+      <GameStartStatus run={run} /><button className="place-primary" disabled={run.busy || !run.remaining} onClick={start}>Lên đường khám phá →</button>
       <Link className="place-mode" href={`/game/place?mode=${event ? "online" : "event"}`}>Chuyển sang bản {event ? "online" : "sự kiện"}</Link>
-      <small className="place-trial">Bản chơi thử · Kết quả chưa lưu vào hộ chiếu, chưa dùng đổi quà.</small>
+      <small className="place-trial">Bản chơi thử · Điểm được ghi nhận vào tài khoản sau khi kết thúc.</small>
     </section>}
     {board && <>
       <header className="place-heading"><h1>Đây là đâu?</h1><span>CHẶNG 04 · {event ? "SỰ KIỆN" : "ONLINE"}</span>{playing && <button onClick={() => dispatch({ type: "pause", now: performance.now() })}>Tạm dừng</button>}</header>
@@ -100,7 +103,7 @@ function Game({ event }: { event: boolean }) {
       <h1 ref={heading} tabIndex={-1}>{passed ? "Bạn đã tìm về đúng nơi!" : "Việt Nam vẫn chờ bạn khám phá"}</h1>
       <div className="place-result-score">{score}<small>/ {state.order.length * MAX_SCORE} điểm</small></div><p>{close}/{state.order.length} ảnh ghim lệch dưới {CLOSE_KM} km · Mục tiêu {target} ảnh</p>
       <ol className="place-result-list">{state.results.map((r, i) => <li key={r.place}><Image src={places[r.place].image} alt="" width={88} height={64} unoptimized /><div><small>KHUNG HÌNH {String(i + 1).padStart(2, "0")} · {r.close ? "GHIM GẦN" : r.timedOut ? "HẾT GIỜ" : "CẦN GẦN HƠN"}</small><h2>{places[r.place].name}</h2><p>{distanceLabel(r)} · {r.score} điểm</p></div></li>)}</ol>
-      <button className="place-primary" onClick={() => dispatch({ type: "reset" })}>Khám phá lần nữa</button><Link className="place-mode" href="/game">Về hành trình 5 chặng →</Link><small className="place-trial">Kết quả bản chơi thử chưa lưu vào hộ chiếu, chưa dùng nhận sticker hay đổi quà.</small>
+      <GameResultStatus run={run} /><button className="place-primary" onClick={() => dispatch({ type: "reset" })}>Khám phá lần nữa</button><Link className="place-mode" href="/game">Về hành trình 5 chặng →</Link><small className="place-trial">Điểm được ghi nhận vào tài khoản sau khi kết thúc.</small>
     </section>}
   </div></main>;
 }

@@ -1,4 +1,4 @@
-import { test, expect } from "@playwright/test";
+import { test, expect } from "./game-fixture";
 import { fits, initialState, reducer, type State } from "../app/game/dong-ho/engine";
 
 test("three-minute countdown ends round and hydration is clean", async ({ page }) => {

@@ -1,4 +1,4 @@
-import { test, expect } from "@playwright/test";
+import { test, expect } from "./game-fixture";
 import { DURATION, MAX_SCORE, unitsForStreak, scoreFromUnits, GOOD, notes } from "../app/game/rhythm/engine";
 
 async function setup(page: import("@playwright/test").Page) {

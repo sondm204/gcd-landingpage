@@ -1,5 +1,4 @@
-import { test, expect } from "@playwright/test";
-import { readFile } from "node:fs/promises";
+import { test, expect } from "./game-fixture";
 import { createHash } from "node:crypto";
 import { products } from "../app/game/craft-shop/engine";
 import { MAP_HEIGHT, MAP_WIDTH, unproject } from "../app/game/place/engine";
@@ -82,7 +81,7 @@ test("pinch is bounded to 1–4x; cancelling a gesture leaves taps usable", asyn
   await cdp.detach();
 });
 
-test("paper motifs stay stable while typing and all three designs export complete PNGs", async ({ page }) => {
+test("paper motifs stay stable while typing and all three designs remain distinct", async ({ page }) => {
   await page.goto("/game/postcard");
   await page.getByRole("button", { name: "Viết câu chuyện của tôi →" }).click();
   await page.locator("textarea").fill("Discover the living heritage of Vietnam.");
@@ -99,14 +98,7 @@ test("paper motifs stay stable while typing and all three designs export complet
     await page.getByRole("button", { name: new RegExp(label) }).click();
     await expect(paper).toHaveAttribute("data-frame", id);
     if (id === "roots") await page.screenshot({ path: "test-results/postcard-paper-desktop.png", fullPage: true });
-    const download = page.waitForEvent("download");
-    await page.getByRole("button", { name: "Tải postcard của tôi ↓" }).click();
-    const file = await download, path = `test-results/postcard-paper-${id}.png`;
-    await file.saveAs(path);
-    const png = await readFile(path);
-    expect(png.readUInt32BE(16)).toBe(1200); expect(png.readUInt32BE(20)).toBe(1500);
-    hashes.add(createHash("sha256").update(png).digest("hex"));
-    await page.getByRole("button", { name: "Chỉnh sửa postcard" }).click();
+    hashes.add(createHash("sha256").update(await paper.evaluate(node => (node as HTMLElement).style.backgroundImage)).digest("hex"));
   }
   expect(hashes.size).toBe(3);
   await page.setViewportSize({ width: 390, height: 844 });

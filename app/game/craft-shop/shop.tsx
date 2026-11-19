@@ -2,8 +2,10 @@
 
 import Link from "next/link";
 import GameInstructions from "../components/game-instructions";
+import { useRankedGame } from "../hooks/use-ranked-game";
+import { GameStartStatus, GameResultStatus } from "../components/game-run-status";
 import { useSearchParams } from "next/navigation";
-import { useEffect, useReducer, useRef } from "react";
+import { useEffect, useRef } from "react";
 import { AnimatePresence, MotionConfig, motion, useReducedMotion } from "motion/react";
 import ProductArt from "./product-art";
 import { useBackgroundMusic } from "../hooks/use-background-music";
@@ -30,7 +32,8 @@ function Face({ angry, variant }: { angry: boolean; variant: number }) {
 }
 
 function Shop({ mode }: { mode: Mode }) {
-  const [state, dispatch] = useReducer(reducer, mode, initialState);
+  const run = useRankedGame("craft", mode, reducer, () => initialState(mode));
+  const { state, dispatch } = run;
   const titleRef = useRef<HTMLHeadingElement>(null);
   const playRef = useRef<HTMLElement>(null);
   const screen = useGameFullscreen(state.phase === "playing");
@@ -47,7 +50,7 @@ function Shop({ mode }: { mode: Mode }) {
     const timer = window.setInterval(tick, 100);
     document.addEventListener("visibilitychange", tick);
     return () => { clearInterval(timer); document.removeEventListener("visibilitychange", tick); };
-  }, [active]);
+  }, [active, dispatch]);
   useEffect(() => {
     if (state.phase === "playing") playRef.current?.scrollIntoView({ block: "start", behavior: "instant" });
     else { window.scrollTo({ top: 0, behavior: "instant" }); titleRef.current?.focus({ preventScroll: true }); }
@@ -66,7 +69,7 @@ function Shop({ mode }: { mode: Mode }) {
           <div className="craft-rules"><span><b>Liên tục</b>khách ghé tiệm</span><span><b>60 giây</b>mỗi lượt</span><span><b>10 điểm</b>mỗi đơn đúng</span></div>
           <GameInstructions><ol><li>Mỗi khách gọi <b>2–3 món</b>. Số trên đơn là thứ tự cần xếp.</li><li>Chạm món trên kệ để thêm vào khay; có thể chọn cùng món nhiều lần. Chạm món trên khay để bỏ.</li><li>Nhấn <b>Giao hàng</b>: khay khớp trọn đơn của khách nào thì khách đó nhận hàng. Mỗi đơn đúng được 10 điểm, hãy giao thật nhiều trong 60 giây!</li></ol>
           <p className="craft-note">Khách chờ khoảng {rules[mode].patience / 1000} giây, mỗi 10 giây khách mới chờ ít hơn 3 giây (tối thiểu 8 giây). Mỗi khách bỏ đi trừ 10 điểm, điểm tối thiểu là 0. Khi còn dưới 30%, khách sẽ tức giận. Giao sai không mất đơn nhưng ngắt chuỗi đúng; hết giờ chờ thì khách rời tiệm. Đồng hồ vẫn chạy khi bạn rời tab.</p></GameInstructions>
-          <button className="craft-primary" onClick={() => { music.start(); effects.unlock(); screen.enter(); dispatch({ type: "start", orders: shuffledOrders(), now: Date.now() }); }}>Mở cửa tiệm →</button>
+          <GameStartStatus run={run} /><button className="craft-primary" disabled={run.busy || !run.remaining} onClick={async () => { music.start(); effects.unlock(); screen.enter(); if (!await run.begin(seed => ({ type: "start", orders: shuffledOrders(seed), seed, now: Date.now() }))) music.stop(); }}>Mở cửa tiệm →</button>
           <Link className="craft-mode-link" href={`/game/craft-shop?mode=${mode === "online" ? "event" : "online"}`}>Chuyển sang {mode === "online" ? "bản sự kiện" : "bản online"}</Link>
         </div>
       </section>}
@@ -105,8 +108,8 @@ function Shop({ mode }: { mode: Mode }) {
         </section>
       </>}
 
-      {state.phase === "result" && <motion.section initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} className="craft-result"><div className="craft-result-seal" aria-hidden="true">✧</div><p className="craft-eyebrow">HẾT 60 GIÂY · TỔNG KẾT LƯỢT CHƠI</p><h2 ref={titleRef} tabIndex={-1}>Một phút làm chủ tiệm</h2><p>Bạn đã giao đúng {correct} đơn hàng. Mỗi đơn đúng được 10 điểm; thử lại để phục vụ thêm nhiều khách nhé!</p><div className="craft-result-stats"><span><b>{state.score}</b>điểm</span><span><b>{correct}</b>đơn đúng</span><span><b>{leftCustomers}</b>khách bỏ đi</span></div><ul className="craft-review">{state.orders.map(order => { const a = state.answers.find(answer => answer.id === order.id); return <li key={order.id}><span aria-label={a?.correct ? "Đúng" : "Chưa hoàn thành"}>{a?.correct ? "✓" : "−"}</span><div><b>Khách #{order.id}</b><small>{order.items.map(id => products.find(p => p.id === id)!.name).join(" → ")}</small><small>{a?.correct ? "Đã giao đúng thứ tự" : "Chưa giao kịp"}</small></div><strong>{(a?.points ?? 0) > 0 ? "+" : ""}{a?.points ?? 0}</strong></li>; })}</ul><p className="craft-note">Kết quả chơi thử trên thiết bị này, chưa lưu vào hộ chiếu và chưa dùng để nhận sticker hoặc đổi quà.</p><button className="craft-primary" onClick={() => dispatch({ type: "reset" })}>Chơi lại</button><Link className="craft-mode-link" href="/game">Về hành trình 5 chặng →</Link></motion.section>}
-      <details className="craft-info"><summary>Về bản chơi thử</summary><p>Khách đến liên tục trong 60 giây, không giới hạn số đơn. Mỗi đơn đúng được 10 điểm, chuỗi đúng chỉ để theo dõi và không nhân điểm. Giao sai hoặc khách bỏ đi ngắt chuỗi, mỗi khách bỏ đi bị trừ 10 điểm. Chưa kết nối tài khoản hay bảng xếp hạng.</p></details>
+      {state.phase === "result" && <motion.section initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} className="craft-result"><div className="craft-result-seal" aria-hidden="true">✧</div><p className="craft-eyebrow">HẾT 60 GIÂY · TỔNG KẾT LƯỢT CHƠI</p><h2 ref={titleRef} tabIndex={-1}>Một phút làm chủ tiệm</h2><p>Bạn đã giao đúng {correct} đơn hàng. Mỗi đơn đúng được 10 điểm; thử lại để phục vụ thêm nhiều khách nhé!</p><div className="craft-result-stats"><span><b>{state.score}</b>điểm</span><span><b>{correct}</b>đơn đúng</span><span><b>{leftCustomers}</b>khách bỏ đi</span></div><ul className="craft-review">{state.orders.map(order => { const a = state.answers.find(answer => answer.id === order.id); return <li key={order.id}><span aria-label={a?.correct ? "Đúng" : "Chưa hoàn thành"}>{a?.correct ? "✓" : "−"}</span><div><b>Khách #{order.id}</b><small>{order.items.map(id => products.find(p => p.id === id)!.name).join(" → ")}</small><small>{a?.correct ? "Đã giao đúng thứ tự" : "Chưa giao kịp"}</small></div><strong>{(a?.points ?? 0) > 0 ? "+" : ""}{a?.points ?? 0}</strong></li>; })}</ul><p className="craft-note">Điểm cao nhất của game được tính vào tổng điểm.</p><GameResultStatus run={run} /><button className="craft-primary" onClick={() => dispatch({ type: "reset" })}>Chơi lại</button><Link className="craft-mode-link" href="/game">Về hành trình 5 chặng →</Link></motion.section>}
+      <details className="craft-info"><summary>Về bản chơi thử</summary><p>Khách đến liên tục trong 60 giây, không giới hạn số đơn. Mỗi đơn đúng được 10 điểm, chuỗi đúng chỉ để theo dõi và không nhân điểm. Giao sai hoặc khách bỏ đi ngắt chuỗi, mỗi khách bỏ đi bị trừ 10 điểm. Điểm cao nhất được lưu vào bảng xếp hạng.</p></details>
     </div>
   </main>;
 }
