@@ -4,16 +4,15 @@ insert into public.booth_admins(user_id) values('11111111-1111-4111-8111-1111111
 do $$
 declare a jsonb; b jsonb; retry jsonb; payload jsonb;
 begin
-  assert (select count(*) = 34 from public.booth_public_map), 'Public plan must have 34 positions';
-  assert (select count(*) = 26 from public.booth_positions where is_active and is_bookable), '26 booths accept proposals';
+  assert (select count(*) = 40 from public.booth_public_map), 'Public plan must have 40 positions';
+  assert (select count(*) = 32 from public.booth_positions where is_active and is_bookable), '32 booths accept proposals';
   assert (select count(*)=5 from public.booth_public_map where code like 'VH%' and not is_bookable), 'Culture booths must be reserved';
+  assert not exists(select 1 from public.booth_public_map where code like 'TR%'), 'No TR labels';
   assert (select count(*)=3 from public.booth_public_map where code like 'BTC%' and not is_bookable), 'Organizer booths must be reserved';
-  assert (select count(*)=21 from public.booth_public_map where code like 'TM%' and is_bookable), '21 commercial booths';
-  assert (select x=28.375 and y=39.375 from public.booth_public_map where code='VH05'), 'VH05 must sit above TM01';
-  assert (select x=24.75 from public.booth_public_map where code='VH04'), 'VH04 returns to original row';
-  assert (select code='TM21' and is_bookable and y=45.5 from public.booth_public_map where id=34), 'TM21 fills gap above TM12';
-  assert (select count(*)=5 from public.booth_public_map where code like 'TT%' and is_bookable), '5 sponsor booths';
-  assert not exists(select 1 from public.booth_public_map where id>34), 'Retired booths hidden';
+  assert (select count(*)=24 from public.booth_public_map where code like 'TM%' and is_bookable), '24 commercial booths';
+  assert (select code='VH04' and not is_bookable from public.booth_public_map where id=29), 'VH04 retains its ID';
+  assert (select code='TM21' and is_bookable from public.booth_public_map where id=34), 'TM21 retains its ID';
+  assert (select count(*)=8 from public.booth_public_map where code like 'TT%' and is_bookable), '8 sponsor booths';
   assert not has_table_privilege('anon', 'public.booth_proposals', 'select'), 'Anonymous users must not read PII';
   assert not has_table_privilege('anon', 'public.booth_vouchers', 'select'), 'Public cannot enumerate discount codes';
   assert not has_table_privilege('authenticated', 'public.booth_vouchers', 'insert'), 'Auth alone cannot create vouchers';
@@ -23,7 +22,7 @@ begin
   assert (select public = false from storage.buckets where id = 'booth-proposals'), 'Uploads must be private';
   assert not exists(select 1 from information_schema.columns where table_schema='public' and table_name='booth_public_map' and column_name in ('email','phone','contact_name','image_paths')), 'Public projection must not expose PII';
   payload := '{"position_id":1,"brand":"Example Brand","booth_name":"Example booth","contact_name":"Test User","email":"user@example.test","phone":"0901234567","website":"https://example.test","category":"Khác","description":"A sufficiently long booth description."}'::jsonb;
-  for retry in select to_jsonb(n) from generate_series(26,40) n where n<>34 loop
+  for retry in select to_jsonb(n) from generate_series(26,33) n loop
     begin
       perform public.submit_booth_proposal(gen_random_uuid(), 'reserved-position-test', jsonb_set(payload, '{position_id}', retry), '[]');
       raise exception 'Reserved or retired position accepted a proposal';
@@ -85,4 +84,15 @@ begin
     raise exception 'Exhausted voucher accepted';
   exception when raise_exception then if sqlerrm<>'VOUCHER_UNAVAILABLE' then raise; end if; end;
   assert (select count(*)=1 from public.booth_proposals where position_id=20), 'Exhausted voucher must roll back the registration';
+end; $$;
+
+do $$
+declare payload jsonb; n integer;
+begin
+  insert into public.booth_vouchers(code,type,value,usage_limit,created_by) values('EXPANDED','percent',10,3,'11111111-1111-4111-8111-111111111111');
+  payload := '{"brand":"New Commercial","booth_name":"New Booth","contact_name":"Test User","email":"new@example.test","phone":"0901234567","category":"Khác","description":"New plan voucher test","payment":{"discount_code":"EXPANDED","base":5000000,"discount":500000,"amount":4500000}}'::jsonb;
+  for n in 35..37 loop
+    perform public.submit_booth_proposal(gen_random_uuid(),'new-commercial-'||n,jsonb_set(payload,'{position_id}',to_jsonb(n)),'[]');
+  end loop;
+  assert (select used_count=3 from public.booth_vouchers where code='EXPANDED'), 'TM22–TM24 must consume voucher uses';
 end; $$;

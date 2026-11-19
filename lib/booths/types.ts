@@ -1,6 +1,6 @@
 export type ProposalStatus = "pending" | "approved" | "rejected";
-export const BOOTH_COUNT = 26;
-export const POSITION_COUNT = 34;
+export const BOOTH_COUNT = 32;
+export const POSITION_COUNT = 40;
 export const BOOTH_ZONES = [
   {
     "name": "Gian thương mại",
@@ -75,12 +75,19 @@ export const BOOTH_ZONES = [
 ] as const;
 
 export function zoneForPosition(id: number) {
-  if (id === 34) return BOOTH_ZONES[0];
+  if (id >= 34 && id <= 37) return BOOTH_ZONES[0];
+  if (id >= 38 && id <= 40) return BOOTH_ZONES[1];
   return BOOTH_ZONES.find((zone) => id >= zone.firstId && id <= zone.lastId);
 }
-export const isCommercialPosition = (id: number) => (id >= 1 && id <= 20) || id === 34;
-export const isBookablePosition = (id: number) => (id >= 1 && id <= 25) || id === 34;
-export const zonePositionCount = (prefix: string) => prefix === "TM" ? 21 : prefix === "BTC" ? 3 : 5;
+export const isCommercialPosition = (id: number) => Number.isInteger(id) && ((id >= 1 && id <= 20) || (id >= 34 && id <= 37));
+export const isBookablePosition = (id: number) => Number.isInteger(id) && ((id >= 1 && id <= 25) || (id >= 34 && id <= 40));
+export const zonePositionCount = (prefix: string) => prefix === "TM" ? 24 : prefix === "TT" ? 8 : prefix === "VH" ? 5 : 3;
+export function positionCode(id: number) {
+  const zone = zoneForPosition(id);
+  if (!zone) return "";
+  const n = id >= 38 ? id - 32 : id >= 34 ? id - 13 : id - zone.firstId + 1;
+  return zone.prefix + String(n).padStart(2, "0");
+}
 
 export type BoothPosition = {
   id: number;
@@ -107,21 +114,29 @@ export type BoothProposal = {
   receipt_url?: string;
 };
 
-// Coordinates are percentages of the supplied square plan.
+// Keep database IDs stable: 34=TM21, 35–37=TM22–24, 38–40=TT06–08.
 export function conceptPositions(): BoothPosition[] {
   return Array.from({ length: POSITION_COUNT }, (_, i) => {
     const id = i + 1, group = zoneForPosition(id)!;
-    const n = id === 34 ? 21 : id - group.firstId + 1;
+    const code = positionCode(id), n = Number(code.replace(/\D/g, ""));
     let x: number, y: number, w = 78, h = 52;
-    if (id === 34) { x=788; y=728; h=46; }
-    else if (id <= 20) {
-      if (n <= 4) { x = 454; y = 707 + (n - 1) * 71; }
-      else if (n <= 11) { x = 454 + (n - 5) * 93; y = 1028; }
-      else if (n <= 17) { x = 788 + (n - 12) * 93; y = 793; }
-      else { x = 1123; y = 1028 + (n - 18) * 65; }
-    } else if (id <= 25) { x = n <= 3 ? 788 + (n - 1) * 93 : 788; y = n <= 3 ? 523 : 591 + (n - 4) * 68; h = 50; }
-    else if (id <= 30) { x = n <= 4 ? 117 + (n - 1) * 93 : 454; y = n <= 4 ? 467 : 630; h = 58; }
-    else { x = n === 1 ? 1272 : 117; y = n === 1 ? 691 : n === 2 ? 707 : 1028; w = n === 1 ? 226 : 265; h = 82; }
-    return { id, code: group.prefix + String(n).padStart(2, '0'), zone: group.name, x: x/16, y: y/16, width: w/16, height: h/16, pending_count: 0, confirmed_brand: null, confirmed_booth: null, is_booked: false, is_bookable: group.bookable };
+    if (group.prefix === "TM") {
+      w = 88; h = 46;
+      if (n <= 4) { x = 465; y = 700 + (n - 1) * 58; }
+      else if (n <= 11) { x = 465 + (n - 5) * 94; y = 985; }
+      else if (n <= 16) { x = 1155; y = 985 + (n - 12) * 48; }
+      else if (n === 17) { x = 780; y = 700; }
+      else { x = 780 + (n - 18) * 94; y = 770; }
+    } else if (group.prefix === "TT") {
+      w = 88; h = 46;
+      if (n === 6) { x = 790; y = 408; }
+      else if (n <= 5) { x = n <= 3 ? 780 + (n - 1) * 94 : 780; y = n <= 3 ? 525 : 580 + (n - 4) * 55; }
+      else { x = n === 7 ? 935 : 1070; y = n === 7 ? 408 : 512; w = n === 7 ? 280 : 150; h = n === 7 ? 66 : 70; }
+    } else if (group.prefix === "VH") {
+      if (n <= 3) { x = n === 1 ? 150 : n === 2 ? 300 : 100; y = n === 3 ? 540 : 465; w = 115; h = 64; }
+      else { x = n === 4 ? 155 : 310; y = 608; w = 135; h = 68; }
+    }
+    else { x = n === 1 ? 1300 : 105; y = n === 1 ? 680 : n === 2 ? 695 : 985; w = n === 1 ? 240 : 285; h = 82; }
+    return { id, code, zone: group.name, x: x/16, y: y/16, width: w/16, height: h/16, pending_count: 0, confirmed_brand: null, confirmed_booth: null, is_booked: false, is_bookable: group.bookable };
   });
 }
