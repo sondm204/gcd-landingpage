@@ -140,7 +140,7 @@ try {
   const foreign = await fetch(`${origin}/api/booths/proposals`, { method: "POST", headers: { Origin: "https://foreign.test" } }); assert.equal(foreign.status, 403);
   await page.goto(`${origin}/booths`);
   await page.getByRole("button", { name: /^TM12 ·/ }).waitFor();
-  assert.equal(await page.locator(".booth-map-spot").count(), 26);
+  assert.equal(await page.locator(".booth-map-spot").count(), 32);
   assert.equal(await page.locator(".booth-map-service").count(), 8);
   assert.equal(await page.getByLabel("Chọn nhanh vị trí").locator('option[value="26"]').count(), 0);
   for (const [zone, firstId, topic] of [["gian thương mại", "1", "sản phẩm"], ["gian tài trợ", "21", "nhà tài trợ"]]) {
@@ -149,8 +149,8 @@ try {
     assert((await page.locator(".booth-selected-zone").textContent()).includes(topic));
   }
   const initialMap = await (await fetch(`${origin}/api/booths`)).json();
-  assert.equal(initialMap.positions.length, 34);
-  assert.equal(initialMap.positions.filter((entry) => entry.is_bookable).length, 26);
+  assert.equal(initialMap.positions.length, 40);
+  assert.equal(initialMap.positions.filter((entry) => entry.is_bookable).length, 32);
   assert.equal(initialMap.positions.filter(entry => !entry.is_bookable).length, 8);
   await page.getByLabel("Chọn nhanh vị trí").selectOption("12");
   await page.getByLabel("Thương hiệu / đơn vị *", { exact: true }).fill("Gốm Việt");
@@ -181,7 +181,7 @@ try {
   };
   const second = await submitSecond(), retry = await submitSecond();
   assert.equal(second.reference, retry.reference); assert.equal(proposals.length, 2);
-  for (const invalidId of ["26", "30", "31", "33", "40", "0"]) await submitSecond(randomUUID(), 400, invalidId);
+  for (const invalidId of ["26", "29", "30", "31", "33", "41", "0"]) await submitSecond(randomUUID(), 400, invalidId);
   assert.equal(proposals.length, 2); assert.equal(uploads.size, 1);
   await submitSecond(randomUUID(),201,"13");
   const blockedReview = await fetch(`${origin}/api/booths/admin/proposals/${proposals[0].id}`, { method: "PATCH", headers: { Origin: origin, "Content-Type": "application/json" }, body: JSON.stringify({ decision: "approved" }) }); assert.equal(blockedReview.status, 401);
@@ -238,7 +238,7 @@ try {
   await submitSecond(randomUUID(), 409);
   const originalStamp=proposals[0].updated_at;
   await page.getByRole("button", { name:"Sửa thông tin / ảnh / vị trí",exact:true }).click();
-  assert.equal(await page.locator('.booth-edit-form select[name="position_id"] option').count(), 26);
+  assert.equal(await page.locator('.booth-edit-form select[name="position_id"] option').count(), 32);
   await page.locator('.booth-edit-form input[name="brand"]').fill("Gốm Việt mới");
   await page.locator('.booth-edit-form input[name="booth_name"]').fill("Đất và tương lai");
   await page.locator('.booth-edit-form select[name="position_id"]').selectOption("13");
@@ -325,6 +325,10 @@ try {
   assert.equal(proposals.at(-1).position_id,24);
   await submitSecond(randomUUID(),201,"34");
   assert.equal(proposals.at(-1).position_id,34);
+  for (const id of [35,36,37,38,39,40]) {
+    await submitSecond(randomUUID(),201,String(id));
+    assert.equal(proposals.at(-1).position_id,id);
+  }
   assert.deepEqual(pageErrors, []);
   const previewProbe = createServer(); await new Promise((done) => previewProbe.listen(0, "127.0.0.1", done));
   const previewPort = previewProbe.address().port; await new Promise((done) => previewProbe.close(done));
@@ -332,7 +336,7 @@ try {
   preview = spawn(process.execPath, ["node_modules/next/dist/bin/next", "start", "-p", String(previewPort)], { windowsHide: true, stdio: "ignore", env: { ...process.env, APP_ORIGIN: previewOrigin, SUPABASE_URL: "", SUPABASE_PUBLISHABLE_KEY: "", SUPABASE_SERVICE_ROLE_KEY: "", BOOTH_RATE_LIMIT_SECRET: "" } });
   for (let i=0; i<100; i++) { try { if ((await fetch(previewOrigin)).ok) break; } catch {} await new Promise((done) => setTimeout(done, 200)); }
   const previewMap = await (await fetch(`${previewOrigin}/api/booths`)).json();
-  assert.equal(previewMap.configured, false); assert.equal(previewMap.positions.length, 34);
+  assert.equal(previewMap.configured, false); assert.equal(previewMap.positions.length, 40);
   const previewSubmit = await fetch(`${previewOrigin}/api/booths/proposals`, { method: "POST", headers: { Origin: previewOrigin } }); assert.equal(previewSubmit.status, 503);
   await page.goto(`${previewOrigin}/booths`);
   await page.locator(".booth-map-spot").first().waitFor();

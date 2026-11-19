@@ -1,6 +1,7 @@
+import { isCommercialPosition, positionCode } from "./types.ts";
 export const COMMERCIAL_PRICE = 5_000_000;
 export function calculatePayment(position: number, code: string, config = "[]") {
-  if (!((position >= 1 && position <= 20) || position === 34)) {
+  if (!isCommercialPosition(position)) {
     if (code) throw new Error("Mã giảm giá chỉ áp dụng cho gian thương mại.");
     return null;
   }
@@ -18,5 +19,5 @@ export function calculatePayment(position: number, code: string, config = "[]") 
 
 export function transferMemo(position: number, brand: string) {
   const name = brand.normalize("NFD").replace(/[\u0300-\u036f]/g, "").replace(/[đĐ]/g, "D").toUpperCase().replace(/[^A-Z0-9 ]/g, " ").replace(/\s+/g, " ").trim();
-  return `JCITL GCD TM${String(position === 34 ? 21 : position).padStart(2, "0")} ${name}`.slice(0, 50).trim();
+  return `JCITL GCD ${positionCode(position)} ${name}`.slice(0, 50).trim();
 }

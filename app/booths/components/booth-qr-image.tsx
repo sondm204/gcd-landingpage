@@ -5,6 +5,7 @@ import { useCopy } from "@/i18n/copy";
 import Image from "next/image";
 import { useCallback, useEffect, useRef, useState } from "react";
 import { isEmbeddedBrowser } from "@/lib/booths/browser";
+import { positionCode } from "@/lib/booths/types";
 
 type PreparedImage = { src: string; file: File };
 
@@ -57,7 +58,7 @@ export default function BoothQrImage({ qr, position }: { qr: string; position: n
   const [error, setError] = useState("");
   const pending = useRef<Promise<PreparedImage> | null>(null);
   const mounted = useRef(true);
-  const filename = `GCD-TM${String(position === 34 ? 21 : position).padStart(2, "0")}-QR.png`;
+  const filename = `GCD-${positionCode(position)}-QR.png`;
   const prepare = useCallback(() => {
     if (!pending.current) {
       pending.current = preparePng(qr, filename).catch(err => { pending.current = null; throw err; });
