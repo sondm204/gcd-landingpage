@@ -18,7 +18,7 @@ pnpm build
 pnpm start
 ```
 
-Font được tải về lúc build bởi `next/font/google`, sau đó phục vụ từ chính ứng dụng.
+Font được lưu tại `public/fonts/` và khai báo trong `app/fonts.css`, hỗ trợ tiếng Việt và không cần tải từ Google khi dev/build. Giấy phép OFL đi kèm trong cùng thư mục.
 
 ## Trải nghiệm
 

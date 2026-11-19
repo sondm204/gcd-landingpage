@@ -13,6 +13,7 @@ import HomeLink from "./home-link";
 
 export default function SiteHeader() {
   const pathname = usePathname();
+  if (["/game/craft-shop", "/game/dong-ho", "/game/rhythm", "/game/place", "/game/postcard"].some(path => pathname === path || pathname.startsWith(`${path}/`))) return null;
   return <HeaderContent key={pathname} pathname={pathname} />;
 }
 
@@ -20,6 +21,7 @@ function HeaderContent({ pathname }: { pathname: string }) {
   const t = useCopy();
   const home = pathname === "/";
   const booths = pathname === "/booths" || pathname.startsWith("/booths/");
+  const game = pathname === "/game" || pathname.startsWith("/game/");
   const [menuOpen, setMenuOpen] = useState(false);
   const headerRef = useRef<HTMLElement>(null);
   const toggleRef = useRef<HTMLButtonElement>(null);
@@ -44,6 +46,7 @@ function HeaderContent({ pathname }: { pathname: string }) {
       }}>
         <HomeLink className={home ? "active" : undefined} aria-current={home ? "page" : undefined}>{t("Trang chủ")}</HomeLink>
         <Link href="/booths" className={booths ? "active" : undefined} aria-current={pathname === "/booths" ? "page" : undefined}>{t("Gian hàng")}</Link>
+        <Link href="/game" className={game ? "active" : undefined} aria-current={pathname === "/game" ? "page" : undefined}>{t("Hộ chiếu Di sản")}</Link>
         {booths && <BoothAccount />}
         {home ? <button className="nav-cta" onClick={() => {
           setMenuOpen(false);

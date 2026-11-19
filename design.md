@@ -27,7 +27,7 @@ Thông tin dùng chung tại `lib/event.ts`: **Chủ nhật, 29/11/2026**, **H�
 
 - **Playfair Display** (`--font-display`): tiêu đề serif theo tinh thần poster, chữ nghiêng ở câu dẫn; kích thước co giãn bằng `clamp()`.
 - **Be Vietnam Pro** (`--font-body`): nội dung, form, điều hướng và lịch trình; ưu tiên dễ đọc và khoảng cách dòng thoáng.
-- Cả hai hỗ trợ tiếng Việt, dùng `next/font/google` trong `app/layout.tsx`, được phục vụ từ ứng dụng sau build.
+- Cả hai hỗ trợ tiếng Việt, được lưu tại `public/fonts/` và khai báo trong `app/fonts.css`, không tải từ Google khi dev/build. Giấy phép OFL đi kèm tài sản font.
 - Wordmark **The Heritage Odyssey** dùng artwork gốc. Tiêu đề, slogan, ngày và địa điểm vẫn là HTML có thể đọc/chọn.
 
 ## Hình ảnh
