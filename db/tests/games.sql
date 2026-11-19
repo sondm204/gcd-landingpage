@@ -5,10 +5,12 @@ begin
   a:=public.game_open_session('+84900000001','Người chơi A','người chơi a',repeat('a',64)); p:=(a->>'id')::uuid;
   perform public.game_open_session('+84900000001','NGƯỜI CHƠI A','người chơi a',repeat('b',64));
   if (select count(*) from public.game_players where phone='+84900000001')<>1 then raise exception 'Phone duplicated'; end if;
+  perform public.game_open_session('+84900000001',null,null,repeat('d',64));
+  if (select display_name from public.game_players where id=p)<>'Người chơi A' then raise exception 'Phone login changed the existing name'; end if;
   begin
-    perform public.game_open_session('+84900000001','Tên khác','tên khác',repeat('c',64));
-    raise exception 'Expected account mismatch';
-  exception when raise_exception then if sqlerrm<>'ACCOUNT_MISMATCH' then raise; end if; end;
+    perform public.game_open_session('+84900000009',null,null,repeat('e',64));
+    raise exception 'Expected name step for new phone';
+  exception when raise_exception then if sqlerrm<>'NAME_REQUIRED' then raise; end if; end;
   begin
     perform public.game_open_session('+84900000002','Người chơi A','người chơi a',repeat('c',64));
     raise exception 'Expected unique name';

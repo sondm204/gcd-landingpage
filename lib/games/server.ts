@@ -35,7 +35,7 @@ export async function currentPlayer() {
 }
 export async function requirePlayer() {
   const player = await currentPlayer();
-  if (!player) throw new GameError(401, "Nhập số điện thoại và tên hiển thị để bắt đầu chơi.");
+  if (!player) throw new GameError(401, "Nhập số điện thoại để mở hộ chiếu của bạn.");
   return player;
 }
 export function gameJson(data: unknown, status = 200) { return Response.json(data, { status, headers: { "Cache-Control": "no-store, private" } }); }
@@ -51,7 +51,6 @@ export async function gameBody(request: Request, max = 8192): Promise<unknown> {
   try { return JSON.parse(Buffer.concat(chunks).toString("utf8")); } catch { throw new GameError(400, "Nội dung không hợp lệ."); }
 }
 export function dbGameError(error: { code?: string; message: string }): never {
-  if (error.message.includes("ACCOUNT_MISMATCH")) throw new GameError(409, "Số điện thoại đã có tài khoản. Hãy nhập đúng tên hiển thị đã đăng ký.");
   if (error.code === "23505") throw new GameError(409, "Tên hiển thị đã có người sử dụng. Hãy chọn tên khác.");
   if (error.message.includes("ATTEMPT_LIMIT")) throw new GameError(409, "Bạn đã dùng hết 3 lượt của game này.");
   if (/ATTEMPT_CLOSED|ATTEMPT_EXPIRED|RESULT_CONFLICT|REQUEST_REUSED/.test(error.message)) throw new GameError(409, "Lượt chơi đã đóng hoặc đã ghi nhận kết quả. Vui lòng kiểm tra lại tài khoản.");

@@ -1,5 +1,6 @@
 import "./game.css";
 import type { Metadata } from "next";
+import { Suspense } from "react";
 import GameLobby from "./components/game-lobby";
 
 const title = "Hộ chiếu Di sản — Global Citizens Day 2026";
@@ -17,5 +18,5 @@ export const metadata: Metadata = {
 };
 
 export default function GamePage() {
-  return <GameLobby />;
+  return <Suspense fallback={<main className="game-account-gate">Đang mở hành trình…</main>}><GameLobby /></Suspense>;
 }

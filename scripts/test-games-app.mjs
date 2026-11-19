@@ -8,6 +8,11 @@ import { shuffledOrders, products } from '../app/game/craft-shop/engine.ts';
 import { notes } from '../app/game/rhythm/engine.ts';
 import { places, roundOrder } from '../app/game/place/engine.ts';
 const players=[], sessions=[], attempts=[], letters=[];
+const adminId='11111111-1111-4111-8111-111111111111';
+const settings={collecting_open:false,redeeming_open:false,minimum_stamps:null,reward_label:'Event gift'};
+const stations=[1,2,3].map(id=>({booth_id:id,code:`TM0${id}`,name:`Heritage Booth ${id}`,zone:'Gian thương mại',enabled:true,active:true,title:null,qr_token:(String(id).repeat(64))}));
+const stamps=[],redemptions=[];
+const passport=p=>({card_code:p.passport_code,settings:{...settings},count:stamps.filter(s=>s.player_id===p.id).length,redemption:redemptions.find(r=>r.player_id===p.id)??null,stations:stations.filter(s=>s.enabled||stamps.some(st=>st.booth_id===s.booth_id&&st.player_id===p.id)).map(s=>({id:s.booth_id,code:s.code,name:s.title||s.name,zone:s.zone,active:s.enabled&&s.active,received_at:stamps.find(st=>st.booth_id===s.booth_id&&st.player_id===p.id)?.received_at??null}))});
 const key='game-integration-server-only-key';
 let loseLetterResponse=true;
 const json=(res,status,body)=>{res.writeHead(status,{'Content-Type':'application/json'});res.end(JSON.stringify(body));};
@@ -17,13 +22,15 @@ const backend=createServer(async(req,res)=>{
     const url=new URL(req.url,'http://localhost');
     const chunks=[];for await(const chunk of req)chunks.push(chunk);
     const body=chunks.length?JSON.parse(Buffer.concat(chunks).toString()):{};
+    const admin={id:adminId,email:'admin@example.test',role:'authenticated',aud:'authenticated',app_metadata:{},user_metadata:{},created_at:new Date().toISOString()};
+    if(url.pathname==='/auth/v1/token')return json(res,200,{access_token:`${Buffer.from('{"alg":"HS256","typ":"JWT"}').toString('base64url')}.${Buffer.from(JSON.stringify({sub:adminId,aud:'authenticated',exp:Math.floor(Date.now()/1000)+3600})).toString('base64url')}.test`,refresh_token:'test-refresh',expires_in:3600,token_type:'bearer',user:admin});
+    if(url.pathname==='/auth/v1/user')return req.headers.authorization?.includes('.test')?json(res,200,admin):json(res,401,{message:'No admin'});
     if(req.headers.apikey!==key)return json(res,403,{message:'Service role required'});
     const fn=url.pathname.replace('/rest/v1/rpc/','');
     if(fn==='booth_consume_rate_limit')return json(res,200,true);
     if(fn==='game_open_session'){
       let player=players.find(p=>p.phone===body.p_phone);
-      if(player&&player.name_key!==body.p_name_key)return error(res,'ACCOUNT_MISMATCH');
-      if(!player){if(players.some(p=>p.name_key===body.p_name_key))return error(res,'duplicate name','23505');player={id:randomUUID(),phone:body.p_phone,name_key:body.p_name_key,display_name:body.p_name};players.push(player);}
+      if(!player){if(!body.p_name)return error(res,'NAME_REQUIRED');if(players.some(p=>p.name_key===body.p_name_key))return error(res,'duplicate name','23505');player={id:randomUUID(),phone:body.p_phone,name_key:body.p_name_key,display_name:body.p_name,passport_code:randomUUID().replaceAll('-','')+randomUUID().replaceAll('-','')};players.push(player);}
       sessions.push({token_hash:body.p_token_hash,player_id:player.id,expires_at:new Date(Date.now()+86400000).toISOString()});
       return json(res,200,{id:player.id,display_name:player.display_name});
     }
@@ -56,8 +63,30 @@ const backend=createServer(async(req,res)=>{
       const rows=totals.map(p=>({...p,rank:totals.findIndex(r=>r.score===p.score)+1,total_rows:totals.length}));
       return json(res,200,rows.slice(body.p_offset,body.p_offset+50));
     }
+    if(fn.startsWith('event_passport_')){
+      if(!['event_passport_state','event_passport_claim'].includes(fn)&&body.p_admin!==adminId)return error(res,'NOT_ADMIN');
+      if(fn==='event_passport_state')return json(res,200,passport(players.find(p=>p.id===body.p_player)));
+      if(fn==='event_passport_admin_state')return json(res,200,{settings,stations:stations.map(s=>({...s,id:s.booth_id,name:s.title||s.name,visits:stamps.filter(st=>st.booth_id===s.booth_id).length})),total_stamps:stamps.length,total_players:new Set(stamps.map(s=>s.player_id)).size,total_redemptions:redemptions.length});
+      if(fn==='event_passport_claim'){
+        const station=stations.find(s=>s.qr_token===body.p_token);if(!station)return error(res,'QR_INVALID');
+        const existing=stamps.find(s=>s.player_id===body.p_player&&s.booth_id===station.booth_id);if(existing)return json(res,200,{reused:true,station_id:station.booth_id,received_at:existing.received_at});
+        if(!settings.collecting_open)return error(res,'COLLECTION_CLOSED');if(!station.enabled)return error(res,'STATION_DISABLED');
+        const stamp={player_id:body.p_player,booth_id:station.booth_id,received_at:new Date().toISOString()};stamps.push(stamp);return json(res,200,{reused:false,station_id:station.booth_id,received_at:stamp.received_at});
+      }
+      if(fn==='event_passport_configure'){Object.assign(settings,{collecting_open:body.p_collecting,redeeming_open:body.p_redeeming,minimum_stamps:body.p_minimum,reward_label:body.p_reward});return json(res,200,null);}
+      if(fn==='event_passport_station_update'){const s=stations.find(s=>s.booth_id===body.p_id);s.enabled=body.p_enabled;s.title=body.p_title;if(body.p_rotate)s.qr_token=randomUUID().replaceAll('-','')+randomUUID().replaceAll('-','');return json(res,200,null);}
+      if(fn==='event_passport_sync')return json(res,200,null);
+      const player=players.find(p=>p.passport_code===body.p_card);if(!player)return error(res,'PASSPORT_NOT_FOUND');
+      if(fn==='event_passport_lookup')return json(res,200,{player:{id:player.id,display_name:player.display_name},passport:passport(player)});
+      if(fn==='event_passport_redeem'){
+        const previous=redemptions.find(r=>r.player_id===player.id);if(previous)return json(res,200,{reused:true,redemption:previous});
+        if(!settings.redeeming_open||settings.minimum_stamps===null)return error(res,'REDEMPTION_CLOSED');
+        const count=passport(player).count;if(count<settings.minimum_stamps)return error(res,'NOT_ENOUGH_STAMPS');
+        const redemption={player_id:player.id,stamp_count:count,reward_label:settings.reward_label,redeemed_at:new Date().toISOString()};redemptions.push(redemption);return json(res,200,{reused:false,redemption});
+      }
+    }
     const table=url.pathname.replace('/rest/v1/','');
-    const source={game_players:players,game_sessions:sessions,game_attempts:attempts}[table];
+    const source={game_players:players,game_sessions:sessions,game_attempts:attempts,event_passport_stations:stations,booth_admins:[{user_id:adminId,active:true}]}[table];
     if(source){
       const matches=row=>[...url.searchParams].every(([field,value])=>['select','limit','order'].includes(field)||value.startsWith('eq.')&&String(row[field])===value.slice(3)||value.startsWith('gt.')&&String(row[field])>value.slice(3));
       const rows=source.filter(matches);
@@ -85,13 +114,15 @@ try{
   assert.equal((await api('POST','/api/game/attempts',{game:'craft',mode:'online',request_key:randomUUID()})).status,401);
   await page.goto(origin+'/game');
   await page.getByLabel('Số điện thoại',{exact:true}).fill('0912345678');
+  assert.equal(await page.getByLabel('Tên hiển thị',{exact:true}).count(),0);
+  await page.getByRole('button',{name:'Tiếp tục →',exact:true}).click();
   await page.getByLabel('Tên hiển thị',{exact:true}).fill('Heritage Player');
-  await page.getByRole('button',{name:'Vào hành trình →'}).click();
+  await page.getByRole('button',{name:'Tạo hộ chiếu →'}).click();
   await page.getByRole('heading',{name:'Xin chào, Heritage Player'}).waitFor();
   const player=players[0];assert.equal(player.phone,'+84912345678');
   assert.equal((await api('POST','/api/game/session',{phone:'+84912345678',display_name:'HERITAGE PLAYER'})).status,200);
   assert.equal(players.length,1);
-  assert.equal((await api('POST','/api/game/session',{phone:'0912345678',display_name:'Wrong Name'})).status,409);
+  assert.equal((await api('POST','/api/game/session',{phone:'0912345678'})).status,200);
   assert.equal((await api('POST','/api/game/session',{phone:'0987654321',display_name:'Heritage Player'})).status,409);
   await page.goto(origin+'/game/postcard');
   for(let i=0;i<3;i++){
@@ -141,6 +172,56 @@ try{
   await page.getByRole('button',{name:'Đăng xuất',exact:true}).click();
   await page.goto(origin+'/game/rhythm');await page.getByRole('heading',{name:'Nhập tài khoản để bắt đầu'}).waitFor();
   assert.equal((await api('POST',`/api/game/attempts/${rhythm.id}`,actions)).status,401);
+  assert.equal((await api('GET','/api/game/passport/admin')).status,401);
+  assert.equal((await api('POST','/api/game/passport/claim',{code:stations[0].qr_token})).status,401);
+  const adminContext=await browser.newContext({viewport:{width:1280,height:900}}),adminPage=await adminContext.newPage();
+  await adminPage.goto(origin+'/game/admin#card='+player.passport_code);
+  await adminPage.getByRole('link',{name:'Đăng nhập quản trị →'}).click();
+  await adminPage.getByLabel('Email quản trị').fill('admin@example.test');
+  await adminPage.getByLabel('Mật khẩu',{exact:true}).fill('test-only-password');
+  await adminPage.getByRole('button',{name:'Đăng nhập quản trị'}).click();
+  await adminPage.getByRole('heading',{name:'Điều phối sự kiện'}).waitFor();
+  await adminPage.getByLabel('Mở nhận dấu',{exact:true}).check();
+  await adminPage.getByLabel('Mở đổi quà',{exact:true}).check();
+  await adminPage.getByLabel('Số dấu tối thiểu').fill('2');
+  await adminPage.getByRole('button',{name:'Lưu cấu hình',exact:true}).click();
+  await adminPage.getByText('Đã lưu cấu hình passport.').waitFor();
+  const qr=await adminContext.request.get(origin+'/api/game/passport/admin/qr/1');assert.equal(qr.status(),200);assert((await qr.text()).includes('<svg'));
+  await page.goto(origin+'/game/check-in#code='+stations[0].qr_token);
+  await page.getByLabel('Số điện thoại',{exact:true}).fill('0912345678');
+  await page.getByRole('button',{name:'Tiếp tục →',exact:true}).click();
+  await page.getByRole('heading',{name:'Một dấu hẹn mới!'}).waitFor();
+  assert.equal(await page.getByLabel('Tên hiển thị',{exact:true}).count(),0);
+  assert.equal(stamps.length,1);
+  await page.reload();await page.getByRole('heading',{name:'Dấu hẹn đã có trong hộ chiếu!'}).waitFor();assert.equal(stamps.length,1);
+  await page.goto(origin+'/game/check-in#code='+stations[1].qr_token);
+  await page.getByText('2 con dấu đã nhận',{exact:true}).waitFor();assert.equal(stamps.length,2);
+  await page.goto(origin+'/game?tab=event');await page.getByRole('heading',{name:'Những trang dấu của bạn'}).waitFor();
+  assert.equal(await page.locator('.game-stageCard, .game-account-games').count(),0);
+  assert.equal(await page.locator('.passport-station[data-stamped=true]').count(),2);
+  const publicPassport=await api('GET','/api/game/passport');assert(!JSON.stringify(publicPassport.body).includes('qr_token'));
+  const cardImage=page.locator('.passport-reward-card img');await cardImage.scrollIntoViewIfNeeded();
+  await cardImage.evaluate(img=>img.decode());assert(await cardImage.evaluate(img=>img.naturalWidth>0));
+  assert.equal(await page.evaluate(()=>document.documentElement.scrollWidth>window.innerWidth),false);
+  await page.evaluate(()=>window.scrollTo(0,0));
+  await page.screenshot({path:'test-results/event-passport-mobile.png',fullPage:true});
+  await adminPage.reload();await adminPage.getByRole('button',{name:'Xác nhận trao quà',exact:true}).waitFor();
+  assert(await adminPage.getByRole('button',{name:'Xác nhận trao quà',exact:true}).isEnabled());
+  await adminPage.getByRole('button',{name:'Xác nhận trao quà',exact:true}).click();
+  await adminPage.getByRole('button',{name:'Đã trao quà, xác nhận'}).click();
+  await adminPage.getByText(/Đã xác nhận trao quà/).waitFor();assert.equal(redemptions.length,1);
+  const again=await adminContext.request.post(origin+'/api/game/passport/admin',{headers:{origin},data:{action:'redeem',card:player.passport_code}});assert.equal((await again.json()).reused,true);assert.equal(redemptions.length,1);
+  await page.getByRole('button',{name:'Cập nhật hộ chiếu'}).click();await page.getByText('Món quà đã được trao.',{exact:true}).waitFor();
+  assert.equal((await api('GET','/api/game/leaderboard')).body.entries[0].score,710);
+  await adminPage.locator('.passport-admin-station').first().locator('summary').click();
+  await adminPage.locator('.passport-admin-station img').first().evaluate(img=>img.decode());
+  await adminPage.evaluate(()=>{window.print=()=>{window.__printed=true;};});
+  await adminPage.getByRole('button',{name:'In toàn bộ QR đang bật'}).click();
+  await adminPage.waitForFunction(()=>window.__printed===true);
+  assert.equal(await adminPage.locator('.passport-print-sheet article').count(),3);
+  await adminPage.evaluate(()=>window.scrollTo(0,0));
+  await adminPage.screenshot({path:'test-results/passport-admin.png',fullPage:true});
+  await adminContext.close();
   assert.deepEqual(consoleErrors,[]);
-  console.log('PASS: actual Next.js account cookies, uniqueness, login gate, idempotent starts, 3-letter limit, retry after committed error, private leaderboards and server replay for all four scored games.');
+  console.log('PASS: phone-first registration/login, game replay, QR check-in after login, duplicate stamps, event-only passport tab, authenticated admin QR, gift threshold and exactly-once redemption.');
 }finally{if(browser)await browser.close();child.kill();backend.close();}

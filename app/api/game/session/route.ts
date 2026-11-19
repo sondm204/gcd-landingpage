@@ -1,7 +1,7 @@
 import { cookies } from "next/headers";
 import { connection } from "next/server";
 import { randomBytes } from "node:crypto";
-import { accountSchema } from "@/lib/games/validation";
+import { phoneLoginSchema } from "@/lib/games/validation";
 import { gameIds, type Usage } from "@/lib/games/types";
 import { currentPlayer, dbGameError, gameBody, gameDb, gameError, gameJson, gameOrigin, gameRate, SESSION_COOKIE, tokenHash, GameError } from "@/lib/games/server";
 
@@ -22,11 +22,12 @@ export async function GET() {
 export async function POST(request: Request) {
   try {
     gameOrigin(request); await gameRate(request, "account-ip", 120);
-    const parsed = accountSchema.safeParse(await gameBody(request));
+    const parsed = phoneLoginSchema.safeParse(await gameBody(request));
     if (!parsed.success) throw new GameError(400, parsed.error.issues[0].message);
     await gameRate(request, "account-phone", 10, 60, parsed.data.phone);
     const token = randomBytes(32).toString("hex");
-    const { data, error } = await gameDb().rpc("game_open_session", { p_phone: parsed.data.phone, p_name: parsed.data.display_name, p_name_key: parsed.data.display_name.toLowerCase(), p_token_hash: tokenHash(token) });
+    const { data, error } = await gameDb().rpc("game_open_session", { p_phone: parsed.data.phone, p_name: parsed.data.display_name ?? null, p_name_key: parsed.data.display_name?.toLowerCase() ?? null, p_token_hash: tokenHash(token) });
+    if (error?.message.includes("NAME_REQUIRED")) return gameJson({ needs_name: true });
     if (error) dbGameError(error);
     (await cookies()).set(SESSION_COOKIE, token, { httpOnly: true, secure: process.env.NODE_ENV === "production", sameSite: "lax", path: "/", maxAge: 30 * 86400 });
     return gameJson({ player: data });

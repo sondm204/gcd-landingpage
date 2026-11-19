@@ -5,6 +5,12 @@
 > Tài liệu gốc: *Hộ chiếu Di sản - Game QR tại Global Citizen Day 2026*, 19 trang.  
 > Sự kiện: **05/12/2026**, Hội trường Nguyễn Văn Đạo, ĐHQGHN — JCI Thăng Long.
 
+## Cập nhật triển khai: passport tại sự kiện
+
+Yêu cầu mới thay luồng sự kiện trong đề xuất gốc: tab **Tại sự kiện** không chứa mini-game. Người tham dự ghé gian hàng, quét QR nhận một dấu cho mỗi vị trí; BTC cấu hình mốc dấu và xác nhận trao quà một lần cho mỗi tài khoản. Điểm game online độc lập với con dấu. Đăng nhập bằng SĐT trước, chỉ số mới cần nhập tên hiển thị. Ngày sự kiện hiện tại: **06/12/2026**.
+
+Quy trình hiện hành và hướng dẫn vận hành nằm tại [docs/event-passport.md](docs/event-passport.md) và [docs/game-accounts.md](docs/game-accounts.md). Các mô tả mini-game event, điểm thưởng thực tế và đổi điểm trong phần đề xuất gốc dưới đây được giữ để tham khảo lịch sử, không phải luồng hiện hành.
+
 ## 0. Cách đọc tài liệu
 
 - **[Đã nêu trong đề xuất]**: nội dung xuất hiện trong PDF gốc.
