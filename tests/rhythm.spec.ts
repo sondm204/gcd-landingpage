@@ -134,6 +134,31 @@ test("keyboard long note survives pause only after pressing again, then scores o
   await expect(pad).toHaveAttribute("aria-pressed", "false");
 });
 
+test("pressing a visible hold starts its timer immediately and fixes its position", async ({ page }) => {
+  await page.setViewportSize({ width: 390, height: 740 });
+  await setup(page);
+  const note = notes.find(n => n.duration)!;
+  const start = note.at - 1000;
+  const key = ["d", "f", "j", "k"][note.lane];
+  const block = page.locator(`.rhythm-falling-note[data-note-id="${note.id}"] .rhythm-note-block`);
+  await time(page, start);
+  // Complete earlier visible notes in order, so this hold is next.
+  for (const previous of notes.slice(0, note.id)) {
+    if (previous.at + GOOD >= start) await page.keyboard.press(["d", "f", "j", "k"][previous.lane]);
+  }
+  await page.keyboard.down(key);
+  await expect(page.locator(".rhythm-pads button").nth(note.lane)).toHaveAttribute("data-holding", "true");
+  const before = await block.boundingBox();
+  await time(page, start + Math.floor(note.duration / 2));
+  expect((await block.boundingBox())!.y).toBeCloseTo(before!.y, 1);
+  await expect(block.locator(".rhythm-hold-progress")).toBeVisible();
+  await page.screenshot({ path: "test-results/rhythm-hold-immediate.png" });
+  await time(page, start + note.duration + 1);
+  await expect(block).toHaveCount(0);
+  await expect(page.locator(".rhythm-pads button").nth(note.lane)).toHaveAttribute("data-holding", "false");
+  await page.keyboard.up(key);
+});
+
 test("following notes scroll visibly behind the hold tail and reach the line after release", async ({ page }) => {
   await page.setViewportSize({ width: 390, height: 844 });
   await setup(page);

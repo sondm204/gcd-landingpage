@@ -36,7 +36,7 @@ export const scoreFromUnits = (units: number) => Math.round(Math.min(MAX_SCORE, 
 export const pointsForNextNote = (streak: number) => unitsForNote(streak + 1) / MAX_UNITS * MAX_SCORE;
 function scoring(units: number) { const scoreUnits = Math.max(0, Math.min(MAX_UNITS, units)); return { scoreUnits, score: scoreFromUnits(scoreUnits) }; }
 export type Grade = "perfect" | "good" | "miss";
-type Hold = { noteId: number; grade: Exclude<Grade, "miss">; resumeUntil: number | null };
+type Hold = { noteId: number; startedAt: number; endAt: number; grade: Exclude<Grade, "miss">; resumeUntil: number | null };
 export type State = {
   phase: "ready" | "playing" | "paused" | "result";
   elapsed: number; judgments: (Grade | null)[]; holds: (Hold | null)[]; pressed: boolean[];
@@ -65,7 +65,7 @@ function advance(s: State, elapsed: number): State {
     if (next.judgments[note.id] !== null) return;
     const hold = next.holds[note.lane];
     if (hold?.noteId === note.id) {
-      if (next.pressed[note.lane] && elapsed >= note.at + note.duration) events.push({ id: note.id, at: note.at + note.duration, grade: hold.grade });
+      if (next.pressed[note.lane] && elapsed >= hold.endAt) events.push({ id: note.id, at: hold.endAt, grade: hold.grade });
       else if ((!next.pressed[note.lane] && elapsed > (hold.resumeUntil ?? -Infinity)) || elapsed >= DURATION) events.push({ id: note.id, at: hold.resumeUntil ?? elapsed, grade: "miss" });
     } else if (elapsed > note.at + GOOD || elapsed >= DURATION) events.push({ id: note.id, at: note.at + GOOD, grade: "miss" });
   });
@@ -85,7 +85,7 @@ export function reducer(s: State, a: Action): State {
   if (a.type === "release") {
     pressed[a.lane] = false;
     const released = { ...next, pressed };
-    return hold ? judge(released, hold.noteId, next.elapsed >= notes[hold.noteId].at + notes[hold.noteId].duration - HOLD_RELEASE ? hold.grade : "miss") : released;
+    return hold ? judge(released, hold.noteId, next.elapsed >= hold.endAt - HOLD_RELEASE ? hold.grade : "miss") : released;
   }
   if (pressed[a.lane]) return next;
   pressed[a.lane] = true;
@@ -100,7 +100,8 @@ export function reducer(s: State, a: Action): State {
   if (!note || note.lane !== a.lane || next.holds.some(Boolean) || !noteIsVisible(note, next.elapsed)) return { ...next, pressed, lastInput, wrong: next.wrong + 1, ...scoring(next.scoreUnits - 50), combo: 0, feedback: "Bấm theo thứ tự nốt", feedbackId: next.feedbackId + 1, lastLane: -1 };
   const grade = "perfect";
   if (note.duration) {
-    const holds = [...next.holds]; holds[a.lane] = { noteId: note.id, grade, resumeUntil: null };
+    // A visible long note starts counting immediately, wherever it was pressed.
+    const holds = [...next.holds]; holds[a.lane] = { noteId: note.id, startedAt: next.elapsed, endAt: next.elapsed + note.duration, grade, resumeUntil: null };
     return { ...next, pressed, lastInput, holds, feedback: "Giữ đến hết đuôi nốt…", feedbackId: next.feedbackId + 1, lastLane: a.lane };
   }
   return judge({ ...next, pressed, lastInput }, note.id, grade);

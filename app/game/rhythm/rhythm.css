@@ -25,3 +25,4 @@
 .rhythm-note-block { font-size: 14px; font-weight: 700; }
 .rhythm-falling-note[data-next=true] .rhythm-note-block { border-color: #fffbea; outline: 2px solid #fffbea; outline-offset: 3px; box-shadow: 0 0 22px color-mix(in srgb, var(--lane) 60%, transparent); }
 .rhythm-pads button[data-next=true] { border-color: #fffbea; background: color-mix(in srgb, var(--lane) 18%, #142b36); }
+.rhythm-hold-progress { position: absolute; left: 0; right: 0; bottom: 0; height: 4px; border-radius: 0 0 6px 6px; background: var(--lane); transform-origin: left; }

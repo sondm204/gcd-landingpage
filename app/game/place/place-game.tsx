@@ -67,9 +67,9 @@ function Game({ event }: { event: boolean }) {
       <p className="place-kicker">CHẶNG 04 · DẤU ĐÔI CHÂN · {event ? "SỰ KIỆN" : "ONLINE"}</p>
       <div className="place-intro-compass" aria-hidden="true"><span>N</span><b>✧</b><i>VIỆT NAM</i></div>
       <h1 ref={heading} tabIndex={-1}>Đây là <em>đâu?</em></h1><p className="place-intro-lead">Một khung hình. Một điểm đến.<br />Bạn nhận ra bao nhiêu điều thân thuộc?</p>
-      <div className="place-rule-cards"><span><b>{event ? "02" : ROUND_COUNT}</b>khung hình</span><span><b>20s</b>cho mỗi ảnh</span><span><b>&lt;100 km</b>để ghim gần</span></div>
-      <GameInstructions><ol><li>Nhìn ảnh không kèm tên, tìm vị trí trên bản đồ Việt Nam.</li><li>Chạm để đặt ghim. Dùng + / − để phóng to, kéo bản đồ để dịch chuyển; có thể sửa ghim trước khi chốt.</li><li>Chọn “Chốt vị trí” khi đã sẵn sàng. Hết giờ sẽ tự chốt ghim hiện tại; chưa đặt ghim được 0 điểm.</li></ol></GameInstructions>
-      <p className="place-goal">Ghim gần ít nhất <b>{target}/{event ? 2 : ROUND_COUNT} ảnh</b> để đạt chặng. Mỗi ảnh tối đa {MAX_SCORE} điểm; càng gần, điểm càng cao.</p>
+      <div className="place-rule-cards"><span><b>{ROUND_COUNT}</b>khung hình</span><span><b>20s</b>cho mỗi ảnh</span><span><b>&lt;100 km</b>để ghim gần</span></div>
+      <GameInstructions><ol><li>Mỗi lượt chọn ngẫu nhiên {ROUND_COUNT} trong {places.length} địa điểm, không trùng ảnh. Nhìn ảnh không kèm tên, tìm vị trí trên bản đồ Việt Nam.</li><li>Chạm để đặt ghim. Dùng + / − để phóng to, kéo bản đồ để dịch chuyển; có thể sửa ghim trước khi chốt.</li><li>Chọn “Chốt vị trí” khi đã sẵn sàng. Hết giờ sẽ tự chốt ghim hiện tại; chưa đặt ghim được 0 điểm.</li></ol></GameInstructions>
+      <p className="place-goal">Ghim gần ít nhất <b>{target}/{ROUND_COUNT} ảnh</b> để đạt chặng. Mỗi ảnh tối đa {MAX_SCORE} điểm; càng gần, điểm càng cao.</p>
       <button className="place-primary" onClick={start}>Lên đường khám phá →</button>
       <Link className="place-mode" href={`/game/place?mode=${event ? "online" : "event"}`}>Chuyển sang bản {event ? "online" : "sự kiện"}</Link>
       <small className="place-trial">Bản chơi thử · Kết quả chưa lưu vào hộ chiếu, chưa dùng đổi quà.</small>

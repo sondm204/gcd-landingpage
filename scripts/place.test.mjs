@@ -1,5 +1,6 @@
 import { test } from "node:test";
 import assert from "node:assert/strict";
+import { readFileSync } from "node:fs";
 import { CLOSE_KM, MAX_SCORE, ROUND_COUNT, ROUND_TIME, requiredClose, distanceKm, initialState, places, pointsForDistance, project, reducer, roundOrder, unproject, validPoint } from "../app/game/place/engine.ts";
 const start = (event = false) => reducer(initialState(event), { type: "start", seed: 12345 });
 const loaded = (event = false) => reducer(start(event), { type: "loaded", now: 1000 });
@@ -16,10 +17,12 @@ test("Haversine distances are accurate and scores decrease with distance", () =>
   assert.equal(distanceKm(a, a), 0); assert(Math.abs(distanceKm(a, b) - 1140) < 5); assert.equal(distanceKm(a, b), distanceKm(b, a));
   assert.equal(pointsForDistance(0), 30); assert(pointsForDistance(50) > pointsForDistance(100)); assert.equal(pointsForDistance(10000), 0);
 });
-test("rounds shuffle reproducibly without repeats; online has ten and event has two", () => {
-  assert.deepEqual(roundOrder(7, false), roundOrder(7, false));
-  assert.equal(new Set(roundOrder(7, false)).size, 10); assert.equal(roundOrder(7, true).length, 2);
-  assert(new Set(Array.from({ length: 20 }, (_, seed) => roundOrder(seed, false).join())).size > 1);
+test("rounds draw ten unique places from the whole pool, changing both selection and order", () => {
+  assert.deepEqual(roundOrder(7), roundOrder(7));
+  const draws = Array.from({ length: 256 }, (_, seed) => roundOrder(seed));
+  assert(draws.every(draw => draw.length === 10 && new Set(draw).size === 10));
+  assert.equal(new Set(draws.flat()).size, 30);
+  assert(new Set(draws.map(draw => [...draw].sort((a,b) => a-b).join())).size > 10);
 });
 test("loading images never consumes the 20-second timer; duplicate loads cannot restart it", () => {
   let s = start(); assert.equal(s.phase, "loading");
@@ -70,17 +73,25 @@ test("round transitions clear pins, yield the expected result count, and reset c
       s = reducer(s, { type: "pin", point: places[s.order[s.round]].point, now: now + 1 });
       s = reducer(s, { type: "submit", now: now + 2 }); s = reducer(s, { type: "next" }); now += 1000;
     }
-    assert.equal(s.results.length, event ? 2 : 10); assert.equal(s.results.reduce((sum, r) => sum + r.score, 0), event ? 60 : 300);
+    assert.equal(s.results.length, 10); assert.equal(s.results.reduce((sum, r) => sum + r.score, 0), 300);
     assert.deepEqual(reducer(s, { type: "reset" }), initialState(event));
   }
 });
 
-test("ten local photos span all three regions and scores never exceed 30", () => {
-  assert.equal(places.length, 10); assert.equal(ROUND_COUNT, 10); assert.equal(MAX_SCORE, 30);
-  assert.equal(new Set(places.map(p => p.id)).size, 10);
+test("thirty local photos span all three regions and scores never exceed 30", () => {
+  assert.equal(places.length, 30); assert.equal(ROUND_COUNT, 10); assert.equal(MAX_SCORE, 30);
+  assert.equal(new Set(places.map(p => p.id)).size, 30);
+  assert.equal(new Set(places.map(p => p.image)).size, 30);
   const counts = Object.values(places.reduce((a,p) => ({...a,[p.region]:(a[p.region] ?? 0)+1}), {})).sort();
-  assert.deepEqual(counts, [3,3,4]);
-  for(const p of places) assert(validPoint(p.point));
+  assert.deepEqual(counts, [10,10,10]);
+  for(const p of places) {
+    assert(validPoint(p.point));
+    assert(p.author && p.license && p.licenseUrl.startsWith("https://") && p.source.startsWith("https://"));
+    const image = readFileSync(new URL(`../public${p.image}`, import.meta.url));
+    assert.equal(image.toString("ascii", 0, 4), "RIFF");
+    assert.equal(image.toString("ascii", 8, 12), "WEBP");
+    assert(image.length > 1000);
+  }
   for(let km=0;km<=2000;km++) assert(pointsForDistance(km)>=0 && pointsForDistance(km)<=30);
   assert.equal(requiredClose(false), 7); assert.equal(requiredClose(true), 1);
 });

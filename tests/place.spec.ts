@@ -82,7 +82,7 @@ test("event mode times out with last pin, then no pin; both play and review fit 
   await page.setViewportSize({ width: 320, height: 568 });
   await page.clock.install(); await begin(page, true);
   const place = await currentPlace(page); await pick(page, place.point);
-  await expect(page.locator(".place-hud")).toContainText("1 / 2");
+  await expect(page.locator(".place-hud")).toContainText("1 / 10");
   expect(await page.evaluate(() => document.documentElement.scrollHeight)).toBe(568);
   await page.clock.fastForward(20100);
   await expect(page.locator(".place-app")).toHaveAttribute("data-phase", "review");
@@ -95,9 +95,15 @@ test("event mode times out with last pin, then no pin; both play and review fit 
   await page.clock.fastForward(20100);
   await expect(page.locator(".place-distance")).toContainText("Chưa đặt ghim");
   await expect(page.locator(".place-distance")).toContainText("+0 điểm");
+  for (let round = 2; round < 10; round++) {
+    await page.getByRole("button", { name: "Khung hình tiếp theo →" }).click();
+    await expect(page.locator(".place-app")).toHaveAttribute("data-phase", "playing");
+    await page.clock.fastForward(20100);
+    await expect(page.locator(".place-app")).toHaveAttribute("data-phase", "review");
+  }
   await page.getByRole("button", { name: "Xem kết quả hành trình →" }).click();
   await expect(page.getByRole("heading", { name: "Bạn đã tìm về đúng nơi!" })).toBeVisible();
-  await expect(page.locator(".place-result-list li")).toHaveCount(2);
+  await expect(page.locator(".place-result-list li")).toHaveCount(10);
 });
 
 test("image loading delays the clock, hiding tab pauses it, resume keeps pin and time", async ({ page }) => {

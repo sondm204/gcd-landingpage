@@ -40,8 +40,8 @@ export const stages: {
     id: "place", name: "Đây là đâu?", category: "Dọc miền di sản", stamp: "Đôi chân",
     description: "Nhìn một khung hình, ghim một điểm đến. Bạn hiểu đất nước mình đến đâu?",
     story: "Những miền di sản đang chờ được gọi tên. Theo dấu các khung hình, tìm về đúng nơi chốn để khôi phục dấu ấn Đôi chân.",
-    online: { summary: "10 hình ảnh · 20 giây / ảnh", rules: ["Quan sát ảnh không kèm tên và đặt ghim lên bản đồ Việt Nam.", "Có 10 ảnh dọc ba miền mỗi lượt, mỗi ảnh 20 giây. Ghim càng gần vị trí thật, điểm càng cao.", "Ít nhất 7/10 ảnh có vị trí ghim sai lệch dưới 100 km để vượt chặng."] },
-    event: { summary: "2 hình ảnh · 20 giây / ảnh", rules: ["Quan sát 2 hình ảnh di sản và ghim vị trí trên bản đồ, mỗi ảnh 20 giây.", "Ghim lệch dưới 100 km ở ít nhất 1 ảnh để đạt bản rút gọn. Kết quả bản thử chưa dùng nhận sticker hay đổi quà."] },
+    online: { summary: "10 ảnh ngẫu nhiên · 20 giây / ảnh", rules: ["Quan sát ảnh không kèm tên và đặt ghim lên bản đồ Việt Nam.", "Mỗi lượt chọn ngẫu nhiên 10 trong 30 địa điểm dọc ba miền, không trùng ảnh; mỗi ảnh 20 giây. Ghim càng gần vị trí thật, điểm càng cao.", "Ít nhất 7/10 ảnh có vị trí ghim sai lệch dưới 100 km để vượt chặng."] },
+    event: { summary: "10 ảnh ngẫu nhiên · 20 giây / ảnh", rules: ["Mỗi lượt chọn ngẫu nhiên 10 địa điểm không trùng từ bộ 30 địa điểm, mỗi ảnh 20 giây.", "Ghim lệch dưới 100 km ở ít nhất 1 ảnh để đạt mục tiêu bản sự kiện. Kết quả bản thử chưa dùng nhận sticker hay đổi quà."] },
     challenge: "Gắn cờ di sản quê mình lên bản đồ lớn tại gian.",
   },
   {

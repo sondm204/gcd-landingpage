@@ -104,7 +104,7 @@ test("only the earliest unfinished visible note can be pressed, including during
   s = reducer(isolated(hold), { type: "hit", lane: hold.lane, elapsed: hold.at - 500 });
   assert.equal(s.holds[hold.lane]?.noteId, hold.id);
   s = { ...s, judgments: s.judgments.map((j, id) => id === hold.id + 1 ? null : j) };
-  s = reducer(s, { type: "hit", lane: notes[hold.id + 1].lane, elapsed: hold.at + hold.duration - 100 });
+  s = reducer(s, { type: "hit", lane: notes[hold.id + 1].lane, elapsed: hold.at - 500 + hold.duration - 100 });
   assert.equal(s.wrong, 1);
   assert.equal(s.judgments[hold.id + 1], null);
 });
@@ -133,6 +133,21 @@ test("hold head gives no points until completion; repeated down/tick cannot resc
   assert.equal(s.score, scoreFromUnits(4100)); assert.equal(s.judgments[hold.id], "perfect");
   s = reducer(s, { type: "release", lane: hold.lane, elapsed: hold.at + hold.duration + 1 });
   s = reducer(s, { type: "tick", elapsed: DURATION }); assert.equal(s.score, scoreFromUnits(4100));
+});
+
+test("holds count their duration from the actual press, early or late, and complete before reaching the bottom", () => {
+  for (const offset of [-1000, -500, 100]) {
+    const pressedAt = hold.at + offset;
+    let s = reducer(isolated(hold), { type: "hit", lane: hold.lane, elapsed: pressedAt });
+    assert.equal(s.holds[hold.lane]?.endAt, pressedAt + hold.duration);
+    s = reducer(s, { type: "tick", elapsed: pressedAt + hold.duration - 1 });
+    assert.equal(s.judgments[hold.id], null);
+    s = reducer(s, { type: "tick", elapsed: pressedAt + hold.duration });
+    assert.equal(s.judgments[hold.id], "perfect");
+    assert.equal(s.scoreUnits, 4100);
+    s = reducer(s, { type: "tick", elapsed: hold.at + hold.duration + 500 });
+    assert.equal(s.scoreUnits, 4100);
+  }
 });
 
 test("releasing early fails a long note once; release tolerance has an explicit boundary", () => {

@@ -93,7 +93,7 @@ function Game({ event }: { event: boolean }) {
       <div className="rhythm-rules"><span><b>60 giây</b>nhanh dần về cuối</span><span><b>4 làn</b>D · F · J · K</span><span><b>{MAX_SCORE}</b>điểm tối đa</span></div>
       <GameInstructions><ol>
         <li>Chờ đếm ngược 3 nhịp. Nốt vừa xuất hiện là có thể bấm nút cùng làn, hoặc dùng phím D–F–J–K. Không cần căn vạch.</li>
-        <li>Bấm theo số thứ tự, bắt đầu từ nốt được viền sáng. Với nốt dài, giữ đến hết đuôi rồi mới bấm nốt tiếp theo. Thả sớm hoặc bấm vượt thứ tự sẽ ngắt chuỗi.</li>
+        <li>Bấm theo số thứ tự, bắt đầu từ nốt được viền sáng. Với nốt dài, thời gian giữ bắt đầu ngay khi bấm: giữ đến khi thanh tiến độ đầy rồi mới bấm nốt tiếp theo. Thả sớm hoặc bấm vượt thứ tự sẽ ngắt chuỗi.</li>
         <li>Tối đa {MAX_SCORE} điểm. Mỗi nốt đúng nối dài chuỗi và tăng điểm cho nốt tiếp theo. Hụt, thả sớm hoặc bấm sai sẽ ngắt chuỗi, trừ nửa giá trị nốt cơ bản. Điểm thấp nhất là 0.</li>
       </ol>
       <p className="rhythm-note">Nhạc nền ngũ cung nguyên bản với giai điệu, hợp âm và nhịp gõ tăng tốc cùng màn chơi; chưa phải bản thu Quan họ, Ca trù, Chèo hay Xẩm. Game tự tạm dừng khi rời tab.</p></GameInstructions>
@@ -108,11 +108,15 @@ function Game({ event }: { event: boolean }) {
       <section className="rhythm-stage" aria-label="Sân khấu bốn làn" data-elapsed={Math.round(state.elapsed)}>
         <div className="rhythm-lanes" aria-hidden="true">{keys.map((key, lane) => <div key={key} className="rhythm-lane" data-lane={lane}>
           {notes.filter(n => n.lane === lane && state.judgments[n.id] === null && (state.holds[lane]?.noteId === n.id || noteIsVisible(n, state.elapsed))).map(n => {
-            const holding = state.holds[lane]?.noteId === n.id;
-            const head = holding ? Math.max(n.at, state.elapsed) : n.at;
+            const hold = state.holds[lane]?.noteId === n.id ? state.holds[lane] : null;
+            const holding = Boolean(hold);
+            const progress = hold ? Math.min(1, Math.max(0, (state.elapsed - hold.startedAt) / n.duration)) : 0;
+            const scale = (hold ? travelTime(hold.startedAt) : travel) + GOOD;
+            const headTop = 100 - (n.at + GOOD - (hold?.startedAt ?? state.elapsed)) / scale * 100;
+            const tailHeight = n.duration / scale * 100 * (1 - progress);
             return <div className="rhythm-falling-note" key={n.id} data-note-id={n.id} data-next={nextNote?.id === n.id} data-holding={holding}>
-              {n.duration > 0 && <div className="rhythm-note-tail" style={{ top: `${100 - (n.at + n.duration + GOOD - state.elapsed) / (travel + GOOD) * 100}%`, height: `${Math.max(0, n.at + n.duration - head) / (travel + GOOD) * 100}%` }} />}
-              <div className="rhythm-note-block" data-long={n.duration > 0} style={{ top: `${100 - (head + GOOD - state.elapsed) / (travel + GOOD) * 100}%` }}><span>{holding ? "GIỮ" : `#${n.id + 1}${n.duration ? " · GIỮ" : ""}`}</span></div>
+              {n.duration > 0 && <div className="rhythm-note-tail" style={{ top: `${headTop - tailHeight}%`, height: `${tailHeight}%` }} />}
+              <div className="rhythm-note-block" data-long={n.duration > 0} style={{ top: `${headTop}%` }}><span>{hold ? `GIỮ ${Math.max(0, (hold.endAt - state.elapsed) / 1000).toFixed(1)}s` : `#${n.id + 1}${n.duration ? " · GIỮ" : ""}`}</span>{hold && <i className="rhythm-hold-progress" style={{ transform: `scaleX(${progress})` }} />}</div>
             </div>;
           })}
           {state.lastLane === lane && <span key={state.feedbackId} className="rhythm-hit-flash" />}
