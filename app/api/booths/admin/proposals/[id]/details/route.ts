@@ -41,6 +41,7 @@ export async function PATCH(request: Request, { params }: { params: Promise<{ id
       p_data: input.data, p_images: [...retained, ...uploaded], p_note: input.data.note,
     });
     if (error) {
+      if (error.message.includes("BOOTH_LOCKED")) throw new BoothError(409, "Vị trí đang tạm khóa. Hãy mở khóa trước khi duyệt hoặc chuyển gian hàng đến.");
       if (error.message.includes("BOOTH_TAKEN")) throw new BoothError(409, "Ô đích đã có gian hàng xác nhận. Vui lòng chọn ô khác.");
       if (/STALE_PROPOSAL|NOT_CONFIRMED/.test(error.message)) throw new BoothError(409, "Gian hàng đã được thay đổi bởi một thao tác khác. Hãy tải lại trước khi sửa.");
       if (error.message.includes("NOT_ADMIN")) throw new BoothError(403, "Tài khoản không còn quyền quản trị.");

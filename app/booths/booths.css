@@ -71,6 +71,15 @@
 .booth-map-legend span { display: flex; gap: 7px; align-items: center; }
 .booth-map-legend i { width: 13px; height: 13px; border: 1px solid #9db8dd; border-radius: 2px; }
 .booth-map-legend .open { background: #ffffff; }.booth-map-legend .pending { background: #efd39e; }.booth-map-legend .booked { background: #315b96; }
+.booth-map-legend .locked { background: #e0e5ed; border-color: #596b83; }
+.booth-map-spot.is-locked:not(.is-booked) .booth-map-spot-fill { fill: #e0e5ed !important; stroke: #596b83 !important; stroke-dasharray: 6 3; }
+.booth-map-spot.is-locked:not(.is-booked) text { fill: #495a71 !important; }
+.booth-position-lock { display: grid; gap: 14px; padding: 18px; margin-bottom: 22px; border: 1px solid #b6c5d6; border-radius: 12px; background: #f0f4fa; }
+.booth-position-lock[data-locked=true],.booth-locked { background: #e9edf3; border-color: #77899f; }
+.booth-locked { border: 1px solid #b6c5d6; border-radius: 10px; padding: 20px; margin-top: 20px; }
+.booth-position-lock strong { color: #243e5e; font-size: 16px; }
+.booth-position-lock p { margin: 8px 0 0; font-size: 14px; line-height: 1.6; color: #53677f; }
+.booth-position-lock button { justify-self: start; }
 .booth-map-note { padding: 4px 23px 22px; color: var(--muted); font-size: 12px; line-height: 1.8; }
 .booth-form-card { padding: 26px; border: 1px solid var(--line); background: #ffffff; min-width: 0; }
 .booth-form-heading { margin-bottom: 20px; padding-bottom: 20px; border-bottom: 1px solid var(--line); }

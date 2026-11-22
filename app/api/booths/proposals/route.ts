@@ -41,9 +41,10 @@ export async function POST(request: Request) {
     }
     const payment = await quotePayment(input.position_id, input.discount_code);
     // Reject booked positions before uploading. The RPC checks again under a row lock.
-    const { data: position, error: lookupError } = await db.from("booth_public_map").select("is_booked").eq("id", input.position_id).single();
+    const { data: position, error: lookupError } = await db.from("booth_public_map").select("is_booked,is_locked").eq("id", input.position_id).single();
     if (lookupError) throw new BoothError(503, "Không thể kiểm tra vị trí lúc này.");
     if (position.is_booked) throw new BoothError(409, "Vị trí đã được xác nhận. Vui lòng chọn vị trí khác.");
+    if (position.is_locked) throw new BoothError(409, "Vị trí đang tạm khóa đăng ký. Vui lòng chọn vị trí khác.");
     let receiptPath: string | null = null;
     for (const image of [...validated, ...receiptImages]) {
       const path = `${key.data}/${randomUUID()}.${image.extension}`;
@@ -54,6 +55,7 @@ export async function POST(request: Request) {
     }
     const { data, error } = await db.rpc("submit_booth_proposal", { p_request_key: key.data, p_fingerprint: fingerprint, p_data: { ...input, payment: payment ? { ...payment, memo: transferMemo(input.position_id, input.brand), receipt_path: receiptPath } : null }, p_images: uploaded.filter(path => path !== receiptPath) });
     if (error) {
+      if (error.message.includes("BOOTH_LOCKED")) throw new BoothError(409, "Vị trí đang tạm khóa đăng ký. Vui lòng chọn vị trí khác.");
       if (/VOUCHER_UNAVAILABLE|VOUCHER_CHANGED/.test(error.message)) throw new BoothError(409, "Voucher đã hết lượt hoặc thay đổi. Vui lòng xác nhận lại mã và số tiền trước khi gửi.");
       if (error.message.includes("BOOTH_TAKEN")) throw new BoothError(409, "Vị trí vừa được xác nhận cho gian hàng khác. Vui lòng chọn lại.");
       if (error.message.includes("REQUEST_KEY_REUSED")) throw new BoothError(409, "Phiên gửi đã được sử dụng. Vui lòng tải lại trang trước khi gửi nội dung mới.");

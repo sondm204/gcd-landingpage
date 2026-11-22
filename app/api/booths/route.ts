@@ -6,8 +6,8 @@ export async function GET() {
   await connection();
   try {
     if (!configured()) return json({ configured: false, positions: conceptPositions() });
-    const { data, error } = await serviceClient().from("booth_public_map").select("id,code,zone,x,y,width,height,pending_count,confirmed_brand,confirmed_booth,is_booked,is_bookable").order("id");
-    if (error || data?.length !== POSITION_COUNT || data.some((position, index) => position.id !== index + 1 || position.is_bookable !== isBookablePosition(position.id))) throw new BoothError(503, "Chưa tải được sơ đồ gian hàng. Vui lòng thử lại sau.");
+    const { data, error } = await serviceClient().from("booth_public_map").select("id,code,zone,x,y,width,height,pending_count,confirmed_brand,confirmed_booth,is_booked,is_bookable,is_locked").order("id");
+    if (error || data?.length !== POSITION_COUNT || data.some((position, index) => position.id !== index + 1 || position.is_bookable !== isBookablePosition(position.id) || typeof position.is_locked !== "boolean")) throw new BoothError(503, "Chưa tải được sơ đồ gian hàng. Vui lòng thử lại sau.");
     const logos = new Map<number, string>();
     const booked = data.filter(position => position.is_booked).map(position => position.id);
     if (booked.length) {

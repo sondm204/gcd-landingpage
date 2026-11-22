@@ -722,5 +722,21 @@
   "m0687": "TR01–TR02 are assigned and not open for registration.",
   "m0688": "Cultural experience support",
   "navHeritagePassport": "Heritage Passport",
-  "passportAdminLoginDescription": "Sign in with your organizer account to manage QR codes, passport stamps and gift handovers."
+  "passportAdminLoginDescription": "Sign in with your organizer account to manage QR codes, passport stamps and gift handovers.",
+  "boothLock01": "Could not update the booking lock. Please try again.",
+  "boothLock02": "Temporarily locked {v0}. Existing proposals have been preserved.",
+  "boothLock03": "Unlocked {v0}.",
+  "boothLock04": "Position booking lock",
+  "boothLock05": "This position is temporarily locked",
+  "boothLock06": "Manage registrations",
+  "boothLock07": "Locking pauses new proposals, approvals and incoming booth moves. Existing proposals and confirmed booths are preserved.",
+  "boothLock08": "Unlock position",
+  "boothLock09": "Temporarily lock position",
+  "boothLock10": "Booking temporarily locked",
+  "boothLock11": "temporarily locked booths",
+  "boothLock12": "The organizers have temporarily paused proposals for this position. Please choose another position or come back later.",
+  "boothLock13": "Invalid position lock information.",
+  "boothLock14": "This position does not support booking locks.",
+  "boothLock15": "This position is temporarily locked. Unlock it before approving or moving a booth here.",
+  "boothLock16": "This position is temporarily locked for registration. Please choose another position."
 }

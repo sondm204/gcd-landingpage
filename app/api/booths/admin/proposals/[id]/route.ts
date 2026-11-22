@@ -11,6 +11,7 @@ export async function PATCH(request: Request, { params }: { params: Promise<{ id
     if (!z.uuid().safeParse(id).success || !input.success) throw new BoothError(400, "Yêu cầu xét duyệt không hợp lệ.");
     const { data, error } = await serviceClient().rpc("review_booth_proposal", { p_proposal_id: id, p_decision: input.data.decision, p_admin_id: user.id, p_note: input.data.note });
     if (error) {
+      if (error.message.includes("BOOTH_LOCKED")) throw new BoothError(409, "Vị trí đang tạm khóa. Hãy mở khóa trước khi duyệt hoặc chuyển gian hàng đến.");
       if (/BOOTH_TAKEN|ALREADY_REVIEWED/.test(error.message)) throw new BoothError(409, "Đề xuất đã được xử lý hoặc vị trí đã được chốt. Vui lòng tải lại danh sách.");
       if (error.message.includes("NOT_FOUND")) throw new BoothError(404, "Không tìm thấy đề xuất.");
       if (error.message.includes("NOT_ADMIN")) throw new BoothError(403, "Quyền quản trị đã thay đổi. Vui lòng đăng nhập lại.");

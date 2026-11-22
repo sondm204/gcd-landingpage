@@ -41,6 +41,22 @@ try {
   run("psql", [...connection, "--single-transaction", "-f", resolve("db/tests/admin-edits.sql")]);
   run("psql", [...connection, "--single-transaction", "-f", resolve("db/tests/games.sql")]);
   run("psql", [...connection, "--single-transaction", "-f", resolve("db/tests/passports.sql")]);
+  run("psql", [...connection, "--single-transaction", "-f", resolve("db/tests/position-locks.sql")]);
+  console.log("PASS: admin-only booking locks, preserved proposals, idempotent lock auditing, blocked approval/moves and unlock recovery.");
+  const locker = spawn(join(bin,"psql"+ext), [...connection,"-At","-c","begin; select public.set_booth_position_lock(16::smallint,true,'11111111-1111-4111-8111-111111111111'); select 'LOCK_HELD'; select pg_sleep(1); commit;"], {windowsHide:true});
+  let lockOutput="", lockErrors="";
+  const lockReady = new Promise((done,reject) => {
+    locker.stdout.on("data",value=>{lockOutput+=value;if(lockOutput.includes("LOCK_HELD"))done();});
+    locker.stderr.on("data",value=>lockErrors+=value);
+    locker.on("error",reject);
+    locker.on("close",code=>{if(code || !lockOutput.includes("LOCK_HELD"))reject(new Error(lockErrors||"Lock transaction did not become ready"));});
+  });
+  const lockFinished = new Promise(done=>locker.on("close",code=>done(code)));
+  await lockReady;
+  const competing = spawnSync(join(bin,"psql"+ext), [...connection,"-c",`select public.submit_booth_proposal(gen_random_uuid(),'lock-race','{"position_id":16,"brand":"Race","booth_name":"Race Booth","contact_name":"Contact","email":"race@example.test","phone":"0901234567","category":"Other","description":""}'::jsonb,'[]');`], {encoding:"utf8",windowsHide:true,timeout:10000});
+  assert.notEqual(competing.status,0);assert.match(competing.stderr,/BOOTH_LOCKED/);assert.equal(await lockFinished,0);
+  run("psql",[...connection,"-c","select public.set_booth_position_lock(16::smallint,false,'11111111-1111-4111-8111-111111111111');"]);
+  console.log("PASS: a submission waiting behind an uncommitted admin lock is rejected after that lock commits.");
   const concurrentPlayer = run("psql", [...connection, "-At", "-c", "select id from public.game_players where phone='+84900000003'"]);
   const gameStarts = await Promise.all(Array.from({ length: 4 }, () => new Promise(done => {
     const child = spawn(join(bin, "psql" + ext), [...connection, "-c", `select public.game_start_attempt('${concurrentPlayer}','place','online',gen_random_uuid(),42);`], { windowsHide: true });

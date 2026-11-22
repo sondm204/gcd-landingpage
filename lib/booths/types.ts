@@ -103,6 +103,7 @@ export type BoothPosition = {
   confirmed_logo_url?: string | null;
   is_booked: boolean;
   is_bookable: boolean;
+  is_locked: boolean;
 };
 export type BoothProposal = {
   id: string; reference: string; position_id: number; brand: string; booth_name: string;
@@ -137,6 +138,6 @@ export function conceptPositions(): BoothPosition[] {
       else { x = n === 4 ? 155 : 310; y = 608; w = 135; h = 68; }
     }
     else { x = n === 1 ? 1300 : 105; y = n === 1 ? 680 : n === 2 ? 695 : 985; w = n === 1 ? 240 : 285; h = 82; }
-    return { id, code, zone: group.name, x: x/16, y: y/16, width: w/16, height: h/16, pending_count: 0, confirmed_brand: null, confirmed_booth: null, is_booked: false, is_bookable: group.bookable };
+    return { id, code, zone: group.name, x: x/16, y: y/16, width: w/16, height: h/16, pending_count: 0, confirmed_brand: null, confirmed_booth: null, is_booked: false, is_bookable: group.bookable, is_locked: false };
   });
 }

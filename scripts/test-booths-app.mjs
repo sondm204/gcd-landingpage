@@ -12,6 +12,8 @@ const adminId = "11111111-1111-4111-8111-111111111111";
 const nonAdminId = "22222222-2222-4222-8222-222222222222";
 const proposals = [];
 const vouchers = [];
+const lockedPositions = new Set();
+let lockBeforeSubmit = false;
 let activeAdmin = true;
 const uploads = new Map();
 const png = Buffer.from("iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mP8/x8AAwMCAO+jhX0AAAAASUVORK5CYII=", "base64");
@@ -19,7 +21,7 @@ const user = (id) => ({ id, email: id === adminId ? "admin@example.test" : "gues
 const jwt = (id) => `${Buffer.from('{"alg":"HS256","typ":"JWT"}').toString("base64url")}.${Buffer.from(JSON.stringify({ sub: id, aud: "authenticated", role: "authenticated", exp: Math.floor(Date.now()/1000)+3600 })).toString("base64url")}.test-signature`;
 const publicMap = () => conceptPositions().map((position) => {
   const winner = proposals.find((item) => item.position_id === position.id && item.status === "approved");
-  return { ...position, is_booked: Boolean(winner), pending_count: proposals.filter((item) => item.position_id === position.id && item.status === "pending").length, confirmed_brand: winner?.brand || null, confirmed_booth: winner?.booth_name || null };
+  return { ...position, is_locked: lockedPositions.has(position.id), is_booked: Boolean(winner), pending_count: proposals.filter((item) => item.position_id === position.id && item.status === "pending").length, confirmed_brand: winner?.brand || null, confirmed_booth: winner?.booth_name || null };
 });
 const json = (res, status, body, headers = {}) => { res.writeHead(status, { "Content-Type": "application/json", ...headers }); res.end(JSON.stringify(body)); };
 const backend = createServer(async (req, res) => {
@@ -68,9 +70,17 @@ const backend = createServer(async (req, res) => {
       return json(res, 200, rows, { "Content-Range": `${offset}-${offset+rows.length-1}/${total}` });
     }
     if (url.pathname === "/rest/v1/rpc/booth_consume_rate_limit") return json(res, 200, true);
+    if (url.pathname === "/rest/v1/rpc/set_booth_position_lock") {
+      if (!activeAdmin || body.p_admin_id !== adminId) return json(res,400,{message:"NOT_ADMIN"});
+      if (!conceptPositions().find(p=>p.id===body.p_position_id)?.is_bookable) return json(res,400,{message:"INVALID_POSITION"});
+      if (body.p_locked) lockedPositions.add(body.p_position_id); else lockedPositions.delete(body.p_position_id);
+      return json(res,200,{id:body.p_position_id,is_locked:body.p_locked});
+    }
     if (url.pathname === "/rest/v1/rpc/submit_booth_proposal") {
       const previous = proposals.find((item) => item.request_key === body.p_request_key);
       if (previous) return json(res, 200, { id: previous.id, reference: previous.reference, reused: true });
+      if (lockBeforeSubmit) { lockedPositions.add(body.p_data.position_id); lockBeforeSubmit=false; }
+      if (lockedPositions.has(body.p_data.position_id)) return json(res,400,{message:"BOOTH_LOCKED"});
       if (publicMap().find((item) => item.id === body.p_data.position_id).is_booked) return json(res, 400, { message: "BOOTH_TAKEN" });
       const entry = { ...body.p_data, id: randomUUID(), request_key: body.p_request_key, fingerprint: body.p_fingerprint, reference: `GCD-TEST${proposals.length+1}`, status: "pending", image_paths: body.p_images, created_at: new Date().toISOString(), updated_at: new Date().toISOString(), reviewed_at: null, review_note: null };
       proposals.push(entry); return json(res, 200, { id: entry.id, reference: entry.reference, reused: false });
@@ -80,6 +90,7 @@ const backend = createServer(async (req, res) => {
       const entry = proposals.find((item) => item.id === body.p_proposal_id);
       if (!entry) return json(res, 400, { message: "NOT_FOUND" });
       if (entry.status !== "pending") return json(res, 400, { message: "ALREADY_REVIEWED" });
+      if (body.p_decision === "approved" && lockedPositions.has(entry.position_id)) return json(res,400,{message:"BOOTH_LOCKED"});
       entry.status = body.p_decision; entry.review_note = body.p_note; entry.reviewed_at = new Date().toISOString();
       entry.updated_at = new Date().toISOString();
       if (body.p_decision === "approved") proposals.filter((item) => item.position_id === entry.position_id && item.status === "pending").forEach((item) => { item.status = "rejected"; item.reviewed_at = new Date().toISOString(); });
@@ -90,6 +101,7 @@ const backend = createServer(async (req, res) => {
       if (!entry) return json(res,400,{message:"NOT_FOUND"});
       if (entry.updated_at!==body.p_expected_updated_at) return json(res,400,{message:"STALE_PROPOSAL"});
       if (entry.status!=="approved") return json(res,400,{message:"NOT_CONFIRMED"});
+      if (entry.position_id!==body.p_data.position_id && lockedPositions.has(body.p_data.position_id)) return json(res,400,{message:"BOOTH_LOCKED"});
       if (proposals.some((item)=>item.id!==entry.id && item.position_id===body.p_data.position_id && item.status==="approved")) return json(res,400,{message:"BOOTH_TAKEN"});
       const old=entry.position_id;
       Object.assign(entry,body.p_data,{image_paths:body.p_images,updated_at:new Date(Math.max(Date.now(),Date.parse(entry.updated_at)+1)).toISOString()});
@@ -181,6 +193,7 @@ try {
   };
   const second = await submitSecond(), retry = await submitSecond();
   assert.equal(second.reference, retry.reference); assert.equal(proposals.length, 2);
+  assert.equal((await fetch(`${origin}/api/booths/admin/positions/12`,{method:"PATCH",headers:{Origin:origin,"Content-Type":"application/json"},body:JSON.stringify({is_locked:true})})).status,401);
   for (const invalidId of ["26", "29", "30", "31", "33", "41", "0"]) await submitSecond(randomUUID(), 400, invalidId);
   assert.equal(proposals.length, 2); assert.equal(uploads.size, 1);
   await submitSecond(randomUUID(),201,"13");
@@ -224,6 +237,30 @@ try {
   const authCookies = (await page.context().cookies()).filter((cookie) => cookie.name.includes("auth-token"));
   assert(authCookies.length > 0 && authCookies.every((cookie) => cookie.httpOnly && cookie.sameSite === "Lax"));
   assert.equal(await page.locator(".booth-admin-item").count(), 2);
+  const lockApi = async (id,value,overrideOrigin) => page.evaluate(async ({id,value,overrideOrigin}) => {
+    const response=await fetch(`/api/booths/admin/positions/${id}`,{method:"PATCH",headers:{"Content-Type":"application/json",...(overrideOrigin?{Origin:overrideOrigin}:{})},body:JSON.stringify({is_locked:value})});
+    return {status:response.status,data:await response.json()};
+  },{id,value,overrideOrigin});
+  await page.getByRole("button",{name:"Tạm khóa vị trí",exact:true}).click();
+  await page.getByRole("button",{name:"Mở khóa vị trí",exact:true}).waitFor();
+  assert(lockedPositions.has(12)); assert.equal(proposals.length,3);
+  assert(await page.getByRole("button",{name:"Duyệt & chốt TM12",exact:true}).isDisabled());
+  await submitSecond(randomUUID(),409);
+  await submitSecond(secondKey,201);
+  const quoteLocked=await fetch(`${origin}/api/booths/payment`,{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({position:12,brand:"Locked brand",code:"",requestKey:randomUUID()})});assert.equal(quoteLocked.status,409);
+  const lockedReview=await page.evaluate(async id=>(await fetch(`/api/booths/admin/proposals/${id}`,{method:"PATCH",headers:{"Content-Type":"application/json"},body:JSON.stringify({decision:"approved"})})).status,proposals[0].id);assert.equal(lockedReview,409);
+  const guest=await browser.newContext({viewport:{width:390,height:800}}),guestPage=await guest.newPage();
+  await guestPage.goto(origin+'/en/booths');
+  await guestPage.locator('.booth-map-spot.is-locked').click();
+  await guestPage.locator('.booth-locked').getByRole('heading',{name:'This position is temporarily locked',exact:true}).waitFor();
+  assert.equal(await guestPage.locator('#booth-registration').count(),0);
+  await guestPage.screenshot({path:'test-results/booth-locked-mobile.png',fullPage:true});await guest.close();
+  assert.equal((await lockApi(26,true)).status,400); assert.equal((await lockApi(12,'yes')).status,400);
+  activeAdmin=false;assert.equal((await lockApi(12,false)).status,403);assert(lockedPositions.has(12));activeAdmin=true;
+  lockBeforeSubmit=true;await submitSecond(randomUUID(),409,'9');assert(lockedPositions.has(9));await lockApi(9,false);
+  await page.getByRole("button",{name:"Mở khóa vị trí",exact:true}).click();
+  await page.getByRole("button",{name:"Tạm khóa vị trí",exact:true}).waitFor();assert(!lockedPositions.has(12));
+  console.log('PASS: admin-only lock/unlock, blocked proposals/payment/approval, idempotent retry, stale-map race and English guest locked UI.');
   activeAdmin = false;
   const revoked = await page.evaluate(async (id) => (await fetch(`/api/booths/admin/proposals/${id}`, { method: "PATCH", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ decision: "approved" }) })).status, proposals[0].id);
   assert.equal(revoked, 403); assert.equal(proposals[0].status, "pending"); activeAdmin = true;

@@ -722,5 +722,21 @@
   "TR01–TR02 đã bố trí, không nhận đăng ký mới.": "m0687",
   "Hỗ trợ trải nghiệm văn hoá": "m0688",
   "Hộ chiếu Di sản": "navHeritagePassport",
-  "Đăng nhập bằng tài khoản ban tổ chức để quản lý QR, con dấu và xác nhận trao quà.": "passportAdminLoginDescription"
+  "Đăng nhập bằng tài khoản ban tổ chức để quản lý QR, con dấu và xác nhận trao quà.": "passportAdminLoginDescription",
+  "Chưa thể cập nhật khóa vị trí. Vui lòng thử lại.": "boothLock01",
+  "Đã tạm khóa {v0}. Các hồ sơ hiện có được giữ nguyên.": "boothLock02",
+  "Đã mở khóa {v0}.": "boothLock03",
+  "Khóa đăng ký vị trí": "boothLock04",
+  "Vị trí đang tạm khóa": "boothLock05",
+  "Quản lý nhận đăng ký": "boothLock06",
+  "Khóa tạm ngừng đề xuất mới, duyệt và chuyển gian đến. Hồ sơ hiện có và gian đã chốt được giữ nguyên.": "boothLock07",
+  "Mở khóa vị trí": "boothLock08",
+  "Tạm khóa vị trí": "boothLock09",
+  "Tạm khóa đăng ký": "boothLock10",
+  "gian tạm khóa": "boothLock11",
+  "Ban tổ chức đang tạm dừng nhận đề xuất tại vị trí này. Vui lòng chọn vị trí khác hoặc quay lại sau.": "boothLock12",
+  "Thông tin khóa vị trí không hợp lệ.": "boothLock13",
+  "Vị trí này không hỗ trợ khóa đăng ký.": "boothLock14",
+  "Vị trí đang tạm khóa. Hãy mở khóa trước khi duyệt hoặc chuyển gian hàng đến.": "boothLock15",
+  "Vị trí đang tạm khóa đăng ký. Vui lòng chọn vị trí khác.": "boothLock16"
 }
