@@ -139,7 +139,19 @@ Migration `V4__three_themed_booth_zones.sql` chuyển sang 3 khu × 8 gian và m
 
 Quầy B25 hiển thị trên sơ đồ với nhãn riêng, không có tương tác chọn; bị loại khỏi số lượng đang mở, selector đăng ký và selector chuyển gian quản trị. Validation API chỉ nhận ID 1–24. Trigger database kiểm tra `is_active` và `is_bookable` khi gửi, duyệt hoặc chuyển gian; gọi RPC trực tiếp cũng không thể đăng ký B25 hay các vị trí đã ngừng hoạt động. Đề xuất chờ vẫn không giữ chỗ. Chọn khu chỉ thay vị trí và gợi ý nội dung, không tự gửi hoặc xóa thông tin đã nhập.
 
+## Tạm khóa vị trí nhận đăng ký
+
+Migration `V17__temporary_booth_locks.sql` thêm cờ `booth_positions.is_locked`, lịch sử `booth_position_lock_events` và RPC dành riêng cho admin. Chạy `pnpm db:migrate` trước khi triển khai mã mới.
+
+Trong `/booths`, admin chọn một gian thương mại hoặc tài trợ trên sơ đồ, rồi bấm **Tạm khóa vị trí**; bấm **Mở khóa vị trí** để nhận đăng ký lại. Không có giờ tự mở khóa. Sơ đồ và tổng quan hiển thị trạng thái khóa, kể cả vị trí chưa có hồ sơ. Khách vẫn xem được ô đó nhưng thay form bằng thông báo tạm khóa; số gian đang mở không tính các ô khóa.
+
+Khóa không xóa hồ sơ, ảnh, gian đã chốt hay dấu passport. Không tạo QR thanh toán, nhận hồ sơ mới, duyệt hồ sơ chờ hoặc chuyển gian vào vị trí đang khóa. Admin vẫn có thể từ chối hồ sơ, sửa thông tin gian đã chốt tại chỗ hoặc chuyển gian ra khỏi ô khóa; ô cũ giữ trạng thái khóa. Retry đúng nội dung của hồ sơ đã lưu trước khi khóa vẫn trả mã tham chiếu cũ.
+
+`PATCH /api/booths/admin/positions/[id]` nhận `{ "is_locked": true | false }`, yêu cầu phiên quản trị đang hoạt động và cùng origin. Server kiểm tra trước upload/thanh toán; trigger PostgreSQL kiểm tra lại dưới cùng row lock với gửi, duyệt và chuyển gian để xử lý cả trường hợp admin khóa trong khi khách đang điền form hoặc upload. Bật/tắt cùng trạng thái nhiều lần không tạo lịch sử trùng; lịch sử chỉ server service role đọc được.
+
 ## Kiểm thử
+
+`pnpm test:booths:db` kiểm tra quyền khóa, giữ hồ sơ cũ, chặn ghi và phục hồi sau mở khóa, chỉnh sửa gian đã chốt và gửi đồng thời với transaction khóa. `pnpm test:booths:app` kiểm tra API thực, nút khóa/mở khóa, form khách tiếng Anh, chặn QR/thao tác duyệt và trường hợp sơ đồ cũ chưa cập nhật.
 
 ```powershell
 pnpm build

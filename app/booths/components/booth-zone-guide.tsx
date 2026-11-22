@@ -9,7 +9,7 @@ export default function BoothZoneGuide({ positions, selected, onSelect }: { posi
     <div className="booth-zone-heading"><span className="booth-kicker">{t("4 NHÓM VỊ TRÍ")}</span><h2>{t("Chọn hình thức tham gia phù hợp.")}</h2><p>{t("Gian thương mại và tài trợ nhận đề xuất. Gian văn hoá đã có đơn vị phụ trách; gian BTC dành riêng cho hỗ trợ khách và đổi quà.")}</p></div>
     <div className="booth-zone-grid">{BOOTH_ZONES.map((zone) => {
       const slots = positions.filter((position) => position.is_bookable && position.zone === zone.name);
-      const available = slots.filter((position) => !position.is_booked);
+      const available = slots.filter((position) => !position.is_booked && !position.is_locked);
       const active = zoneForPosition(selected)?.name === zone.name;
       return <article key={t(zone.name)} className={`booth-zone-card${active ? " is-selected" : ""}`} style={{ borderTopColor: zone.color }}>
         <div className="booth-zone-card-top"><span style={{ color: zone.color }}>{zone.prefix}01–{zone.prefix}{String(zonePositionCount(zone.prefix)).padStart(2,"0")}</span><span>{zonePositionCount(zone.prefix)} {t("GIAN") }</span></div>
