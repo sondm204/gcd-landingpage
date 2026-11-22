@@ -38,24 +38,21 @@
 .guest-showcase { border-top: 1px solid var(--line); padding-top: 32px; }
 .guest-carousel-layout { display: grid; grid-template-columns: 1.05fr 1fr; gap: clamp(30px, 5vw, 80px); align-items: center; }
 .guest-visual { position: relative; min-width: 0; }
-.guest-orbit-wrapper { position: relative; }
+.guest-portrait-wrapper { position: relative; }
 .guest-shared-backdrop { position: absolute; inset: -2% -3% 2%; overflow: hidden; border: 1px solid #bdd3ef; border-radius: 45% 45% 0 0; background: radial-gradient(ellipse at 50% 40%, #fff9e8, #bddbff); box-shadow: 0 20px 35px #08275c12; pointer-events: none; }
 .guest-shared-backdrop .guest-orbit { top: 22%; border-style: dashed; }
 .guest-shared-backdrop .guest-orbit-outer { width: 92%; left: 4%; top: 16%; border-style: solid; box-shadow: none; }
 .guest-shared-backdrop .guest-art-label { top: 24%; left: 7%; font-size: 9px; }
-.guest-orbit-stage { --orbit-radius: clamp(130px, 17vw, 235px); position: relative; z-index: 1; height: clamp(460px, 46vw, 650px); perspective: 1200px; transform-style: preserve-3d; }
-.guest-orbit-card { position: absolute; left: 50%; top: 48%; width: 78%; height: 92%; padding: 0; font: inherit; text-align: left; color: var(--ink); background: none; cursor: pointer; transform-style: preserve-3d; transform: translate(-50%, -50%) translateZ(calc(-1 * var(--orbit-radius))) rotateY(var(--guest-angle)) translateZ(var(--orbit-radius)) rotateY(calc(-1 * var(--guest-angle))); transition: transform 1.15s cubic-bezier(.45,0,.2,1); }
-.guest-orbit-card .guest-portrait { display: block; width: 100%; height: 100%; background: transparent; border: 0; overflow: visible; transition: filter 1s ease, opacity 1s ease; }
-.guest-orbit-card.is-behind .guest-portrait { filter: grayscale(1) brightness(.78); opacity: .75; box-shadow: none; }
-.guest-orbit-card.is-front .guest-portrait { filter: grayscale(0); opacity: 1; }
-.guest-orbit-card { pointer-events: none; cursor: default; }
+.guest-portrait-stage { position: relative; z-index: 1; height: clamp(460px, 46vw, 650px); overflow: hidden; }
+.guest-portrait-frame { position: absolute; inset: 2% 11% 6%; pointer-events: none; }
+.guest-portrait-frame .guest-portrait { display: block; width: 100%; height: 100%; background: transparent; border: 0; }
+.guest-portrait-frame .guest-photo { object-fit: cover; padding-top: 18px; }
 .guest-description-panel { min-width: 0; }
 .guest-navigation { display: flex; justify-content: flex-start; gap: 16px; margin-top: 20px; }
 .guest-navigation button { display: inline-flex; align-items: center; justify-content: center; gap: 18px; padding: 12px 22px; min-height: 46px; border: 1px solid var(--line); background: var(--paper); color: var(--ink); font: inherit; font-size: 14px; cursor: pointer; transition: background .2s, color .2s, border-color .2s; }
 .guest-navigation button:hover { background: var(--ink); color: var(--paper); border-color: var(--ink); }
 .guest-navigation button:focus-visible { outline: 2px solid var(--red); outline-offset: 4px; }
 .guest-portrait-footer { position: absolute; bottom: 17px; left: 6%; letter-spacing: 1.5px; font-size: 8px; z-index: 2; }
-.guest-orbit-card .guest-photo { padding-top: 18px; }
 .guest-stories { display: grid; min-width: 0; }
 .guest-story { grid-area: 1 / 1; opacity: 0; visibility: hidden; pointer-events: none; transition: opacity .55s ease, visibility .55s; }
 .guest-story.is-active { opacity: 1; visibility: visible; pointer-events: auto; }
@@ -70,14 +67,14 @@
 .guest-story.is-active .guest-copy > :nth-child(5) { transition-delay: .36s; }
 @media (max-width: 800px) {
   .guest-carousel-layout { grid-template-columns: 1fr; gap: 10px; }
-  .guest-orbit-stage { --orbit-radius: clamp(125px, 30vw, 195px); height: clamp(410px, 90vw, 550px); width: 100%; max-width: 570px; margin-inline: auto; perspective: 1000px; }
-  .guest-orbit-card { width: 72%; }
+  .guest-portrait-stage { height: clamp(410px, 90vw, 550px); width: 100%; max-width: 570px; margin-inline: auto; }
+  .guest-portrait-frame { inset-inline: 14%; }
   .guest-story .guest-copy { padding: 15px 0 0; }
   .guest-story .guest-copy h3 { font-size: clamp(36px, 8vw, 55px); }
   .guest-scene-label { margin-bottom: 25px; }
 }
 @media (prefers-reduced-motion: reduce) {
-  .guest-orbit-card, .guest-orbit-card .guest-portrait, .guest-story, .guest-story .guest-copy > * { transition: none; }
+  .guest-story, .guest-story .guest-copy > * { transition: none; }
   .guest-story .guest-copy > * { transform: none; }
 }
 

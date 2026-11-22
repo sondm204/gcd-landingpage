@@ -738,5 +738,16 @@
   "boothLock13": "Thông tin khóa vị trí không hợp lệ.",
   "boothLock14": "Vị trí này không hỗ trợ khóa đăng ký.",
   "boothLock15": "Vị trí đang tạm khóa. Hãy mở khóa trước khi duyệt hoặc chuyển gian hàng đến.",
-  "boothLock16": "Vị trí đang tạm khóa đăng ký. Vui lòng chọn vị trí khác."
+  "boothLock16": "Vị trí đang tạm khóa đăng ký. Vui lòng chọn vị trí khác.",
+  "guestDinhHuyTuName": "Đinh Huy Tú",
+  "guestDinhHuyTuAlt": "Khách mời Đinh Huy Tú cùng máy tính trong không gian sáng tạo số",
+  "guestDinhHuyTuRole": "SÁNG TẠO SỐ · KHÁCH MỜI ĐẶC BIỆT",
+  "guestDinhHuyTuCaption": "Từ ý tưởng Việt đến sân chơi sáng tạo toàn cầu.",
+  "guestDinhHuyTuDescription": "Là thành viên đội Minecraft Việt Nam giành chiến thắng tại MrBeast World Wide Building Challenge, Đinh Huy Tú mang đến câu chuyện về sức sáng tạo và tinh thần đồng đội của người trẻ Việt trên sân chơi quốc tế. Từ những khối vuông trong thế giới số, cuộc gặp gỡ gợi mở cách biến ý tưởng thành dấu ấn riêng và tự tin kết nối với cộng đồng toàn cầu.",
+  "guestNguyenThoThoName": "Nguyễn Thơ Thơ",
+  "guestNguyenThoThoAlt": "Nhà thiết kế Nguyễn Thơ Thơ trong trang phục thêu tay",
+  "guestNguyenThoThoRole": "NHÀ THIẾT KẾ · SÁNG LẬP TIỆM THƠ",
+  "guestNguyenThoThoCaption": "Từ đường kim truyền thống đến những kết nối đương đại.",
+  "guestNguyenThoThoDescription": "Nhà thiết kế, nhà sáng lập và điều hành Tiệm Thơ (Thơ Heritage House), Nguyễn Thơ Thơ đưa họa tiết Đông Hồ, Hàng Trống vào thời trang nhung, lụa và thêu tay truyền thống. Chị trực tiếp thêu tay biểu trưng APEC Việt Nam 2027 và xuất hiện trong thước phim quảng bá sự kiện do Thông tấn xã Việt Nam giới thiệu ngày 21/11/2026 — một dấu ấn đưa tinh hoa thủ công Việt đến với bạn bè quốc tế.",
+  "programGuestDialogue": "Gặp gỡ các khách mời đặc biệt trong chương trình; cùng trao đổi góc nhìn về bản sắc Việt, sáng tạo và kết nối toàn cầu."
 }
