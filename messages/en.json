@@ -738,5 +738,16 @@
   "boothLock13": "Invalid position lock information.",
   "boothLock14": "This position does not support booking locks.",
   "boothLock15": "This position is temporarily locked. Unlock it before approving or moving a booth here.",
-  "boothLock16": "This position is temporarily locked for registration. Please choose another position."
+  "boothLock16": "This position is temporarily locked for registration. Please choose another position.",
+  "guestDinhHuyTuName": "Đinh Huy Tú",
+  "guestDinhHuyTuAlt": "Special guest Đinh Huy Tú with his computer in a digital creative setting",
+  "guestDinhHuyTuRole": "DIGITAL CREATIVITY · SPECIAL GUEST",
+  "guestDinhHuyTuCaption": "From Vietnamese ideas to a global creative stage.",
+  "guestDinhHuyTuDescription": "A member of the Vietnamese Minecraft team that won the MrBeast World Wide Building Challenge, Đinh Huy Tú brings a story of creativity and teamwork among young Vietnamese people on an international stage. Starting with blocks in a digital world, this encounter invites us to turn ideas into a distinctive voice and connect confidently with a global community.",
+  "guestNguyenThoThoName": "Nguyễn Thơ Thơ",
+  "guestNguyenThoThoAlt": "Fashion designer Nguyễn Thơ Thơ in a hand-embroidered outfit",
+  "guestNguyenThoThoRole": "FASHION DESIGNER · FOUNDER OF TIỆM THƠ",
+  "guestNguyenThoThoCaption": "Traditional stitches. Contemporary connections.",
+  "guestNguyenThoThoDescription": "Fashion designer and the founder and director of Tiệm Thơ (Thơ Heritage House), Nguyễn Thơ Thơ brings motifs from Đông Hồ and Hàng Trống folk paintings into velvet, silk and traditional hand embroidery. She personally hand-embroidered the APEC Vietnam 2027 emblem and appeared in the event’s promotional film introduced by the Vietnam News Agency on 21 November 2026, bringing Vietnamese craftsmanship to an international audience.",
+  "programGuestDialogue": "Meet the program’s special guests and exchange perspectives on Vietnamese identity, creativity and global connections."
 }

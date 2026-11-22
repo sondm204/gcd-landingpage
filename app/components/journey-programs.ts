@@ -18,6 +18,6 @@ export const programs = [
     description: "Gặp gỡ người truyền cảm hứng, trao đổi cách mang giá trị Việt vào bối cảnh mới và tìm một việc mình có thể bắt đầu. Một ý tưởng nhỏ, khi có thêm góc nhìn và người đồng hành, có thể mở ra hướng đi mới.",
     tags: ["Sáng tạo", "Hợp tác", "Chủ động hành động"],
     detail: "Workshop và talkshow nối câu chuyện bản sắc với lựa chọn của người trẻ hôm nay. Lắng nghe trải nghiệm, trao đổi ý tưởng và suy nghĩ về cách kết hợp hiểu biết địa phương với tư duy cởi mở để giải quyết vấn đề quanh mình.",
-    activities: ["Talkshow dự kiến về bản lĩnh cá nhân, bản sắc Việt và khả năng thích nghi trong môi trường đa văn hoá.", "Workshop dự kiến khuyến khích biến chất liệu văn hoá thành ý tưởng sáng tạo có ích cho cộng đồng.", "Khách mời đề xuất: nghệ sĩ Xuân Bắc. Sự tham gia chưa được xác nhận."],
+    activities: ["Talkshow dự kiến về bản lĩnh cá nhân, bản sắc Việt và khả năng thích nghi trong môi trường đa văn hoá.", "Workshop dự kiến khuyến khích biến chất liệu văn hoá thành ý tưởng sáng tạo có ích cho cộng đồng.", "Gặp gỡ các khách mời đặc biệt trong chương trình; cùng trao đổi góc nhìn về bản sắc Việt, sáng tạo và kết nối toàn cầu."],
   },
 ];
