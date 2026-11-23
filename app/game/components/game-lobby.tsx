@@ -20,6 +20,22 @@ export default function GameLobby() {
   const setMode = (value: GameMode) => router.replace(`/game?tab=${value}#chon-chang`, { scroll: false });
   const [selected, setSelected] = useState<(typeof stages)[number] | null>(null);
   const dialogRef = useRef<HTMLDialogElement>(null);
+  const [openGames, setOpenGames] = useState<StageId[]>([]);
+  useEffect(() => {
+    const controller = new AbortController();
+    async function refresh() {
+      try {
+        const response = await fetch("/api/game/availability", { cache: "no-store", signal: controller.signal });
+        const data = await response.json();
+        if (!controller.signal.aborted) setOpenGames(response.ok ? data.games.filter((item: {game: StageId; is_open: boolean}) => item.is_open).map((item: {game: StageId}) => item.game) : []);
+      } catch { if (!controller.signal.aborted) setOpenGames([]); }
+    }
+    void refresh();
+    const timer = setInterval(() => void refresh(), 15000);
+    const focus = () => void refresh();
+    window.addEventListener("focus", focus);
+    return () => { controller.abort(); clearInterval(timer); window.removeEventListener("focus", focus); };
+  }, []);
 
   useEffect(() => {
     const dialog = dialogRef.current;
@@ -63,7 +79,7 @@ export default function GameLobby() {
           {mode === "online" ? <div className="game-stageGrid">
             {stages.map((stage, index) => <button type="button" key={stage.id} className="game-stageCard" data-stage={stage.id} onClick={() => showStage(stage)} aria-label={`Khám phá chặng ${index + 1}: ${stage.name}`} aria-haspopup="dialog">
               <div className="game-cardArt"><span className="game-stageNumber">CHẶNG <b>0{index + 1}</b></span><StageArt id={stage.id} /><span className="game-artCaption">{stage.category}</span></div>
-              <div className="game-cardContent"><div className="game-cardTopline"><span className="game-stampLabel"><StageIcon id={stage.id} />Dấu {stage.stamp}</span><span className="game-comingSoon">{playablePaths[stage.id] ? "Có thể chơi thử" : "Sắp ra mắt"}</span></div><h3>{stage.name}</h3><p>{stage.description}</p><span className="game-gameSummary">{stage[mode].summary}</span><span className="game-cardAction">Khám phá chặng <Arrow /></span></div>
+              <div className="game-cardContent"><div className="game-cardTopline"><span className="game-stampLabel"><StageIcon id={stage.id} />Dấu {stage.stamp}</span><span className="game-comingSoon">{playablePaths[stage.id] && openGames.includes(stage.id) ? "Có thể chơi thử" : "Sắp ra mắt"}</span></div><h3>{stage.name}</h3><p>{stage.description}</p><span className="game-gameSummary">{stage[mode].summary}</span><span className="game-cardAction">Khám phá chặng <Arrow /></span></div>
             </button>)}
             <aside className="game-storyCard">
               <span className="game-storyMark" aria-hidden="true">✦</span><p className="game-kicker">MỘT HÀNH TRÌNH, NĂM DẤU ẤN</p><h3>Muốn đi xa,<br />phải biết mình<br /><em>từ đâu đến.</em></h3><p>Thu thập đủ 5 con dấu, tìm lại bản sắc và trở thành Đại sứ di sản.</p><div className="game-storyStamps" aria-label="Năm dấu ấn: Đôi tay, Đôi mắt, Đôi tai, Đôi chân, Tiếng nói">{stages.map(stage => <span key={stage.id} title={stage.stamp}><StageIcon id={stage.id} /></span>)}</div>
@@ -77,7 +93,7 @@ export default function GameLobby() {
     <footer className="game-footer"><div><b>HỘ CHIẾU DI SẢN</b><span>Một trải nghiệm của Global Citizens Day 2026</span></div><Link href="/">Về trang sự kiện <Arrow /></Link></footer>
 
     <dialog className="game-dialog" ref={dialogRef} aria-labelledby="stage-dialog-title" onClick={event => { if (event.target === event.currentTarget) dialogRef.current?.close(); }}>
-      {selected && <><div className="game-dialogArt" data-stage={selected.id}><StageArt id={selected.id} /><button type="button" className="game-closeDialog" aria-label="Đóng giới thiệu chặng" onClick={() => dialogRef.current?.close()}>×</button></div><div className="game-dialogBody"><p className="game-kicker">CHẶNG 0{stages.indexOf(selected) + 1} · {mode === "online" ? "ONLINE" : "TẠI SỰ KIỆN"}</p><h2 id="stage-dialog-title">{selected.name}</h2><p className="game-dialogStory">{selected.story}</p><h3>Cách chơi</h3><ul>{selected[mode].rules.map(rule => <li key={rule}>{rule}</li>)}</ul>{mode === "event" && <div className="game-challenge"><b>Thử thách thực tế · Tùy chọn</b><p>{selected.challenge}</p></div>}<div className="game-dialogStamp"><StageIcon id={selected.id} /><span>Dấu ấn của chặng: <b>{selected.stamp}</b></span></div>{playablePaths[selected.id] ? <><Link className="game-craftPlay" href={`${playablePaths[selected.id]}?mode=${mode}`} onClick={() => dialogRef.current?.close()}>Chơi thử {selected.name} →</Link><p className="game-dialogNote">Mỗi game có 3 lượt. Điểm cao nhất được ghi nhận vào tài khoản.</p></> : <><button type="button" className="game-playButton" disabled>Trò chơi sắp ra mắt</button><p className="game-dialogNote">Bạn có thể xem trước các chặng. Hành trình chơi sẽ được mở sau.</p></>}</div></>}
+      {selected && <><div className="game-dialogArt" data-stage={selected.id}><StageArt id={selected.id} /><button type="button" className="game-closeDialog" aria-label="Đóng giới thiệu chặng" onClick={() => dialogRef.current?.close()}>×</button></div><div className="game-dialogBody"><p className="game-kicker">CHẶNG 0{stages.indexOf(selected) + 1} · {mode === "online" ? "ONLINE" : "TẠI SỰ KIỆN"}</p><h2 id="stage-dialog-title">{selected.name}</h2><p className="game-dialogStory">{selected.story}</p><h3>Cách chơi</h3><ul>{selected[mode].rules.map(rule => <li key={rule}>{rule}</li>)}</ul>{mode === "event" && <div className="game-challenge"><b>Thử thách thực tế · Tùy chọn</b><p>{selected.challenge}</p></div>}<div className="game-dialogStamp"><StageIcon id={selected.id} /><span>Dấu ấn của chặng: <b>{selected.stamp}</b></span></div>{playablePaths[selected.id] && openGames.includes(selected.id) ? <><Link className="game-craftPlay" href={`${playablePaths[selected.id]}?mode=${mode}`} onClick={() => dialogRef.current?.close()}>Chơi thử {selected.name} →</Link><p className="game-dialogNote">Mỗi game có 3 lượt. Điểm cao nhất được ghi nhận vào tài khoản.</p></> : <><button type="button" className="game-playButton" disabled>Trò chơi sắp ra mắt</button><p className="game-dialogNote">Bạn có thể xem trước các chặng. Hành trình chơi sẽ được mở sau.</p></>}</div></>}
     </dialog>
   </div>;
 }
