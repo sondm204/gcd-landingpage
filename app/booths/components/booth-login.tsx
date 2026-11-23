@@ -5,7 +5,7 @@ import { useCopy } from "@/i18n/copy";
 import { useState } from "react";
 import { useRouter } from "@/i18n/navigation";
 
-export default function BoothLogin({ redirectTo = "/booths" }: { redirectTo?: "/booths" | "/game/admin" }) {
+export default function BoothLogin({ redirectTo = "/booths" }: { redirectTo?: "/booths" | "/game/admin" | "/register/admin" }) {
   const t = useCopy();
   const router = useRouter();
   const [busy, setBusy] = useState(false);
@@ -21,5 +21,6 @@ export default function BoothLogin({ redirectTo = "/booths" }: { redirectTo?: "/
     } catch (err) { setError(err instanceof Error ? err.message : t("Mất kết nối. Vui lòng thử lại.")); }
     finally { setBusy(false); }
   }
-  return <main className="booths-main"><section className="booth-login"><span className="booth-kicker">{t("KHÔNG GIAN BAN TỔ CHỨC")}</span><h1>{t("Chào bạn trở lại.")}</h1><p>{redirectTo === "/game/admin" ? t("Đăng nhập bằng tài khoản ban tổ chức để quản lý QR, con dấu và xác nhận trao quà.") : t("Đăng nhập bằng tài khoản quản trị đã được cấp để xét duyệt đề xuất và chốt vị trí gian hàng.")}</p><form onSubmit={login}><fieldset disabled={busy}><label className="booth-field">{t("Email quản trị")}<input name="email" type="email" autoComplete="username" required maxLength={254} /></label><label className="booth-field">{t("Mật khẩu")}<input name="password" type="password" autoComplete="current-password" required maxLength={256} /></label>{error && <div className="booth-alert error" role="alert">{t(error)}</div>}<button className="booth-button" type="submit">{busy ? t("Đang đăng nhập…") : t("Đăng nhập quản trị")}<span aria-hidden="true">↗</span></button></fieldset></form></section></main>;
+  const introduction = redirectTo === "/register/admin" ? t("Đăng nhập bằng tài khoản ban tổ chức để xem danh sách và xuất dữ liệu.") : redirectTo === "/game/admin" ? t("Đăng nhập bằng tài khoản ban tổ chức để quản lý QR, con dấu và xác nhận trao quà.") : t("Đăng nhập bằng tài khoản quản trị đã được cấp để xét duyệt đề xuất và chốt vị trí gian hàng.");
+  return <main className="booths-main"><section className="booth-login"><span className="booth-kicker">{t("KHÔNG GIAN BAN TỔ CHỨC")}</span><h1>{t("Chào bạn trở lại.")}</h1><p>{introduction}</p><form onSubmit={login}><fieldset disabled={busy}><label className="booth-field">{t("Email quản trị")}<input name="email" type="email" autoComplete="username" required maxLength={254} /></label><label className="booth-field">{t("Mật khẩu")}<input name="password" type="password" autoComplete="current-password" required maxLength={256} /></label>{error && <div className="booth-alert error" role="alert">{t(error)}</div>}<button className="booth-button" type="submit">{busy ? t("Đang đăng nhập…") : t("Đăng nhập quản trị")}<span aria-hidden="true">↗</span></button></fieldset></form></section></main>;
 }

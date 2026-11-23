@@ -140,6 +140,11 @@
 
 .booth-admin-mode { display: flex; align-items: center; justify-content: space-between; gap: 20px; background: #e8f1ff; padding: 22px 25px; margin-top: 24px; border: 1px solid #b5ceee; }
 .booth-admin-mode p { margin-top: 5px; font-size: 13px; }
+.booth-admin-toolbar { display: flex; flex-wrap: wrap; align-items: start; gap: 10px; }
+.booth-admin-mode > div:first-child { min-width: 200px; }
+.admin-export-error { color: #a62a39; font-size: 13px; max-width: 350px; margin: 8px 0 0; }
+.booth-admin-panel > .admin-export { margin: 14px 0; }
+.booth-account-popup > a { display: block; margin: 0 0 16px; }
 .booth-booking-grid.is-admin { grid-template-columns: minmax(0, 1.1fr) minmax(400px, 1fr); }
 .booth-map-column { min-width: 0; }
 .booth-admin-panel { min-width: 0; border: 1px solid var(--line); background: #ffffff; padding: 25px; }
