@@ -9,6 +9,9 @@ export async function POST(request: Request) {
     const parsed = schema.safeParse(await gameBody(request));
     if (!parsed.success) throw new GameError(400, "Thông tin lượt chơi không hợp lệ.");
     const { game, mode, request_key } = parsed.data;
+    const availability = await gameDb().from("game_availability").select("is_open").eq("game",game).single();
+    if(availability.error)throw new GameError(503,"Chưa kiểm tra được trạng thái game. Vui lòng thử lại.");
+    if(!availability.data.is_open)throw new GameError(403,"Game đang tạm đóng. Vui lòng quay lại sau.");
     const { data, error } = await gameDb().rpc("game_start_attempt", { p_player: player.id, p_game: game, p_mode: mode, p_request_key: request_key, p_seed: randomInt(0, 4294967296) });
     if (error) dbGameError(error);
     if (data.status !== "started") throw new GameError(409, "Lượt này đã kết thúc. Vui lòng mở lượt mới.");

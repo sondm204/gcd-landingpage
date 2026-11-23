@@ -1,5 +1,6 @@
 "use client";
 import Image from "next/image";
+import GameAvailability from "./game-availability";
 import { Link } from "@/i18n/navigation";
 import { useCallback, useEffect, useRef, useState, type FormEvent } from "react";
 import { extractPassportCode, type PassportAdmin as AdminData, type PassportLookup, type AdminStation } from "@/lib/games/passport-types";
@@ -64,6 +65,7 @@ export default function PassportAdmin() {
   if (unauthorized) return <main className="passport-admin"><Link href="/game?tab=event">← Hộ chiếu tại sự kiện</Link><section><h1>Không gian ban tổ chức</h1><p>{error}</p><Link className="passport-primary" href={`/game/admin/login${card ? `#card=${encodeURIComponent(card)}` : ""}`}>Đăng nhập quản trị →</Link></section></main>;
   return <main className="passport-admin"><nav><Link href="/game?tab=event">← Hộ chiếu tại sự kiện</Link><Link href="/booths">Quản trị gian hàng ↗</Link></nav><header><p className="game-kicker">GLOBAL CITIZENS DAY 2026 · BAN TỔ CHỨC</p><h1>Quản trị những dấu hẹn</h1><p>Mở nhận dấu, phát QR theo gian và xác nhận trao quà từ dữ liệu hộ chiếu.</p></header>{error && <p className="passport-alert" role="alert">{error}</p>}{notice && <p className="passport-notice" role="status">{notice}</p>}
     {!data ? <section><p role="status">Đang tải…</p><button onClick={() => void load()}>Tải lại</button></section> : <>
+      <GameAvailability />
       <div className="passport-admin-stats"><span><b>{data.total_players}</b>người đã nhận dấu</span><span><b>{data.total_stamps}</b>con dấu đã trao</span><span><b>{data.total_redemptions}</b>hộ chiếu đã đổi quà</span></div>
       <section><h2>Điều phối sự kiện</h2><form onSubmit={settings} key={JSON.stringify(data.settings)}><div className="passport-form-grid"><label><input type="checkbox" name="collecting" defaultChecked={data.settings.collecting_open} /> Mở nhận dấu</label><label><input type="checkbox" name="redeeming" defaultChecked={data.settings.redeeming_open} /> Mở đổi quà</label><label>Số dấu tối thiểu<input type="number" name="minimum" min={1} max={1000} defaultValue={data.settings.minimum_stamps ?? ""} placeholder="Chưa chốt" /></label><label>Tên quà tặng<input name="reward" required maxLength={120} defaultValue={data.settings.reward_label} /></label></div><p>Để trống mốc dấu khi chưa chốt quy chế. Phải có mốc trước khi mở đổi quà.</p><button disabled={busy} className="passport-primary">Lưu cấu hình</button></form></section>
       <section id="doi-qua"><p className="game-kicker">QUẦY ĐỔI QUÀ</p><h2>Kiểm tra hộ chiếu</h2><p>Dùng camera điện thoại quét QR cá nhân mà người chơi xuất trình; hoặc dán liên kết/mã vào đây.</p><form onSubmit={inspect} className="passport-inspect"><label>QR hoặc mã hộ chiếu<input value={card} onChange={e => { setCard(e.target.value); setLookup(null); }} maxLength={500} required placeholder="Dán QR hộ chiếu cá nhân" /></label><button disabled={busy} className="passport-primary">Kiểm tra hộ chiếu</button></form>

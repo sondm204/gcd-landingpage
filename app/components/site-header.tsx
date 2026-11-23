@@ -47,7 +47,7 @@ function HeaderContent({ pathname }: { pathname: string }) {
         <HomeLink className={home ? "active" : undefined} aria-current={home ? "page" : undefined}>{t("Trang chủ")}</HomeLink>
         <Link href="/booths" className={booths ? "active" : undefined} aria-current={pathname === "/booths" ? "page" : undefined}>{t("Gian hàng")}</Link>
         <Link href="/game" className={game ? "active" : undefined} aria-current={pathname === "/game" ? "page" : undefined}>{t("Hộ chiếu Di sản")}</Link>
-        {(booths || pathname.startsWith("/register/admin")) && <BoothAccount />}
+        {(booths || game || pathname.startsWith("/register/admin")) && <BoothAccount />}
         <Link href="/register" className="nav-cta" aria-current={pathname === "/register" ? "page" : undefined}>{t("Hẹn một chuyến đi")} <Arrow /></Link>
       </nav>
       <LanguageSwitch />
