@@ -7,6 +7,7 @@ import { isCommercialPosition, BOOTH_COUNT, POSITION_COUNT, BOOTH_ZONES, zoneFor
 import BoothZoneGuide from "./booth-zone-guide";
 import BoothPayment from "./booth-payment";
 import BoothVouchers from "./booth-vouchers";
+import AdminExportButton from "@/app/components/admin-export-button";
 import BoothZoneIcon from "./booth-zone-icon";
 import BoothMap from "./booth-map";
 import BoothLogo from "./booth-logo";
@@ -136,7 +137,7 @@ export default function BoothBooking() {
     <section className="booths-intro"><div><span className="booth-kicker">{t("DÀNH CHO THƯƠNG HIỆU & ĐƠN VỊ ĐỒNG HÀNH")}</span><h1>{t("Chọn một góc nhỏ.")}<br /><em>{t("Mở ngàn kết nối.")}</em></h1><p>{t("Sơ đồ gồm 24 gian thương mại, 8 gian tài trợ, 5 gian văn hoá và 3 gian BTC. Chọn gian thương mại hoặc tài trợ phù hợp để gửi đề xuất tham gia.")}</p></div><div className="booths-intro-aside"><span className="booths-big-number">{POSITION_COUNT}<span>{t("VỊ TRÍ DỰ KIẾN")}</span></span><p><strong>{BOOTH_COUNT} {t("gian nhận đề xuất")}</strong><br />{t("5 gian văn hoá và 3 gian BTC đã bố trí.")}<br />{t("Chỉ xác nhận sau khi xét duyệt.")}</p></div></section>
     <BoothZoneGuide positions={positions} selected={selected} onSelect={(id) => { selectPosition(id); document.getElementById("booth-plan")?.scrollIntoView({ behavior: window.matchMedia("(prefers-reduced-motion: reduce)").matches ? "instant" : "smooth", block: "start" }); }} />
     <div className="booth-process"><span><b>01</b> {t("Chọn chủ đề & vị trí")}</span><span><b>02</b> {t("Gửi câu chuyện gian hàng")}</span><span><b>03</b> {t("Chờ ban tổ chức xét duyệt")}</span></div>
-    {admin && <div className="booth-admin-mode"><div><span className="booth-kicker">{t("CHẾ ĐỘ QUẢN TRỊ")}</span><p>{admin.email} {t("· Chọn ô để xem đề xuất, xét duyệt hoặc sửa gian hàng đã chốt.")}</p></div><div className="booth-admin-toolbar"><BoothVouchers /><button type="button" className="booth-button secondary compact" disabled={logoutBusy} onClick={logout}>{logoutBusy ? t("Đang đăng xuất…") : t("Đăng xuất ↗")}</button></div></div>}
+    {admin && <div className="booth-admin-mode"><div><span className="booth-kicker">{t("CHẾ ĐỘ QUẢN TRỊ")}</span><p>{admin.email} {t("· Chọn ô để xem đề xuất, xét duyệt hoặc sửa gian hàng đã chốt.")}</p></div><div className="booth-admin-toolbar"><Link href="/register/admin" className="booth-button secondary compact">{t("Người tham dự")} ↗</Link><AdminExportButton href="/api/booths/admin/proposals/export" label={t("Xuất Excel gian hàng")} /><BoothVouchers /><button type="button" className="booth-button secondary compact" disabled={logoutBusy} onClick={logout}>{logoutBusy ? t("Đang đăng xuất…") : t("Đăng xuất ↗")}</button></div></div>}
     {error && <div className="booth-alert error" role="alert">{t(error)} <button type="button" onClick={() => void refresh()}>{t("Tải lại sơ đồ")}</button></div>}
     {!loading && !configured && !error && <div className="booth-alert">{t("Đây là bản xem trước sơ đồ. Cổng nhận đề xuất chưa mở; chức năng gửi sẽ hoạt động khi ban tổ chức hoàn tất cấu hình.")}</div>}
     {loading ? <div className="booth-loading" role="status">{t("Đang mở sơ đồ gian hàng…")}</div> : positions.length > 0 && <>

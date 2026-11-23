@@ -61,9 +61,9 @@ export default function BoothAccount() {
   }
 
   if (!ready) return <span className="booth-account-loading" aria-label={t("Đang kiểm tra tài khoản")} />;
-  if (!admin) return <Link href="/booths/admin/login">{t("Đăng nhập quản trị")}</Link>;
+  if (!admin) return <Link href={pathname.startsWith("/register/admin") ? "/register/admin/login" : "/booths/admin/login"}>{t("Đăng nhập quản trị")}</Link>;
   return <details className="booth-account" ref={popup}>
     <summary aria-label={t("Tài khoản quản trị")} title={t("Tài khoản quản trị")}><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.6" aria-hidden="true"><circle cx="12" cy="8" r="3.5" /><path d="M5 21v-2a7 7 0 0 1 14 0v2" /></svg></summary>
-    <div className="booth-account-popup"><span className="booth-kicker">{t("TÀI KHOẢN QUẢN TRỊ")}</span><p>{admin.email}</p>{error && <p role="alert">{t(error)}</p>}<button className="booth-button secondary compact" type="button" disabled={busy} onClick={logout}>{busy ? t("Đang đăng xuất…") : t("Đăng xuất")}</button></div>
+    <div className="booth-account-popup"><span className="booth-kicker">{t("TÀI KHOẢN QUẢN TRỊ")}</span><p>{admin.email}</p><Link href="/register/admin">{t("Người tham dự")} ↗</Link>{error && <p role="alert">{t(error)}</p>}<button className="booth-button secondary compact" type="button" disabled={busy} onClick={logout}>{busy ? t("Đang đăng xuất…") : t("Đăng xuất")}</button></div>
   </details>;
 }

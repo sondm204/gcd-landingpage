@@ -3,6 +3,7 @@ import { useLocale } from "next-intl";
 import { useCopy, useLocalizedData } from "@/i18n/copy";
 
 import BoothPaymentReview from "./booth-payment-review";
+import AdminExportButton from "@/app/components/admin-export-button";
 
 import { useCallback, useEffect, useRef, useState } from "react";
 import Image from "next/image";
@@ -87,6 +88,7 @@ export default function BoothAdminPanel({ position, positions, onSelect, onChang
     <div className="booth-form-heading"><span className="booth-kicker">{t("QUẢN TRỊ THEO VỊ TRÍ")}</span><div><h2>{position.code}</h2><span>{t("Khu") } {t(position.zone)}<br />{position.pending_count} {t("đề xuất chờ")}{position.is_booked ? t(" · Đã chốt") : ""}</span></div></div>
     <label className="booth-field">{t("Chọn nhanh vị trí")}<select value={position.id} disabled={editing || busy} onChange={(event)=>onSelect(Number(event.target.value))}>{positions.map((entry)=><option key={entry.id} value={entry.id}>{entry.code} · {entry.pending_count} {t("chờ")}{entry.is_locked ? " · " + t("Tạm khóa đăng ký") : ""}{entry.is_booked ? t(" · Đã chốt") : ""}</option>)}</select></label>
     {!editing && <div className="booth-position-filters"><label className="booth-field">{t("Hồ sơ tại ô này")}<select value={status} disabled={busy} onChange={(event)=>{setStatus(event.target.value);setPage(1);setSelected(null);}}><option value="pending">{t("Chờ duyệt")}</option><option value="approved">{t("Đã xác nhận")}</option><option value="rejected">{t("Đã từ chối")}</option><option value="all">{t("Tất cả đề xuất")}</option></select></label><button className="booth-button secondary compact" type="button" disabled={loading||busy} onClick={()=>setRevision((value)=>value+1)}>{t("Tải lại")}</button></div>}
+    {!editing && <AdminExportButton href={`/api/booths/admin/proposals/export?position=${position.id}&status=${status}`} label={t("Xuất Excel vị trí này")} />}
     {notice && <div className="booth-alert" role="status">{t(notice)}</div>}{(actionError || error) && <div className="booth-alert error" role="alert">{t(actionError || error)}</div>}
     {loading ? <p role="status">{t("Đang tải đề xuất của")} {position.code}…</p> : editing && item ? <BoothEditor key={`${item.id}:${item.updated_at}`} proposal={item} positions={positions} onSaved={saved} onCancel={()=>{setEditing(false);setRevision((value)=>value+1);}} /> : <>
       {!items.length ? <div className="booth-alert">{t("Chưa có đề xuất trong bộ lọc này.")}{position.is_booked && status!=="approved" && <button type="button" onClick={()=>{setStatus("approved");setPage(1);}}>{t("Xem gian hàng đã chốt")}</button>}</div> : <>

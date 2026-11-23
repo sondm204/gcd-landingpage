@@ -42,6 +42,8 @@ try {
   run("psql", [...connection, "--single-transaction", "-f", resolve("db/tests/games.sql")]);
   run("psql", [...connection, "--single-transaction", "-f", resolve("db/tests/passports.sql")]);
   run("psql", [...connection, "--single-transaction", "-f", resolve("db/tests/position-locks.sql")]);
+  run("psql", [...connection, "--single-transaction", "-f", resolve("db/tests/registrations.sql")]);
+  console.log("PASS: private event registrations, JCI chapter requirements, duplicate contacts, dates and idempotent retries.");
   console.log("PASS: admin-only booking locks, preserved proposals, idempotent lock auditing, blocked approval/moves and unlock recovery.");
   const locker = spawn(join(bin,"psql"+ext), [...connection,"-At","-c","begin; select public.set_booth_position_lock(16::smallint,true,'11111111-1111-4111-8111-111111111111'); select 'LOCK_HELD'; select pg_sleep(1); commit;"], {windowsHide:true});
   let lockOutput="", lockErrors="";

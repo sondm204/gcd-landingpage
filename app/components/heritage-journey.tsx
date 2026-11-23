@@ -331,13 +331,12 @@ export default function HeritageJourney() {
               <em>{t("Bước tới một thế giới rộng hơn.")}</em>
             </h2>
             <p data-reveal data-reveal-delay="130">{t("Một góc nhìn mới, một kết nối mới, một việc bạn muốn bắt đầu — bạn sẽ mang điều gì từ hôm nay vào tương lai?")}</p>
-            <button
+            <Link href="/register"
               className="button button-red"
               data-reveal
               data-reveal-delay="200"
-              onClick={() => setModal("passport")}
-            >{t("Bắt đầu hành trình của bạn")} <Arrow />
-            </button>
+            >{t("Đăng ký tham gia sự kiện")} <Arrow />
+            </Link>
             <div className="event-status" data-reveal data-reveal-delay="260">
               <span className="live-dot" /> {event.date} · {event.venue}
             </div>
@@ -447,7 +446,7 @@ export default function HeritageJourney() {
                   </label>
                 ))}
               </div>
-              <div className="dialog-notice">{t("Sự kiện đang được chuẩn bị. Lưu hành trình là một lời hẹn cá nhân, chưa phải đăng ký tham dự. Hẹn bạn")} {event.date.toLowerCase()} {t("tại")} {event.venue}{t(". Hình thức đăng ký tham dự sẽ được công bố sau.")}</div>
+              <div className="dialog-notice">{t("Đây là lịch trình cá nhân, chưa phải đăng ký tham dự. Vui lòng đăng ký qua biểu mẫu trên trang đăng ký sự kiện.")} <Link href="/register">{t("Đăng ký tham gia sự kiện")}</Link></div>
               <div className="dialog-actions">
                 <button
                   className="button button-red"

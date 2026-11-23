@@ -47,11 +47,8 @@ function HeaderContent({ pathname }: { pathname: string }) {
         <HomeLink className={home ? "active" : undefined} aria-current={home ? "page" : undefined}>{t("Trang chủ")}</HomeLink>
         <Link href="/booths" className={booths ? "active" : undefined} aria-current={pathname === "/booths" ? "page" : undefined}>{t("Gian hàng")}</Link>
         <Link href="/game" className={game ? "active" : undefined} aria-current={pathname === "/game" ? "page" : undefined}>{t("Hộ chiếu Di sản")}</Link>
-        {booths && <BoothAccount />}
-        {home ? <button className="nav-cta" onClick={() => {
-          setMenuOpen(false);
-          window.dispatchEvent(new Event("open-heritage-passport"));
-        }}>{t("Hẹn một chuyến đi")} <Arrow /></button> : <Link href="/#loi-hen" className="nav-cta">{t("Hẹn một chuyến đi")} <Arrow /></Link>}
+        {(booths || pathname.startsWith("/register/admin")) && <BoothAccount />}
+        <Link href="/register" className="nav-cta" aria-current={pathname === "/register" ? "page" : undefined}>{t("Hẹn một chuyến đi")} <Arrow /></Link>
       </nav>
       <LanguageSwitch />
       <button ref={toggleRef} className="menu-toggle" aria-label={menuOpen ? t("Đóng menu") : t("Mở menu")} aria-expanded={menuOpen} aria-controls="site-navigation" onClick={() => setMenuOpen(!menuOpen)}>{menuOpen ? "✕" : "☰"}</button>
