@@ -60,7 +60,7 @@ pnpm test:booths:app
 
 Kiểm thử gian hàng dùng Chrome và Supabase giả lập cục bộ: gửi đề xuất, upload, đăng nhập, duyệt, chỉnh sửa/đổi vị trí, đăng xuất và responsive. Không ghi dữ liệu vào Supabase thật.
 
-Khi đổi nhận diện trang chủ, kiểm tra thêm ở 320–1440px: hero/wordmark, mây mở đầu, điều hướng mobile, dialog lưu hành trình, carousel khách mời 10 giây và nút chuyển thủ công, nhà tài trợ, mô hình 3D, footer và hai ảnh preview. Bộ `tests/journey.spec.ts` còn các kịch bản của hero/3D phiên bản cũ; cần cập nhật các kịch bản đó trước khi dùng `pnpm test:e2e` làm điều kiện phát hành.
+Khi đổi nhận diện trang chủ, kiểm tra thêm ở 320–1440px: hero/wordmark, mây mở đầu, điều hướng mobile, dialog lưu hành trình, carousel khách mời 10 giây và nút chuyển thủ công, nhà tài trợ, mô hình 3D, footer và hai ảnh preview. Chạy `pnpm exec playwright test tests/journey.spec.ts tests/i18n.spec.ts tests/sketchfab.spec.ts` để kiểm tra hành trình, responsive, VI/EN và điều khiển 3D. Phân tích UI/UX và lý do chọn thiết kế nằm tại [docs/ui-ux-review.md](docs/ui-ux-review.md); quy chuẩn triển khai tại [design.md](design.md).
 
 Ảnh QA xuất vào `test-results/` (không commit). Nếu máy chưa có Google Chrome, cài Chrome hoặc chỉnh `channel` trong `playwright.config.ts` sang trình duyệt Chromium có sẵn.
 

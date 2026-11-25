@@ -1,71 +1,57 @@
 # Design system — Global Citizens Day 2026
 
-## Nhận diện hiện tại
+Hướng thiết kế: **Hành trình di sản đương đại**. Lấy artwork The Heritage Odyssey làm điểm nhớ, dùng đường hành trình và minh họa di sản để kết nối nội dung. Những khu vực người dùng nhập dữ liệu hoặc quản lý hồ sơ có bề mặt rõ, ít trang trí.
 
-Thiết kế theo key visual **The Heritage Odyssey** trong `public/keyvisual/`. Chủ đề **Vietnam Roots – Global Minds** kết nối di sản Việt Nam với tư duy công dân toàn cầu. Ngôn ngữ thị giác: địa cầu xanh, dải lụa vàng, ánh bình minh và các đường nét kiến trúc Việt Nam.
+Phân tích toàn bộ nhóm giao diện, wireframe và lý do chọn thiết kế nằm tại [docs/ui-ux-review.md](docs/ui-ux-review.md).
 
-Thông tin dùng chung tại `lib/event.ts`: **Chủ nhật, 29/11/2026**, **Học viện Thanh thiếu niên Việt Nam**, **Số 3 Chùa Láng, Phường Láng, Hà Nội**, lấy từ poster `3.png`. Khi đổi thông tin, cập nhật cả cấu hình và poster dùng cho link preview.
-
-## Màu sắc
+## Nhận diện và màu
 
 | Token | Giá trị | Vai trò |
 | --- | --- | --- |
-| `--paper` | `#f7faff` | Nền trắng xanh |
-| `--surface` | `#ffffff` | Thẻ, form, nền logo |
-| `--ink`, `--navy` | `#08275c` | Chữ chính, nhận diện |
-| `--royal` | `#125ac4` | CTA, liên kết, trạng thái đang chọn |
-| `--sky` | `#eaf3ff` | Nền phụ, thẻ thông tin |
-| `--gold` | `#c18b2a` | Viền, điểm dừng, trang trí |
-| `--gold-light` | `#ffe2a0` | Chữ và họa tiết trên nền tối |
-| `--heritage-red` | `#9d1519` | Năm 2026 và Vietnam Roots ở hero |
-| `--muted` | `#596b88` | Nội dung phụ |
-| `--line` | `#cbd9ec` | Viền và phân cách |
+| `--paper` | `#F3F7FC` | Nền ứng dụng |
+| `--surface` | `#FFFFFF` | Form, panel và nền logo |
+| `--ink`, `--navy` | `#08275C` | Chữ chính, di sản 3D và footer |
+| `--royal` | `#125AC4` | CTA, liên kết và lựa chọn |
+| `--teal` | `#087E8B` | Giá trị văn hóa, hoạt động song song |
+| `--gold` | `#C18B2A` | Dải lụa, mốc hành trình và trang trí |
+| `--gold-light` | `#FFE2A0` | Chi tiết trên nền tối |
+| `--muted` | `#526783` | Chữ phụ |
+| `--line` | `#CBD9EC` | Phân cách, viền control |
 
-`--red` là tên token kế thừa, hiện trỏ tới xanh royal để giữ tương thích. Không dùng token này cho lỗi và thao tác nguy hiểm; các trạng thái này giữ màu đỏ riêng. Màu gốc của logo, ảnh khách mời và hiện vật 3D được giữ nguyên.
+`--red` là alias tương thích của xanh CTA. Lỗi, thao tác nguy hiểm, thanh toán và trạng thái nghiệp vụ tiếp tục có màu ngữ nghĩa riêng. Không thay màu bản đồ gian hàng hoặc nhận diện gốc của logo, chân dung và hiện vật.
 
-## Typography
+## Typography và khoảng cách
 
-- **Playfair Display** (`--font-display`): tiêu đề serif theo tinh thần poster, chữ nghiêng ở câu dẫn; kích thước co giãn bằng `clamp()`.
-- **Be Vietnam Pro** (`--font-body`): nội dung, form, điều hướng và lịch trình; ưu tiên dễ đọc và khoảng cách dòng thoáng.
-- Cả hai hỗ trợ tiếng Việt, được lưu tại `public/fonts/` và khai báo trong `app/fonts.css`, không tải từ Google khi dev/build. Giấy phép OFL đi kèm tài sản font.
-- Wordmark **The Heritage Odyssey** dùng artwork gốc. Tiêu đề, slogan, ngày và địa điểm vẫn là HTML có thể đọc/chọn.
+- **Be Vietnam Pro** cho nội dung, điều hướng, label, form và dữ liệu. **Playfair Display** cho các tiêu đề di sản. Cả hai lưu tại `public/fonts/`, hỗ trợ tiếng Việt và không cần mạng khi build.
+- Body 16px, control 14–16px, thông tin phụ 13px. Nhãn dùng sentence case; chữ hoa trong artwork và logo được giữ nguyên.
+- Tiêu đề co giãn bằng `clamp()`, không đổi màu/nghiêng một nửa tiêu đề trên mọi section. Giới hạn mô tả khoảng 60–70 ký tự mỗi dòng.
+- Lưới nội dung tối đa 1280px; gutter 20px mobile và 6vw desktop. Khoảng cách theo 4/8/12/16/24/32/48/64/96.
+- Control bo 8px, panel 16px, sân khấu lớn 20–24px. Chỉ tag/trạng thái dùng pill. Không dùng chung một lớp shadow cho mọi thẻ.
 
-## Hình ảnh
+## Cấu trúc trải nghiệm
 
-| Tài sản | Vai trò |
-| --- | --- |
-| `public/keyvisual/1.png` | Hero toàn màn hình, nền lời mời và banner gian hàng |
-| `public/keyvisual/3.png` | Poster đầy đủ, ảnh Open Graph/Twitter 1200×630 |
-| `public/keyvisual/4.png` | Wordmark, lấy vùng chữ bằng SVG viewBox trong `heritage-lockup.tsx` |
-| `public/images/intro-cloud.webp` | Mây tan khi vào trang |
-| `public/images/logo_*.png` | Logo chương trình trên nền trắng |
-| `public/images/ns_xuanbac.png`, `km_hoangthuylinh.png` | Khách mời |
-| `public/images/sponsors/` | Logo và media nhà tài trợ |
+- Header có CTA rõ “Đăng ký tham gia sự kiện”, VI/EN, trạng thái trang và menu mobile hỗ trợ Escape/focus.
+- Hero cao `100dvh`, giữ artwork/video gốc, mây mở đầu và nội dung HTML cho trình đọc màn hình. Ngày, địa điểm và CTA luôn thuộc bố cục nội dung; màn hình thấp có thể cuộn vùng nội dung.
+- Ngay sau hero là lối tắt đến ba chương trình và Hộ chiếu Di sản. Nội dung trải nghiệm đi trước phần giới thiệu tổ chức.
+- Ba trạm giữ minh họa làng nghề, tranh biện và workshop; tuyến lụa là thiết bị kể chuyện chính. Các giá trị tư duy song song không có số thứ tự.
+- Di sản 3D dùng nền navy, giữ đủ mô hình và điều khiển Sketchfab. Lịch trình dùng bề mặt trắng, ưu tiên giờ và hoạt động, phân biệt hoạt động song song bằng nhãn lẫn màu.
+- Khách mời giữ carousel, ảnh và nội dung; nhà tài trợ giữ màu logo gốc thay vì chỉ hiện màu khi hover.
+- Trang đăng ký đặt ngữ cảnh sự kiện cạnh form trên desktop và phía trên form trên mobile. Dùng dữ liệu chung trong `lib/event.ts`; không hardcode ngày/địa điểm vào component.
+- Gian hàng giữ bản đồ, trạng thái, hồ sơ và thanh toán; hướng dẫn khu vực có thể mở rộng trên mobile để không đẩy bản đồ xuống quá xa.
+- Lobby, tài khoản, hộ chiếu QR, bảng điểm và quản trị thừa hưởng thang chữ/control. Không đổi hình học canvas hoặc cơ chế của năm mini-game.
+- Nút “Lưu hành trình” mở tiện ích chọn trạm, lưu trên thiết bị và tải `.txt`. Đây là lịch trình cá nhân, độc lập với form đăng ký tham dự.
 
-Wordmark dùng `mix-blend-mode: multiply` để hòa nền trắng vào artwork. Không tạo stacking context ở `.hero-copy`, nếu không nền trắng sẽ xuất hiện trở lại. Giữ nguyên ảnh gốc trong `keyvisual/`.
+## Tương tác và accessibility
 
-## Các khu vực
+Giữ video, mây, reveal và carousel hiện có. Giảm lớp ambient trang trí, tránh chuyển động nhảy thẻ khi hover. `prefers-reduced-motion` tắt chuyển động trang trí, cuộn mượt và transition không cần thiết. Điều khiển có focus rõ, vùng bấm chính từ 44–48px. Các vùng bảng/form dài có scrollbar để nhận biết khả năng cuộn.
 
-- **Hero:** cao đúng `100dvh` theo vùng hiển thị hiện tại của thiết bị (fallback `100vh`), không đặt chiều cao tối thiểu cố định. Chữ, wordmark và khoảng cách co giãn theo cả chiều rộng và chiều cao; dành khoảng riêng cho header và gợi ý cuộn. Điện thoại xoay ngang dùng bố cục hai cột. Khung nội dung có thể cuộn khi người dùng tăng cỡ chữ lớn hoặc màn hình quá nhỏ. Nền tràn khung, chữ navy và wordmark vàng ở trái/giữa, địa cầu ở phải; mobile có lớp phủ sáng để dễ đọc.
-- **Hành trình:** nền sáng, đường nối xanh–vàng, số trạm navy, minh họa CSS/SVG cùng bảng màu. Giữ cấu trúc kể chuyện và điều hướng khi cuộn.
-- **Di sản 3D:** nền navy đậm, chữ sáng, nút chọn vàng/xanh. Sketchfab giữ xoay, zoom và thông tin tác giả.
-- **Timeline:** nền xanh nhạt, đường dọc mảnh, mốc vàng; chương trình nổi bật có chấm xanh và chữ đậm. Hoạt động song song có nền riêng.
-- **Khách mời:** sân khấu dùng chung xanh–vàng; chỉ chân dung luân chuyển, người phía sau xám. Nút trước/sau dưới mô tả; tự chuyển 10 giây khi hiển thị.
-- **Nhà tài trợ:** thẻ logo trắng, xám khi bình thường, màu gốc khi hover/focus; media trên nền navy. Giữ slideshow và điều khiển thủ công.
-- **Lời mời/footer:** lặp artwork để khép hành trình; footer navy, chữ vàng nhạt, logo trên nền trắng. Hộ chiếu là lịch trình cá nhân trên thiết bị, không phải vé tham dự.
-- **`/booths` và quản trị:** banner cùng artwork; thẻ trắng, viền xanh nhạt, góc bo 5–14px. Bản đồ: trống trắng, có đề xuất vàng, đã chốt navy, đang chọn xanh royal. Trạng thái có nhãn, không chỉ dựa vào màu. Form, popup tài khoản, đăng nhập và dialog duyệt cùng bảng màu.
+## Triển khai và kiểm tra
 
-## Chuyển động và responsive
+- `app/globals.css`: nền tảng, hình học minh họa và tương tác.
+- `app/keyvisual.css`: nhận diện kế thừa từ artwork.
+- `app/ui-system.css`: token và quy tắc trình bày dùng chung, nạp sau các stylesheet nhận diện; selector giới hạn theo component để giữ hình học game/bản đồ.
+- Các stylesheet riêng giữ cấu trúc, trạng thái và responsive của từng tính năng.
+- `tests/journey.spec.ts`: hero ở 320–1440px và landscape, lối tắt, menu mobile, dialog/focus, lưu/tải lịch trình, selector 3D và reduced motion.
+- `tests/i18n.spec.ts`, `tests/sketchfab.spec.ts` và các script kiểm thử ứng dụng xác minh ngôn ngữ, điều khiển mô hình và nghiệp vụ với transport giả lập.
 
-Giữ mây mở đầu, float-in khi cuộn, ticker, carousel và hover. Hero có quỹ đạo ánh sáng và điểm sáng chuyển động nhẹ theo địa cầu. Ambient dừng khi hero ngoài màn hình hoặc tab bị ẩn; `prefers-reduced-motion` tắt animation trang trí. Nhiều cột chuyển sang luồng dọc trên điện thoại. Giữ focus bàn phím rõ và nội dung đọc được khi giảm chuyển động.
-
-## Nguồn triển khai
-
-- `app/globals.css`: tokens, layout và tương tác nền tảng.
-- `app/keyvisual.css`: nhận diện chung cho các section.
-- `app/hero.css`: hero, mây và hiệu ứng địa cầu.
-- `app/global-mind.css`, `app/event-program.css`, `app/sponsors.css`: layout từng section.
-- `app/booths/booths.css`, `app/booths/booths-keyvisual.css`: đặt gian hàng và quản trị.
-- `app/opengraph-image.tsx`, `app/twitter-image.tsx`, `lib/site-metadata.ts`: link preview.
-
-Định hướng cũ lưu như lịch sử tại `docs/art-direction.md`; tài liệu này và key visual hiện tại được ưu tiên khi có mâu thuẫn.
+Thông tin sự kiện hiện tại luôn lấy từ `lib/event.ts`. Artwork và tài liệu cũ có thể còn ngày/địa điểm khác; không lấy thông tin logistics bằng cách suy luận từ ảnh. Mọi thay đổi lịch sự kiện là công việc nội dung riêng.

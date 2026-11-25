@@ -29,7 +29,7 @@ try{
   let ready=false;for(let i=0;i<80;i++){try{if((await fetch(origin+'/en')).ok){ready=true;break;}}catch{}await new Promise(r=>setTimeout(r,200));}assert(ready,logs);
   browser=await chromium.launch({channel:'chrome',headless:true});const page=await browser.newPage({viewport:{width:390,height:844}}),errors=[];page.on('pageerror',e=>errors.push(e.message));
   await page.goto(origin+'/en');await expect(page.locator('.cloud-intro')).toHaveCount(0,{timeout:15000});
-  await expect(page.locator('#event-registration')).toHaveCount(0);await page.getByRole('button',{name:'Open menu',exact:true}).click();await page.getByRole('link',{name:'Plan your journey',exact:true}).click();await expect(page).toHaveURL(origin+'/en/register');
+  await expect(page.locator('#event-registration')).toHaveCount(0);await page.getByRole('button',{name:'Open menu',exact:true}).click();await page.locator('#site-navigation').getByRole('link',{name:'Register for the event',exact:true}).click();await expect(page).toHaveURL(origin+'/en/register');
   const form=page.locator('#event-registration form');await expect(form.locator('[name=full_name]')).toBeVisible();assert.equal((await page.request.get(origin+'/register')).status(),200);
   await expect(form.locator('[name=chapter]')).toHaveCount(0);await form.locator('[name=is_jci]').selectOption('yes');await expect(form.locator('[name=chapter]')).toHaveAttribute('required','');
   await form.locator('[name=is_jci]').selectOption('no');await expect(form.locator('[name=chapter]')).toHaveCount(0);

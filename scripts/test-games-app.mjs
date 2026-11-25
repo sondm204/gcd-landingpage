@@ -86,7 +86,7 @@ const backend=createServer(async(req,res)=>{
       }
     }
     const table=url.pathname.replace('/rest/v1/','');
-    const source={game_players:players,game_sessions:sessions,game_attempts:attempts,event_passport_stations:stations,booth_admins:[{user_id:adminId,active:true}]}[table];
+    const source={game_availability:['craft','print','rhythm','place','postcard'].map(game=>({game,is_open:true})),game_players:players,game_sessions:sessions,game_attempts:attempts,event_passport_stations:stations,booth_admins:[{user_id:adminId,active:true}]}[table];
     if(source){
       const matches=row=>[...url.searchParams].every(([field,value])=>['select','limit','order'].includes(field)||value.startsWith('eq.')&&String(row[field])===value.slice(3)||value.startsWith('gt.')&&String(row[field])>value.slice(3));
       const rows=source.filter(matches);

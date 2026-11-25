@@ -8,7 +8,6 @@ import { Link } from "@/i18n/navigation";
 import { usePathname } from "@/i18n/navigation";
 import { useEffect, useRef, useState } from "react";
 import BoothAccount from "../booths/components/booth-account";
-import { Arrow } from "./ornaments";
 import HomeLink from "./home-link";
 
 export default function SiteHeader() {
@@ -39,7 +38,7 @@ function HeaderContent({ pathname }: { pathname: string }) {
     }}>
       <HomeLink className="brand" aria-label={t("Global Citizens Day 2026 — Trang đầu")} onClick={() => setMenuOpen(false)}>
         <Image src="/keyvisual/logo.png" alt="Logo Global Citizens Day 2026" width={48} height={48} style={{ display: "block", objectFit: "contain", flexShrink: 0 }} />
-        <span className="brand-wordmark">GLOBAL CITIZENS DAY<small>THE HERITAGE ODYSSEY · 2026</small></span>
+        <span className="brand-wordmark">Global Citizens Day<small>The Heritage Odyssey 2026</small></span>
       </HomeLink>
       <nav id="site-navigation" className={menuOpen ? "main-nav open" : "main-nav"} aria-label={t("Điều hướng chính")} onClick={(event) => {
         if ((event.target as HTMLElement).closest("a")) setMenuOpen(false);
@@ -48,7 +47,7 @@ function HeaderContent({ pathname }: { pathname: string }) {
         <Link href="/booths" className={booths ? "active" : undefined} aria-current={pathname === "/booths" ? "page" : undefined}>{t("Gian hàng")}</Link>
         <Link href="/game" className={game ? "active" : undefined} aria-current={pathname === "/game" ? "page" : undefined}>{t("Hộ chiếu Di sản")}</Link>
         {(booths || game || pathname.startsWith("/register/admin")) && <BoothAccount />}
-        <Link href="/register" className="nav-cta" aria-current={pathname === "/register" ? "page" : undefined}>{t("Hẹn một chuyến đi")} <Arrow /></Link>
+        <Link href="/register" className="nav-cta" aria-current={pathname === "/register" ? "page" : undefined}>{t("Đăng ký tham gia sự kiện")}</Link>
       </nav>
       <LanguageSwitch />
       <button ref={toggleRef} className="menu-toggle" aria-label={menuOpen ? t("Đóng menu") : t("Mở menu")} aria-expanded={menuOpen} aria-controls="site-navigation" onClick={() => setMenuOpen(!menuOpen)}>{menuOpen ? "✕" : "☰"}</button>

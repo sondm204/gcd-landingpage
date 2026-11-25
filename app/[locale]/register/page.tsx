@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { getLocale } from "next-intl/server";
 import { Link } from "@/i18n/navigation";
 import EventRegistration from "@/app/components/event-registration";
+import RegistrationSummary from "@/app/components/registration-summary";
 
 export async function generateMetadata(): Promise<Metadata> {
   const en = (await getLocale()) === "en";
@@ -13,5 +14,5 @@ export async function generateMetadata(): Promise<Metadata> {
 
 export default async function RegisterPage() {
   const en = (await getLocale()) === "en";
-  return <main className="registration-page"><nav className="registration-page-nav"><Link href="/">{en ? "Back to the event" : "Về trang sự kiện"}</Link></nav><EventRegistration /></main>;
+  return <main className="registration-page"><nav className="registration-page-nav"><Link href="/">{en ? "Back to the event" : "Về trang sự kiện"}</Link></nav><div className="registration-layout"><RegistrationSummary /><EventRegistration /></div></main>;
 }
