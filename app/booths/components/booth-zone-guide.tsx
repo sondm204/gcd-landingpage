@@ -10,8 +10,8 @@ export default function BoothZoneGuide({ positions, selected, onSelect }: { posi
   return <section className="booth-zone-guide" aria-labelledby="booth-zones-title">
     <button type="button" className="booth-zone-toggle" aria-expanded={expanded} aria-controls="booth-zone-content" onClick={() => setExpanded(!expanded)}>{t("Chọn hình thức tham gia phù hợp.")}<span aria-hidden="true">{expanded ? "−" : "+"}</span></button>
     <div id="booth-zone-content" className="booth-zone-content" data-expanded={expanded}>
-    <div className="booth-zone-heading"><span className="booth-kicker">{t("4 nhóm vị trí")}</span><h2 id="booth-zones-title">{t("Chọn hình thức tham gia phù hợp.")}</h2><p>{t("Gian thương mại và tài trợ nhận đề xuất. Gian văn hoá đã có đơn vị phụ trách; gian BTC dành riêng cho hỗ trợ khách và đổi quà.")}</p></div>
-    <div className="booth-zone-grid">{BOOTH_ZONES.map((zone) => {
+    <div className="booth-zone-heading"><span className="booth-kicker">{t("boothGuideGroups")}</span><h2 id="booth-zones-title">{t("Chọn hình thức tham gia phù hợp.")}</h2><p>{t("boothGuideServiceNote")}</p></div>
+    <div className="booth-zone-grid">{BOOTH_ZONES.filter(zone=>zone.prefix !== "BTC").map((zone) => {
       const slots = positions.filter((position) => position.is_bookable && position.zone === zone.name);
       const available = slots.filter((position) => !position.is_booked && !position.is_locked);
       const active = zoneForPosition(selected)?.name === zone.name;
@@ -24,7 +24,7 @@ export default function BoothZoneGuide({ positions, selected, onSelect }: { posi
         <div className="booth-zone-card-action"><small>{!zone.bookable ? t("Đã bố trí · Không nhận đăng ký") : slots.length ? t("{v0}/{v1} gian đang nhận đề xuất", { v0: available.length, v1: zonePositionCount(zone.prefix) }) : t("Đang tải trạng thái")}</small>{zone.bookable && <button type="button" className="booth-button secondary compact" aria-pressed={active} onClick={() => onSelect(available[0]?.id ?? zone.firstId)}>{t("Chọn")} {t(zone.name).toLowerCase()} <span aria-hidden="true">↗</span></button>}</div>
       </article>;
     })}</div>
-    <p className="booth-gift-note"><strong>{t("Gian văn hoá đã được bố trí.")}</strong> {t("Vui lòng chọn gian thương mại hoặc tài trợ để gửi đề xuất. BTC01–BTC02 hỗ trợ khách; BTC03 phục vụ đổi quà.")}</p>
+    <p className="booth-gift-note"><strong>{t("Gian văn hoá đã được bố trí.")}</strong> {t("boothGuideServiceNote")}</p>
     </div>
   </section>;
 }
