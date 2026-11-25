@@ -38,7 +38,7 @@ button, input, select, textarea { font: inherit; }
 /* Navigation is a quiet frame around the key visual. */
 .site-header { height: 84px; padding-inline: 4%; gap: 20px; border-color: #d7e2ef; --header-background: #ffffffed; }
 .site-header-spacer { height: 84px; }
-.site-header.over-hero { --header-background: #f8fcffdf; --header-blur: 18px; border-color: #d9e5f2a6; }
+.site-header.over-hero { --header-background: rgb(247 250 255 / 25%); --header-blur: 14px; border-color: #fff9; }
 .site-header .brand { gap: 12px; flex-shrink: 0; }
 .site-header .brand-wordmark { font-size: 1rem; letter-spacing: -.025em; font-weight: 650; }
 .site-header .brand-wordmark small { font-size: .75rem; letter-spacing: .01em; margin-top: 5px; color: var(--muted); }
