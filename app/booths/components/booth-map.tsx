@@ -11,8 +11,8 @@ export default function BoothMap({ positions, selected, onSelect }: { positions:
   const [failedLogos, setFailedLogos] = useState<Set<string>>(() => new Set());
   const markerId = useId().replace(/:/g, "");
   return <div className="booth-map-card">
-    <div className="booth-map-top"><div><span className="booth-kicker">{t("MẶT BẰNG DỰ KIẾN · 40 VỊ TRÍ")}</span><h2>{t("Chọn gian thương mại hoặc tài trợ.")}</h2></div><div className="booth-map-tools"><button type="button" aria-label={t("Thu nhỏ sơ đồ")} disabled={zoom <= 1} onClick={() => setZoom(Math.max(1, zoom - .5))}>−</button><button type="button" aria-label={t("Đặt lại sơ đồ")} onClick={() => setZoom(1)}>⟲</button><button type="button" aria-label={t("Phóng to sơ đồ")} disabled={zoom >= 3} onClick={() => setZoom(Math.min(3, zoom + .5))}>+</button></div></div>
-    <div className="booth-map-viewport" tabIndex={0} aria-label={t("Sơ đồ 40 vị trí; phóng to và cuộn ngang để xem chi tiết")}>
+    <div className="booth-map-top"><div><span className="booth-kicker">{t("boothMapHeading")}</span><h2>{t("Chọn gian thương mại hoặc tài trợ.")}</h2></div><div className="booth-map-tools"><button type="button" aria-label={t("Thu nhỏ sơ đồ")} disabled={zoom <= 1} onClick={() => setZoom(Math.max(1, zoom - .5))}>−</button><button type="button" aria-label={t("Đặt lại sơ đồ")} onClick={() => setZoom(1)}>⟲</button><button type="button" aria-label={t("Phóng to sơ đồ")} disabled={zoom >= 3} onClick={() => setZoom(Math.min(3, zoom + .5))}>+</button></div></div>
+    <div className="booth-map-viewport" tabIndex={0} aria-label={t("boothMapViewport")}>
       <div className="booth-map-canvas" style={{ width: `${zoom * 100}%` }}>
         <svg viewBox="70 210 1510 1220" role="group" aria-label={t("Sơ đồ gian hàng Global Citizens Day")}>
           <defs>
@@ -27,10 +27,12 @@ export default function BoothMap({ positions, selected, onSelect }: { positions:
             <path d="M656 410V899M726 410V899" stroke="#e5b775" strokeWidth="2" />
           </g>
           <rect x="482" y="275" width="650" height="132" rx="20" fill="#153b55" />
-          <text x="807" y="340" textAnchor="middle" fontSize="36" fontWeight="700" fill="#fff">{t("HỘI TRƯỜNG")}</text>
+          <text x="807" y="320" textAnchor="middle" fontSize="36" fontWeight="700" fill="#fff">{t("HỘI TRƯỜNG")}</text>
           {[617,877].map((x,index)=><g key={x}><rect x={x} y="361" width="148" height="44" rx="10" fill="#e6f0f6" /><text x={x+74} y="390" textAnchor="middle" fill="#153b55" fontSize="23">{t("Cửa")} {index+1}</text></g>)}
-          <rect x="113" y="314" width="270" height="62" rx="12" fill="#e9f6f1" stroke="#bedfd7" />
-          <text x="248" y="353" textAnchor="middle" fontSize="23" fill="#087d73">Backdrop GCD</text>
+          <g role="img" aria-label="Backdrop GCD">
+            <rect x="768" y="346" width="106" height="59" rx="10" fill="#d9f0df" stroke="#bedfd7" />
+            <text x="821" y="370" textAnchor="middle" fontSize="19" fontWeight="600" fill="#153b55">Backdrop<tspan x="821" dy="24">GCD</tspan></text>
+          </g>
           <text x="117" y="433" fontSize="25" fontWeight="700" fill="#087d73">{t("TRẢI NGHIỆM VĂN HOÁ")}</text>
           <text x="770" y="505" fontSize="27" fontWeight="700" fill="#9a650e">{t("NHÀ TÀI TRỢ")}</text>
           <text x="335" y="582" textAnchor="middle" fontSize="21" fill="#087d73">{t("Khu chờ trải nghiệm")}</text>
@@ -38,9 +40,16 @@ export default function BoothMap({ positions, selected, onSelect }: { positions:
           <path d="M691 891V445" fill="none" stroke="#fff8eb" strokeWidth="5" markerEnd={`url(#${markerId}-carpet)`} />
           <text x="1440" y="890" textAnchor="middle" fontSize="27" fontWeight="700" fill="#087d73">{t("LỐI VÀO")}</text>
           <text x="691" y="927" textAnchor="middle" fontSize="18" fontWeight="600" fill="#a72f49">{t("THẢM ĐỎ · CỬA 1")}</text>
-          <text x="247" y="1130" textAnchor="middle" fontSize="22" fill="#793c91">{t("Khu chờ đổi quà")}</text>
+          <g role="img" aria-label={t("boothMapCheckin")}>
+            <rect x="1444" y="755" width="112" height="74" rx="12" fill="#fff0bd" stroke="#c18b2a" strokeWidth="2" />
+            <path d="M1489 771h22v21h-22zM1495 767v8M1505 767v8M1494 782l4 4 8-8" fill="none" stroke="#79500f" strokeWidth="3" />
+            <text x="1500" y="817" textAnchor="middle" fontSize="20" fontWeight="600" fill="#79500f">{t("boothMapCheckin")}</text>
+          </g>
           {positions.map((booth) => {
-            const x=booth.x*16, y=booth.y*16, w=booth.width*16, h=booth.height*16;
+            // Presentation-only changes: retain persisted IDs, booking state and history.
+            if (booth.code.startsWith("BTC")) return null;
+            const gift = booth.code === "TT06";
+            const x=gift ? 790 : booth.code === "TT07" ? 960 : booth.x*16, y=booth.y*16, w=gift ? 160 : booth.width*16, h=gift ? 66 : booth.height*16;
             if (!booth.is_bookable) {
               const organizer = booth.code.startsWith("BTC");
               const color = organizer ? "#793c91" : "#087d73";
@@ -53,28 +62,29 @@ export default function BoothMap({ positions, selected, onSelect }: { positions:
             }
             const status=booth.is_locked ? t("Tạm khóa đăng ký") : booth.is_booked ? t("Đã xác nhận") : booth.pending_count ? t("{v0} đề xuất, vẫn nhận thêm", { v0: booth.pending_count }) : t("Đang nhận đề xuất");
             const color=BOOTH_ZONES.find(z=>z.name===booth.zone)?.color;
-            const logo = booth.is_booked && booth.confirmed_logo_url && !failedLogos.has(booth.confirmed_logo_url) ? booth.confirmed_logo_url : null;
+            const logo = !gift && booth.is_booked && booth.confirmed_logo_url && !failedLogos.has(booth.confirmed_logo_url) ? booth.confirmed_logo_url : null;
             return <g key={booth.id} className={`booth-map-spot ${booth.is_booked ? "is-booked" : booth.pending_count ? "is-pending" : "is-open"} ${booth.is_locked ? "is-locked" : ""} ${selected===booth.id ? "is-selected" : ""}`} role="button" tabIndex={0} aria-label={`${booth.code} · ${booth.zone} — ${status}`} aria-pressed={selected===booth.id} onClick={()=>onSelect(booth.id)} onKeyDown={e=>{if(e.key==='Enter'||e.key===' '){e.preventDefault();onSelect(booth.id);}}}>
               <title>{booth.code}: {status}{booth.confirmed_brand ? ` · ${booth.confirmed_brand}` : ""}</title>
               <rect className="booth-map-spot-fill" x={x} y={y} width={w} height={h} rx="10" style={{ stroke: color, ...(selected===booth.id || booth.is_booked ? { fill: color } : {}) }} />
               {logo ? <g pointerEvents="none">
                 <defs><clipPath id={`${markerId}-logo-${booth.id}`}><rect x={x+1} y={y+1} width={w-2} height={h-2} rx="9" /></clipPath></defs>
                 <g clipPath={`url(#${markerId}-logo-${booth.id})`}><rect x={x+1} y={y+1} width={w-2} height={h-2} fill="#fff" /><image href={logo} x={x+1} y={y+1} width={w-2} height={h-2} preserveAspectRatio="xMidYMid meet" onError={() => setFailedLogos(previous => new Set(previous).add(logo))} /></g>
-              </g> : <text x={x+w/2} y={y+(booth.code === "TT07" || booth.code === "TT08" ? 25 : h/2+7)} textAnchor="middle" style={{ fontSize: 23, fill: selected===booth.id || booth.is_booked ? "#fff" : color }}>{booth.code}</text>}
-              {(booth.code === "TT07" || booth.code === "TT08") && <text x={x+w/2} y={y+h-9} textAnchor="middle" fontSize="17" fill={selected===booth.id || booth.is_booked ? "#fff" : color}>{booth.code === "TT07" ? t("Backdrop Trống Đồng") : t("Camera 360°")}</text>}
+              </g> : <text x={x+w/2} y={y+(gift || booth.code === "TT07" || booth.code === "TT08" ? 25 : h/2+7)} textAnchor="middle" style={{ fontSize: 23, fill: selected===booth.id || booth.is_booked ? "#fff" : color }}>{gift ? t("boothMapGift") : booth.code}</text>}
+              {gift && <text x={x+w/2} y={y+53} textAnchor="middle" style={{ fontSize: 23, fontWeight: 600, fill: selected===booth.id || booth.is_booked ? "#fff" : color }}>{t("boothMapGiftSecondLine")}</text>}
+              {(booth.code === "TT07" || booth.code === "TT08") && <text x={x+w/2} y={y+h-9} textAnchor="middle" style={{ fontSize: 17, fill: selected===booth.id || booth.is_booked ? "#fff" : color }}>{booth.code === "TT07" ? t("boothMapCultureBackdrop") : t("Camera 360°")}</text>}
               {booth.is_locked && <g transform={`translate(${x+w-18} ${y-7})`} pointerEvents="none" aria-hidden="true"><rect width="25" height="25" rx="6" fill="#495a71" /><rect x="7" y="11" width="11" height="9" rx="2" fill="#fff" /><path d="M9 11V8a3.5 3.5 0 0 1 7 0v3" fill="none" stroke="#fff" strokeWidth="2" /></g>}
               {selected===booth.id && <rect className="booth-map-spot-outline" x={x-4} y={y-4} width={w+8} height={h+8} rx="13" style={{ stroke: color }} />}
             </g>;
           })}
           <g fontSize="19" fontWeight="600">
-            {BOOTH_ZONES.map((zone,index)=><g key={t(zone.name)} transform={`translate(${117+index%3*480} ${index<3 ? 1300 : 1340})`}><rect y="-18" width="18" height="18" rx="3" fill={zone.background} stroke={zone.color} /><text x="28" fill={zone.color}>{zonePositionCount(zone.prefix)} {t(zone.name).toLowerCase()}</text></g>)}
+            {BOOTH_ZONES.filter(zone=>zone.prefix !== "BTC").map((zone,index)=><g key={t(zone.name)} transform={`translate(${117+index*480} 1300)`}><rect y="-18" width="18" height="18" rx="3" fill={zone.background} stroke={zone.color} /><text x="28" fill={zone.color}>{zonePositionCount(zone.prefix)} {t(zone.name).toLowerCase()}</text></g>)}
           </g>
           <path d="M120 1383H174" stroke="#087d73" strokeWidth="4" markerEnd={`url(#${markerId}-visit)`} /><text x="194" y="1390" fontSize="18" fill="#395b79">{t("Hướng tham quan gợi ý")}</text>
           <path d="M690 1383H744" stroke="#ad3650" strokeWidth="4" markerEnd={`url(#${markerId}-hall)`} /><text x="764" y="1390" fontSize="18" fill="#395b79">{t("Vào hội trường theo giờ")}</text>
         </svg>
       </div>
     </div>
-    <div className="booth-map-legend"><span><i className="open" />{t("Nhận đề xuất")}</span><span><i className="pending" />{t("Có đề xuất")}</span><span><i className="booked" />{t("Đã xác nhận")}</span><span><i className="locked" />{t("Tạm khóa đăng ký")}</span><span>{t("VH: đã bố trí · BTC: phục vụ sự kiện")}</span></div>
-    <p className="booth-map-note">{t("VH01–VH05 và 3 gian BTC đã bố trí, không nhận đăng ký. Bạn có thể chọn 24 gian thương mại hoặc 8 gian tài trợ. TT07 là Backdrop Trống Đồng; TT08 là Camera 360°. Sơ đồ đề xuất, không theo tỷ lệ; mặt bằng và lối đi được ban tổ chức xác nhận với địa điểm.")}</p>
+    <div className="booth-map-legend"><span><i className="open" />{t("Nhận đề xuất")}</span><span><i className="pending" />{t("Có đề xuất")}</span><span><i className="booked" />{t("Đã xác nhận")}</span><span><i className="locked" />{t("Tạm khóa đăng ký")}</span><span>{t("boothMapServices")}</span></div>
+    <p className="booth-map-note">{t("boothMapNote")}</p>
   </div>;
 }

@@ -15,7 +15,7 @@ test("mobile booth guidance can be expanded without obscuring booking", async ({
   await expect(page.locator("#booth-zone-content")).not.toBeVisible();
   await toggle.click();
   await expect(toggle).toHaveAttribute("aria-expanded", "true");
-  await expect(page.locator(".booth-zone-card")).toHaveCount(4);
+  await expect(page.locator(".booth-zone-card")).toHaveCount(3);
   await expect(page.locator("#booth-zone-content")).toBeVisible();
   await toggle.click();
   await expect(page.locator("#booth-zone-content")).not.toBeVisible();
