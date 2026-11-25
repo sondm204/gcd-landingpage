@@ -87,7 +87,7 @@ export default function SponsorsSection() {
     <section ref={sectionRef} id="nha-tai-tro" className="sponsors-section section-pad" aria-labelledby="sponsors-title">
       <div className="sponsors-heading">
         <div data-reveal>
-          <span className="eyebrow">{t("NHỮNG NGƯỜI BẠN ĐỒNG HÀNH")}</span>
+          <span className="eyebrow">{t("Những người bạn đồng hành")}</span>
           <h2 id="sponsors-title">{t("Di sản được nối dài")}<br />{t("bởi")} <em>{t("những bàn tay chung sức.")}</em></h2>
         </div>
         <p data-reveal data-reveal-delay="110">{t("Mỗi sự đồng hành mở thêm một lối để câu chuyện văn hóa Việt chạm đến nhiều người hơn.")}</p>

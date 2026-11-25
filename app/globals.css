@@ -28,21 +28,15 @@
   --font-sans: var(--font-body);
 }
 
-/* Hide scrollbar globally but keep scrolling */
-html,
-body,
-* {
-  scrollbar-width: none;
-  /* Firefox */
+/* Hide scrollbars while preserving wheel, touch and keyboard scrolling. */
+html, body, * {
+  scrollbar-width: none !important;
   -ms-overflow-style: none;
-  /* Legacy Edge/IE */
 }
-
-html::-webkit-scrollbar,
-body::-webkit-scrollbar,
 *::-webkit-scrollbar {
-  display: none;
-  /* Chrome, Safari, Edge */
+  display: none !important;
+  width: 0 !important;
+  height: 0 !important;
 }
 
 * {

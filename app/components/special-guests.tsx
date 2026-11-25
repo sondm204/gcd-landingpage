@@ -59,7 +59,7 @@ export default function SpecialGuests() {
   }
 
   return <section className="special-guests section-pad" id="khach-moi" aria-labelledby="guests-title">
-    <div className="guests-heading" data-reveal><div><span className="eyebrow">{t("KHÁCH MỜI ĐẶC BIỆT / SPECIAL GUESTS")}</span><h2 id="guests-title">{t("Những người kể chuyện.")}<br /><em>{t("Những góc nhìn mở.")}</em></h2></div><p>{t("Gặp gỡ những tiếng nói truyền cảm hứng, để nhìn bản sắc Việt bằng một tâm thế mới: tự tin, cởi mở và sẵn sàng kết nối với thế giới.")}</p></div>
+    <div className="guests-heading" data-reveal><div><span className="eyebrow">{t("Gặp gỡ khách mời")}</span><h2 id="guests-title">{t("Những người kể chuyện.")}<br /><em>{t("Những góc nhìn mở.")}</em></h2></div><p>{t("Gặp gỡ những tiếng nói truyền cảm hứng, để nhìn bản sắc Việt bằng một tâm thế mới: tự tin, cởi mở và sẵn sàng kết nối với thế giới.")}</p></div>
     <div ref={stage} className="guest-showcase guest-sliding-showcase" role="region" aria-roledescription="carousel" aria-label={t("Giới thiệu khách mời, tự chuyển mỗi 10 giây")} data-reveal>
       <div className="guest-carousel-layout">
         <div className="guest-visual">

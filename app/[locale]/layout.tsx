@@ -4,6 +4,7 @@ import "../fonts.css";
 import "../globals.css";
 import "../keyvisual.css";
 import "../program-logos.css";
+import "../ui-system.css";
 import { NextIntlClientProvider, hasLocale } from "next-intl";
 import { getMessages } from "next-intl/server";
 import { notFound } from "next/navigation";
