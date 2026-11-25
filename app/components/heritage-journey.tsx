@@ -166,6 +166,15 @@ export default function HeritageJourney() {
       <div className="reading-progress" aria-hidden="true" />
       <main>
         <HeroSection reducedMotion={reducedMotion} />
+        <nav className="journey-shortcuts section-pad" aria-label={t("Các điểm dừng")}>
+          {programs.map((program) => <a href={`#${program.id}`} key={program.id}>
+            <Sun />
+            <span><small>{t("Trạm")} {program.number}</small><strong>{program.type}</strong></span>
+          </a>)}
+          <Link className="journey-shortcut-passport" href="/game">
+            <Lotus /><span><small>Global Citizens Day</small><strong>{t("Hộ chiếu Di sản")}</strong></span>
+          </Link>
+        </nav>
         <div
           className="program-logos"
           aria-label={t("Các đơn vị chương trình")}
@@ -184,10 +193,9 @@ export default function HeritageJourney() {
             ))}
           </div>
         </div>
-        <OrganizerSection />
         <section className="introduction section-pad" id="hanh-trinh">
           <div className="intro-side" data-reveal>
-            <span className="eyebrow">{t("TỪ GỐC RỄ VIỆT ĐẾN TƯ DUY TOÀN CẦU")}</span>
+            <span className="eyebrow">{t("Từ gốc rễ Việt đến tư duy toàn cầu")}</span>
             <Sun />
             <span className="vertical-note">{t("MỖI BƯỚC ĐI, MỘT KẾT NỐI")}</span>
           </div>
@@ -209,7 +217,7 @@ export default function HeritageJourney() {
         </section>
         <GlobalMindSection />
         <div className="journey-heading section-pad">
-          <span className="eyebrow" data-reveal>{t("TRẢI NGHIỆM ĐỂ TRƯỞNG THÀNH")}</span>
+          <span className="eyebrow" data-reveal>{t("Trải nghiệm để trưởng thành")}</span>
           <h2 data-reveal data-reveal-delay="70">{t("Ba điểm dừng.")}<br />
             <em>{t("Mở rộng một tầm nhìn.")}</em>
           </h2>
@@ -247,7 +255,7 @@ export default function HeritageJourney() {
                 ) : (
                   <WorkshopArt />
                 )}
-                <span className="art-footnote">{t("TRẠM")} {program.number} / {program.short}
+                <span className="art-footnote">{t("Trạm")} {program.number} / {program.short}
                 </span>
               </div>
               <div className="station-copy">
@@ -291,7 +299,7 @@ export default function HeritageJourney() {
         >
           <div className="heritage-copy">
             <span className="eyebrow" data-reveal>
-              <span className="live-dot" /> {t("KHÔNG GIAN DI SẢN 3D")}</span>
+              <span className="live-dot" /> {t("Không gian di sản 3D")}</span>
             <h2 id="heritage-title" data-reveal data-reveal-delay="80">{t("Một góc nhìn mới.")}<br />
               <em>{t("Một niềm tự hào")}<br /> {t("rất cũ.")}</em>
             </h2>
@@ -321,22 +329,21 @@ export default function HeritageJourney() {
         </section>
         <EventSchedule />
         <SpecialGuests />
+        <OrganizerSection />
         <SponsorsSection />
         <section className="invitation section-pad" id="loi-hen">
           <Lantern className="invite-lantern left" />
           <Lantern className="invite-lantern right" />
           <div>
-            <span className="eyebrow" data-reveal>{t("TƯƠNG LAI BẮT ĐẦU TỪ BƯỚC ĐI CỦA BẠN")}</span>
+            <span className="eyebrow" data-reveal>{t("Tương lai bắt đầu từ bước đi của bạn")}</span>
             <h2 data-reveal data-reveal-delay="70">{t("Mang theo bản sắc.")}<br />
               <em>{t("Bước tới một thế giới rộng hơn.")}</em>
             </h2>
             <p data-reveal data-reveal-delay="130">{t("Một góc nhìn mới, một kết nối mới, một việc bạn muốn bắt đầu — bạn sẽ mang điều gì từ hôm nay vào tương lai?")}</p>
-            <Link href="/register"
-              className="button button-red"
-              data-reveal
-              data-reveal-delay="200"
-            >{t("Đăng ký tham gia sự kiện")} <Arrow />
-            </Link>
+            <div className="invitation-actions" data-reveal data-reveal-delay="200">
+              <Link href="/register" className="button button-red">{t("Đăng ký tham gia sự kiện")}</Link>
+              <button className="button button-secondary" type="button" onClick={() => setModal("passport")} aria-haspopup="dialog">{t("Lưu hành trình")}</button>
+            </div>
             <div className="event-status" data-reveal data-reveal-delay="260">
               <span className="live-dot" /> {event.date} · {event.venue}
             </div>
@@ -377,13 +384,13 @@ export default function HeritageJourney() {
       <nav className="journey-dots" aria-label={t("Các điểm dừng")}>
         {[
           ["khoi-hanh", t("Khởi hành")],
-          ["don-vi-to-chuc", t("Đơn vị tổ chức")],
           ["hoi-cho", t("Hội chợ")],
           ["tranh-bien", t("Tranh biện")],
           ["doi-thoai", "Workshop"],
           ["khong-gian", t("Di sản 3D")],
           ["lich-trinh", t("Lịch trình")],
           ["khach-moi", t("Khách mời")],
+          ["don-vi-to-chuc", t("Đơn vị tổ chức")],
           ["nha-tai-tro", t("Nhà tài trợ")],
           ["loi-hen", t("Đăng ký")],
         ].map(([id, label]) => (
@@ -474,7 +481,7 @@ export default function HeritageJourney() {
             </>
           ) : typeof modal === "number" ? (
             <>
-              <span className="eyebrow">{t("TRẠM")} {programs[modal].number} / {programs[modal].type}
+              <span className="eyebrow">{t("Trạm")} {programs[modal].number} / {programs[modal].type}
               </span>
               <h2 id="dialog-title">{programs[modal].short}</h2>
               <p>{programs[modal].detail}</p>

@@ -38,8 +38,7 @@
 .booth-map-top .booth-kicker { font-size: 9px; }
 .booth-map-tools { display: flex; gap: 5px; flex-shrink: 0; }
 .booth-map-tools button { width: 38px; height: 38px; background: transparent; color: var(--ink); font-size: 22px; border: 1px solid var(--line); }
-.booth-map-viewport { width: 100%; overflow: auto; scrollbar-width: thin !important; scrollbar-color: #a28c64 #e3ddcc; }
-.booth-map-viewport::-webkit-scrollbar { display: block; height: 8px; }
+.booth-map-viewport { width: 100%; overflow: auto; }
 .booth-map-canvas { min-width: 0; }
 .booth-map-canvas svg { display: block; width: 100%; }
 .booth-map-building { fill: #fff6e3; font-size: 16px; font-weight: 600; }
@@ -139,7 +138,7 @@
 .booth-map-column { min-width: 0; }
 .booth-admin-panel { min-width: 0; border: 1px solid var(--line); background: #ffffff; padding: 25px; }
 .booth-admin-panel .booth-admin-detail { border: 0; border-top: 1px solid var(--line); margin-top: 24px; padding: 23px 0 0; }
-.booth-admin-panel .booth-admin-list { max-height: 330px; overflow-y: auto; scrollbar-width: thin !important; }
+.booth-admin-panel .booth-admin-list { max-height: 330px; overflow-y: auto; }
 .booth-admin-panel .booth-admin-meta { gap: 18px; }
 .booth-position-filters { display: flex; gap: 12px; align-items: end; margin-bottom: 20px; }
 .booth-position-filters .booth-field { flex: 1; margin-bottom: 0; }

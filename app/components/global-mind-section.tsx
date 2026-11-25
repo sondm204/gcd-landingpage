@@ -38,7 +38,7 @@ export default function GlobalMindSection() {
     >
       <div className="global-mind-intro">
         <div data-reveal>
-          <span className="eyebrow">{t("TINH THẦN GLOBAL CITIZENS DAY 2026")}</span>
+          <span className="eyebrow">{t("Tinh thần Global Citizens Day 2026")}</span>
           <h2 id="global-mind-title">{t("Từ hiểu mình,")}<br />
             <em>{t("đến hiểu thế giới.")}</em>
           </h2>
@@ -72,14 +72,13 @@ export default function GlobalMindSection() {
             <br />
             <strong>GLOBAL MINDS</strong>
           </span>
-          <span className="global-orbit-note">{t("BẢN SẮC LÀ ĐIỂM TỰA. KẾT NỐI LÀ KHỞI ĐẦU.")}</span>
+          <span className="global-orbit-note">{t("Bản sắc là điểm tựa. Kết nối là khởi đầu.")}</span>
         </div>
       </div>
-      <ol className="global-pillars">
+      <ul className="global-pillars">
         {pillars.map((pillar, index) => (
           <li key={pillar.en} data-reveal data-reveal-delay={index * 60}>
             <div className="global-pillar-index">
-              <span>0{index + 1}</span>
               <span>{pillar.en}</span>
             </div>
             <h3>{pillar.name}</h3>
@@ -87,7 +86,7 @@ export default function GlobalMindSection() {
             <div className="global-pillar-question">{pillar.question}</div>
           </li>
         ))}
-      </ol>
+      </ul>
     </section>
   );
 }

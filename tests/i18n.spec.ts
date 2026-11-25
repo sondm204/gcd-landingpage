@@ -6,6 +6,23 @@ async function booths(page: Page, admin = false) {
   await page.route("**/api/booths/admin/session", route => route.fulfill({ json: { admin: admin ? { email: "admin@example.test" } : null } }));
 }
 
+test("mobile booth guidance can be expanded without obscuring booking", async ({ page }) => {
+  await booths(page);
+  await page.setViewportSize({ width: 390, height: 844 });
+  await page.goto("/en/booths");
+  const toggle = page.locator(".booth-zone-toggle");
+  await expect(toggle).toHaveAttribute("aria-expanded", "false");
+  await expect(page.locator("#booth-zone-content")).not.toBeVisible();
+  await toggle.click();
+  await expect(toggle).toHaveAttribute("aria-expanded", "true");
+  await expect(page.locator(".booth-zone-card")).toHaveCount(4);
+  await expect(page.locator("#booth-zone-content")).toBeVisible();
+  await toggle.click();
+  await expect(page.locator("#booth-zone-content")).not.toBeVisible();
+  await expect(page.locator(".booth-map-card")).toBeVisible();
+  expect(await page.evaluate(() => document.documentElement.scrollWidth)).toBe(390);
+});
+
 test("home switch preserves query and section and localizes SSR metadata", async ({ page }) => {
   const errors: string[] = []; page.on("pageerror", error => errors.push(error.message));
   await page.goto("/?campaign=test#lich-trinh");
