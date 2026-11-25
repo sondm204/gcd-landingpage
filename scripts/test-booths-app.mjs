@@ -153,7 +153,8 @@ try {
   await page.goto(`${origin}/booths`);
   await page.getByRole("button", { name: /^TM12 ·/ }).waitFor();
   assert.equal(await page.locator(".booth-map-spot").count(), 32);
-  assert.equal(await page.locator(".booth-map-service").count(), 8);
+  // BTC remains in historical/API data but is excluded from the public floor plan.
+  assert.equal(await page.locator(".booth-map-service").count(), 5);
   assert.equal(await page.getByLabel("Chọn nhanh vị trí").locator('option[value="26"]').count(), 0);
   for (const [zone, firstId, topic] of [["gian thương mại", "1", "sản phẩm"], ["gian tài trợ", "21", "nhà tài trợ"]]) {
     await page.getByRole("button", { name: `Chọn ${zone}` }).click();
