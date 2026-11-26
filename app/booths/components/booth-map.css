@@ -12,6 +12,16 @@
 .booth-wayfinding .booth-map-tools .booth-map-expand { width: auto; gap: 7px; padding: 0 12px; font-size: 14px; font-weight: 500; margin-left: 4px; }
 .booth-map-expand svg { width: 18px; height: 18px; }
 .booth-wayfinding .booth-map-help { font-size: 13px; color: #526783; line-height: 1.7; padding: 0 24px 18px; margin: 0; }
+.booth-map-view { display: flex; flex-wrap: wrap; gap: 6px; padding: 0 24px 10px; flex-shrink: 0; }
+.booth-map-view button { min-height: 44px; padding: 8px 14px; border: 1px solid #cbd9e5; border-radius: 8px; color: #153b55; background: #fff; font-size: 14px; }
+.booth-map-view button[aria-pressed="true"] { font-weight: 650; border-color: #153b55; color: #fff; background: #153b55; }
+.booth-map-illustration-note { font-weight: 600; color: #153b55; }
+.booth-photo-hall-signs { text-anchor: middle; fill: #153b55; font-weight: 700; }
+.booth-photo-floor-labels { paint-order: stroke; stroke: #fffffff0; stroke-width: 5px; stroke-linejoin: round; font-size: 25px; font-weight: 700; }
+.booth-wayfinding .is-photo .booth-plan-service-code { font-size: 19px; }
+.booth-wayfinding .is-photo .booth-plan-service-note { font-size: 13px; }
+.booth-wayfinding .is-photo .booth-map-spot.is-open:not(.is-locked):not(.is-selected) .booth-map-spot-fill { fill: #fbfdff; }
+.booth-wayfinding .is-photo .booth-map-spot[data-code="TT06"].is-open:not(.is-locked):not(.is-selected) .booth-map-spot-fill { fill: #fff3d5; }
 .booth-wayfinding .booth-map-viewport { background: #f5f8fc; border-block: 1px solid #e1e9f1; overscroll-behavior: contain; }
 .booth-wayfinding .booth-map-canvas { min-width: 0; }
 .booth-wayfinding .booth-plan-drawing { font-family: var(--font-body), Arial, sans-serif; width: 100%; height: auto; display: block; }
@@ -57,6 +67,7 @@
 .booth-wayfinding.is-expanded .booth-plan-zone-legend, .booth-wayfinding.is-expanded .booth-plan-route-legend, .booth-wayfinding.is-expanded .booth-map-legend, .booth-wayfinding.is-expanded .booth-map-note { display: none; }
 .booth-wayfinding.is-expanded .booth-map-selection { flex-shrink: 0; margin: 0; border-radius: 0; padding: 16px 24px; border-top: 1px solid #d8e3eb; }
 @media (max-width: 600px) {
+  .booth-map-view { padding-inline: 16px; }
   .booth-wayfinding .booth-map-top { padding: 18px 16px 10px; gap: 14px; }
   .booth-wayfinding .booth-map-title { flex-basis: 100%; }
   .booth-wayfinding .booth-map-top h2 { font-size: 19px; max-width: 28ch; }

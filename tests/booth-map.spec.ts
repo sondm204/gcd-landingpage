@@ -1,6 +1,6 @@
 import { test, expect } from "@playwright/test";
 import { conceptPositions } from "../lib/booths/types";
-import { boothMapBounds } from "../app/booths/components/booth-map-layout";
+import { boothMapBounds, boothPhotoBounds } from "../app/booths/components/booth-map-layout";
 
 test("display positions retain their groups and never overlap", () => {
   const positions = conceptPositions().filter(p => !p.code.startsWith("BTC"));
@@ -11,10 +11,16 @@ test("display positions retain their groups and never overlap", () => {
     expect(a.y + a.h).toBeLessThanOrEqual(1390);
     if (position.code.startsWith("VH")) expect(a.x + a.w).toBeLessThan(500);
     if (position.code.startsWith("TT")) expect(a.x).toBeGreaterThan(720);
+    const photo = boothPhotoBounds(position);
+    expect(photo.x + photo.w).toBeLessThanOrEqual(1448);
+    expect(photo.y + photo.h).toBeLessThanOrEqual(1086);
     for (const other of positions.slice(index + 1)) {
       const b = boothMapBounds(other);
       const overlaps = a.x < b.x + b.w && a.x + a.w > b.x && a.y < b.y + b.h && a.y + a.h > b.y;
       expect(overlaps, `${position.code} overlaps ${other.code}`).toBe(false);
+      const otherPhoto = boothPhotoBounds(other);
+      const photoOverlaps = photo.x < otherPhoto.x + otherPhoto.w && photo.x + photo.w > otherPhoto.x && photo.y < otherPhoto.y + otherPhoto.h && photo.y + photo.h > otherPhoto.y;
+      expect(photoOverlaps, `Photo: ${position.code} overlaps ${other.code}`).toBe(false);
     }
   }
 });
@@ -28,6 +34,9 @@ test.beforeEach(async ({ page }) => {
 test("map preserves booth selection and booking states", async ({ page }) => {
   await page.goto("/booths");
   const map = page.locator(".booth-wayfinding");
+  await expect(map.getByRole("button", { name: "Phối cảnh", exact: true })).toHaveAttribute("aria-pressed", "true");
+  const image = await page.request.get("/images/booth-venue-illustration.webp");
+  expect(image.ok()).toBe(true);
   await expect(map.locator(".booth-map-spot")).toHaveCount(32);
   await expect(map.locator(".booth-map-service")).toHaveCount(5);
   await expect(map.locator('g[data-code="TM03"]')).toHaveClass(/is-locked/);
@@ -40,6 +49,11 @@ test("map preserves booth selection and booking states", async ({ page }) => {
   await expect(page.locator(".booth-form-heading h2")).toHaveText("TM02");
   await expect(map.locator(".booth-map-selection")).toContainText("2 đề xuất");
   await map.locator(".booth-plan-drawing").screenshot({ path: "test-results/booth-wayfinding-desktop.png" });
+  await map.getByRole("button", { name: "Sơ đồ 2D", exact: true }).click();
+  await expect(map.locator(".booth-plan-drawing")).not.toHaveClass(/is-photo/);
+  await expect(map.locator('g[data-code="TM02"]')).toHaveAttribute("aria-pressed", "true");
+  await map.getByRole("button", { name: "Phối cảnh", exact: true }).click();
+  await expect(map.locator('g[data-code="TM02"]')).toHaveAttribute("aria-pressed", "true");
 });
 
 test("mobile expanded map supports zoom, selection, Escape and focus return", async ({ page }) => {
@@ -52,6 +66,7 @@ test("mobile expanded map supports zoom, selection, Escape and focus return", as
   await expect(dialog.locator(".booth-map-canvas")).toHaveCSS("min-width", "1080px");
   await dialog.getByRole("button", { name: "Phóng to sơ đồ", exact: true }).click();
   await expect(dialog.getByRole("button", { name: "Đặt lại sơ đồ", exact: true })).toHaveText("150%");
+  await expect(dialog.locator(".booth-map-canvas")).toHaveCSS("min-width", "1620px");
   await dialog.getByRole("button", { name: "Đặt lại sơ đồ", exact: true }).click();
   await dialog.locator('g[data-code="TT06"]').click();
   await expect(dialog.locator(".booth-map-selection")).toContainText("Gian đổi quà");
