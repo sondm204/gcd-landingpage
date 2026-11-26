@@ -2,19 +2,23 @@
 import { useCopy } from "@/i18n/copy";
 import { useEffect, useId, useRef, useState } from "react";
 import { BOOTH_ZONES, zonePositionCount, type BoothPosition } from "@/lib/booths/types";
-import { boothMapBounds } from "./booth-map-layout";
+import { boothMapBounds, boothPhotoBounds } from "./booth-map-layout";
+import BoothPhotoScene from "./booth-photo-scene";
 import "./booth-map.css";
 
 export default function BoothMap({ positions, selected, onSelect }: { positions: BoothPosition[]; selected: number; onSelect: (id: number) => void }) {
   const t = useCopy();
   const [zoom, setZoom] = useState(1);
   const [expanded, setExpanded] = useState(false);
+  const [showPhoto, setShowPhoto] = useState(true);
+  const [photoFailed, setPhotoFailed] = useState(false);
   const [failedLogos, setFailedLogos] = useState<Set<string>>(() => new Set());
   const dialogRef = useRef<HTMLDialogElement>(null);
   const expandButton = useRef<HTMLButtonElement>(null);
   const markerId = useId().replace(/:/g, "");
   const visiblePositions = positions.filter(booth => !booth.code.startsWith("BTC"));
   const selectedBooth = visiblePositions.find(booth => booth.id === selected);
+  const photo = showPhoto && !photoFailed;
   const label = (booth: BoothPosition) => booth.code === "TT06" ? t("boothGiftPosition") : booth.code;
   const status = (booth: BoothPosition) => booth.is_locked ? t("Tạm khóa đăng ký") : booth.is_booked ? t("Đã xác nhận") : booth.pending_count ? t("{v0} đề xuất, vẫn nhận thêm", { v0: booth.pending_count }) : t("Đang nhận đề xuất");
 
@@ -45,14 +49,19 @@ export default function BoothMap({ positions, selected, onSelect }: { positions:
         </button>
       </div>
     </div>
-    <p className="booth-map-help">{t(expanded ? "boothMapExpandedHelp" : "boothMapHelp")}</p>
+    {!photoFailed && <div className="booth-map-view" role="group" aria-label={t("boothMapViewLabel")}>
+      <button type="button" aria-pressed={photo} onClick={() => setShowPhoto(true)}>{t("boothMapPhotoView")}</button>
+      <button type="button" aria-pressed={!photo} onClick={() => setShowPhoto(false)}>{t("boothMapPlanView")}</button>
+    </div>}
+    <p className="booth-map-help">{photo && <span className="booth-map-illustration-note">{t("boothMapIllustration")} </span>}{t(expanded ? "boothMapExpandedHelp" : "boothMapHelp")}</p>
     <div className="booth-map-viewport" tabIndex={0} aria-label={t("boothMapViewport")}>
-      <div className="booth-map-canvas" style={{ width: `${zoom * 100}%` }}>
-        <svg className="booth-plan-drawing" viewBox="70 210 1510 1200" role="group" aria-label={t("Sơ đồ gian hàng Global Citizens Day")}>
+      <div className="booth-map-canvas" style={{ width: `${zoom * 100}%`, minWidth: expanded && photo ? 1080 * zoom : undefined }}>
+        <svg className={`booth-plan-drawing${photo ? " is-photo" : ""}`} viewBox={photo ? "0 0 1448 1086" : "70 210 1510 1200"} role="group" aria-label={t("Sơ đồ gian hàng Global Citizens Day")}>
           <defs>
             <marker id={`${markerId}-visit`} markerUnits="userSpaceOnUse" markerWidth="18" markerHeight="18" refX="14" refY="9" orient="auto"><path d="m2 2 12 7L2 16" fill="none" stroke="#087d73" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round" /></marker>
             <marker id={`${markerId}-carpet`} markerUnits="userSpaceOnUse" markerWidth="20" markerHeight="20" refX="15" refY="10" orient="auto"><path d="m3 3 12 7-12 7" fill="none" stroke="#fff" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round" /></marker>
           </defs>
+          {photo ? <BoothPhotoScene markerId={markerId} onImageError={() => setPhotoFailed(true)} /> : <>
           <rect x="88" y="225" width="1480" height="1165" rx="26" fill="#fff" stroke="#d8e3eb" strokeWidth="2" />
           <g className="booth-plan-culture-zone" aria-hidden="true">
             <rect x="102" y="425" width="390" height="355" rx="22" fill="#f0f8f5" />
@@ -85,14 +94,15 @@ export default function BoothMap({ positions, selected, onSelect }: { positions:
             <path d="M1494 851h24v22h-24zM1500 847v8M1512 847v8M1500 862l4 4 8-8" fill="none" stroke="#79500f" strokeWidth="2.5" strokeLinejoin="round" />
             <text x="1506" y="899" textAnchor="middle" className="booth-plan-checkin-label" fill="#79500f">{t("boothMapCheckin")}</text>
           </g>
+          </>}
           {visiblePositions.map(booth => {
-            const { x, y, w, h } = boothMapBounds(booth);
+            const { x, y, w, h } = photo ? boothPhotoBounds(booth) : boothMapBounds(booth);
             const color = BOOTH_ZONES.find(zone => zone.name === booth.zone)?.color || "#3452a1";
             if (!booth.is_bookable) return <g key={booth.id} className="booth-map-service" role="img" aria-label={t("{v0} · {v1} — Đã bố trí, không nhận đăng ký", { v0: booth.code, v1: t(booth.zone) })}>
               <title>{booth.code} {t("· Đã bố trí, không nhận đăng ký")}</title>
               <rect x={x} y={y} width={w} height={h} rx="12" fill="#fff" stroke={color} strokeWidth="2" />
-              <text x={x+w/2} y={y+31} textAnchor="middle" className="booth-plan-service-code" fill={color}>{booth.code}</text>
-              <text x={x+w/2} y={y+57} textAnchor="middle" className="booth-plan-service-note" fill="#39736a">{t("Điểm hỗ trợ")}</text>
+              <text x={x+w/2} y={photo ? y+17 : y+31} textAnchor="middle" className="booth-plan-service-code" fill={color}>{booth.code}</text>
+              <text x={x+w/2} y={photo ? y+h-7 : y+57} textAnchor="middle" className="booth-plan-service-note" fill="#39736a">{t("Điểm hỗ trợ")}</text>
             </g>;
             const active = selected === booth.id;
             const textColor = active || booth.is_booked ? "#fff" : color;
@@ -103,8 +113,8 @@ export default function BoothMap({ positions, selected, onSelect }: { positions:
               <title>{label(booth)}: {status(booth)}{booth.confirmed_brand ? ` · ${booth.confirmed_brand}` : ""}</title>
               <rect className="booth-map-spot-fill" x={x} y={y} width={w} height={h} rx="10" style={{ stroke: color, ...(active || booth.is_booked ? { fill: color } : gift ? { fill: "#fff3d5" } : {}) }} />
               {logo ? <g pointerEvents="none"><defs><clipPath id={`${markerId}-logo-${booth.id}`}><rect x={x+2} y={y+2} width={w-4} height={h-4} rx="8" /></clipPath></defs><g clipPath={`url(#${markerId}-logo-${booth.id})`}><rect x={x+2} y={y+2} width={w-4} height={h-4} fill="#fff" /><image href={logo} x={x+2} y={y+2} width={w-4} height={h-4} preserveAspectRatio="xMidYMid meet" onError={() => setFailedLogos(previous => new Set(previous).add(logo))} /></g></g> : <>
-                <text x={x+w/2} y={special ? y+29 : y+h/2+8} textAnchor="middle" style={{ fontSize: gift ? 20 : 24, fill: textColor, fontWeight: 650 }}>{gift ? "TT06" : booth.code}</text>
-                {special && <text x={x+w/2} y={y+h-18} textAnchor="middle" style={{ fontSize: gift ? 22 : 19, fill: textColor, fontWeight: gift ? 600 : 450 }}>{gift ? t("boothMapGiftName") : booth.code === "TT07" ? t("boothMapCultureBackdrop") : t("Camera 360°")}</text>}
+                <text x={x+w/2} y={special ? y+(photo ? 18 : 29) : y+h/2+(photo ? 7 : 8)} textAnchor="middle" style={{ fontSize: photo ? (special ? 18 : 22) : gift ? 20 : 24, fill: textColor, fontWeight: 650 }}>{booth.code}</text>
+                {special && <text x={x+w/2} y={y+h-(photo ? 7 : 18)} textAnchor="middle" style={{ fontSize: photo ? 16 : gift ? 22 : 19, fill: textColor, fontWeight: gift ? 600 : 450 }}>{gift ? t("boothMapGiftName") : booth.code === "TT07" ? t("boothMapCultureBackdrop") : t("Camera 360°")}</text>}
               </>}
               {(active || booth.is_booked) && <g aria-hidden="true" pointerEvents="none"><circle cx={x+w-3} cy={y+2} r="11" fill="#fff" stroke={color} strokeWidth="2" /><path d={`m${x+w-8} ${y+2} 3 3 6-6`} fill="none" stroke={color} strokeWidth="2" strokeLinecap="round" /></g>}
               {booth.is_locked && <g transform={`translate(${x+w-18} ${y-9})`} pointerEvents="none" aria-hidden="true"><rect width="25" height="25" rx="6" fill="#495a71" /><rect x="7" y="11" width="11" height="9" rx="2" fill="#fff" /><path d="M9 11V8a3.5 3.5 0 0 1 7 0v3" fill="none" stroke="#fff" strokeWidth="2" /></g>}
